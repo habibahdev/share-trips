@@ -1,0 +1,233 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - Share Trips{% endblock %}
+
+{% block body %}
+    <section class="bg-primary text-white p-5 mb-5"
+         style="background: linear-gradient(135deg, #059669, #0284c7) !important;">
+        <div class="row align-items-center">
+            <div class="col-md-6 mb-4 mb-md-0">
+                <h1 class="display-5 fw-bold mb-3">Voyagez ensemble, dépensez moins.</h1>
+                <p class="lead opacity-75">Trouvez ou proposez un covoiturage en quelques clics.</p>
+                <div class="d-flex gap-3">
+                    <a href="#" class="btn btn-light btn-lg px-4">
+                        Trouver un trajet
+                    </a>
+                    {% if app.user %}
+                        <a href="#" class="btn btn-outline-light btn-lg px-4">
+                            Proposer un trajet
+                        </a>
+                    {% else %}
+                        <a href="#" class="btn btn-outline-light btn-lg px-4">
+                            S'inscrire
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-6">
+                {# Formulaire de recherche #}
+                <div class="bg-white rounded-4 p-4 shadow">
+                    <form method="get" action="{{ path('app_home') }}">
+                        <div class="mb-3">
+                            <label class="form-label text-dark fw-semibold">
+                                <i class="bi bi-geo-alt me-1 text-primary"></i>Départ
+                            </label>
+                            <input type="text" name="origin" class="form-control"
+                                   placeholder="Ex : Paris" {#value="{{ origin }}"#}>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-dark fw-semibold">
+                                <i class="bi bi-geo me-1 text-primary"></i>Arrivée
+                            </label>
+                            <input type="text" name="destination" class="form-control"
+                                   placeholder="Ex : Lyon" {#value="{{ destination }}"#}>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-dark fw-semibold">
+                                <i class="bi bi-calendar me-1 text-primary"></i>Date
+                            </label>
+                            <input type="date" name="date" class="form-control" {#value="{{ date }}"#}>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                            <i class="bi bi-search me-2"></i>Rechercher
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="row text-center mb-5 g-4 my-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <div class="display-6 text-primary mb-2">🗺️</div>
+                <h4 class="fw-bold">Trajets variés</h4>
+                <p class="text-muted mb-0">Des centaines de destinations partout en France.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <div class="display-6 text-primary mb-2">💶</div>
+                <h4 class="fw-bold">Économique</h4>
+                <p class="text-muted mb-0">Partagez les frais et voyagez à moindre coût.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <div class="display-6 text-primary mb-2">🤝</div>
+                <h4 class="fw-bold">Communauté</h4>
+                <p class="text-muted mb-0">Des conducteurs et passagers vérifiés et bienveillants.</p>
+            </div>
+        </div>
+    </div>
+    {#
+    {% if not (origin or destination or date) %}
+        <div class="row text-center mb-5 g-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <div class="display-6 text-primary mb-2">🗺️</div>
+                    <h4 class="fw-bold">Trajets variés</h4>
+                    <p class="text-muted mb-0">Des centaines de destinations disponibles partout en France.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <div class="display-6 text-primary mb-2">💶</div>
+                    <h4 class="fw-bold">Économique</h4>
+                    <p class="text-muted mb-0">Partagez les frais et voyagez à moindre coût.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <div class="display-6 text-primary mb-2">🤝</div>
+                    <h4 class="fw-bold">Communauté</h4>
+                    <p class="text-muted mb-0">Des conducteurs et passagers vérifiés et bienveillants.</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        {% if origin or destination or date %}
+            <h2 class="h4 fw-bold mb-0">
+                <i class="bi bi-search me-2 text-primary"></i>Résultats de recherche
+            </h2>
+            <a href="{{ path('app_home') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-x me-1"></i>Réinitialiser
+            </a>
+        {% else %}
+            <h2 class="h4 fw-bold mb-0">
+                <i class="bi bi-clock me-2 text-primary"></i>Prochains trajets disponibles
+            </h2>
+            <a href="{{ path('app_trip_index') }}" class="btn btn-outline-primary btn-sm">
+                Voir tous les trajets <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        {% endif %}
+    </div>
+
+    {% if trips is empty %}
+        <div class="text-center py-5 text-muted">
+            <div class="display-4 mb-3">🔍</div>
+            <p class="fs-5">Aucun trajet trouvé pour ces critères.</p>
+            <a href="{{ path('app_home') }}" class="btn btn-primary">Voir tous les trajets</a>
+        </div>
+    {% else %} 
+        <div class="row g-4 mb-5">
+            {% for trip in trips %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-semibold">
+                                    {{ trip.origin }}
+                                </span>
+                                <i class="bi bi-arrow-right text-muted"></i>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-semibold">
+                                    {{ trip.destination }}
+                                </span>
+                            </div>
+
+                            <p class="text-muted small mb-1">
+                                <i class="bi bi-calendar2 me-1"></i>
+                                {{ trip.departureAt|date('d/m/Y à H:i') }}
+                            </p>
+                            <p class="text-muted small mb-1">
+                                <i class="bi bi-people me-1"></i>
+                                {{ trip.availableSeats }} place(s) disponible(s)
+                            </p>
+                            <p class="text-muted small mb-3">
+                                <i class="bi bi-person me-1"></i>
+                                {{ trip.driver.firstName }} {{ trip.driver.lastName }}
+                            </p>
+
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <span class="fs-5 fw-bold text-primary">
+                                    {{ trip.pricePerSeat }}€ <small class="text-muted fw-normal fs-6">/ place</small>
+                                </span>
+                                {% if app.user %}
+                                    <a href="{{ path('app_trip_show', {id: trip.id}) }}"
+                                       class="btn btn-primary btn-sm rounded-pill px-3">
+                                        Voir <i class="bi bi-arrow-right ms-1"></i>
+                                    </a>
+                                {% else %}
+                                    <a href="{{ path('app_login') }}"
+                                       class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                        Connexion
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    #}
+    {% if not app.user %}
+        <section class="row g-4 mt-2 mb-3">
+            <div class="col-md-6">
+                <div class="card border-0 rounded-4 p-4 h-100"
+                     style="background: linear-gradient(135deg, #eef2ff, #e0e7ff);">
+                    <h4 class="fw-bold text-primary text-center">Vous êtes conducteur ?</h4>
+                    <p class="text-muted">Publiez vos trajets, partagez vos frais et rencontrez de nouvelles personnes.</p>
+                    <a href="#" class="btn btn-primary mt-auto align-self-center">
+                        Créer un compte
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 rounded-4 p-4 h-100"
+                     style="background: linear-gradient(135deg, #f0fdf4, #dcfce7);">
+                    <h4 class="fw-bold text-success text-center">Vous êtes passager ?</h4>
+                    <p class="text-muted">Trouvez un trajet, réservez en quelques clics et voyagez sereinement.</p>
+                    <a href="#" class="btn btn-success mt-auto align-self-center">
+                        S'inscrire gratuitement
+                    </a>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+
+    <section class="bg-white py-5 border-top">
+        <div class="container">
+            <h2 class="h4 fw-bold text-center mb-5">Comment ça marche ?</h2>
+            <div class="row g-4 text-center">
+                <div class="col-md-4">
+                    <div class="fs-1 mb-3"><i class="ri-search-line"></i></div>
+                    <h5 class="fw-bold">1. Recherchez</h5>
+                    <p class="text-muted">Entrez votre ville de départ, d'arrivée et la date souhaitée.</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="fs-1 mb-3"><i class="ri-hand"></i></div>
+                    <h5 class="fw-bold">2. Réservez</h5>
+                    <p class="text-muted">Choisissez un trajet et réservez votre place en quelques secondes.</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="fs-1 mb-3"><i class="ri-space-ship-2-line"></i></div>
+                    <h5 class="fw-bold">3. Voyagez</h5>
+                    <p class="text-muted">Retrouvez le conducteur et profitez du trajet ensemble.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
