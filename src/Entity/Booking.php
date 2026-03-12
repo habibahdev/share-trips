@@ -4,12 +4,18 @@ namespace App\Entity;
 
 use App\Enum\BookingStatus;
 use App\Repository\BookingRepository;
+use App\Validator\AvailableSeats;
+use App\Validator\NotTripDriver;
+use App\Validator\TripOpen;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BookingRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\UniqueConstraint(fields: ['trip', 'passenger'])]
+#[NotTripDriver()]
+#[AvailableSeats()]
+#[TripOpen()]
 class Booking
 {
     #[ORM\Id]
