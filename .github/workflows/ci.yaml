@@ -20,7 +20,7 @@ jobs:
     name: Security Checker
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       - name: Run Security Checker
         run: |
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: security-checker
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       - name: Run PHPCS
         run: vendor/bin/phpcs
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: security-checker
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       # - name: Run PHPStan
       #   run: vendor/bin/phpstan analyse
@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: security-checker
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       - name: Run Twig Lint
         run: php bin/console lint:twig ./templates
@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [phpcs, phpstan, twig-lint]
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       - name: Run Unit Tests
         run: vendor/bin/phpunit
