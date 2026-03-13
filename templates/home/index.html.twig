@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil - Share Trips{% endblock %}
+{% block title %}Accueil - ShareTrips{% endblock %}
 
 {% block body %}
     <section class="bg-primary text-white p-5 mb-5"
@@ -18,7 +18,7 @@
                             Proposer un trajet
                         </a>
                     {% else %}
-                        <a href="#" class="btn btn-outline-light btn-lg px-4">
+                        <a href="{{ path('app_register') }}" class="btn btn-outline-light btn-lg px-4">
                             S'inscrire
                         </a>
                     {% endif %}
@@ -79,133 +79,62 @@
             </div>
         </div>
     </div>
-    {#
-    {% if not (origin or destination or date) %}
-        <div class="row text-center mb-5 g-4">
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm rounded-4 p-4">
-                    <div class="display-6 text-primary mb-2">🗺️</div>
-                    <h4 class="fw-bold">Trajets variés</h4>
-                    <p class="text-muted mb-0">Des centaines de destinations disponibles partout en France.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm rounded-4 p-4">
-                    <div class="display-6 text-primary mb-2">💶</div>
-                    <h4 class="fw-bold">Économique</h4>
-                    <p class="text-muted mb-0">Partagez les frais et voyagez à moindre coût.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm rounded-4 p-4">
-                    <div class="display-6 text-primary mb-2">🤝</div>
-                    <h4 class="fw-bold">Communauté</h4>
-                    <p class="text-muted mb-0">Des conducteurs et passagers vérifiés et bienveillants.</p>
-                </div>
-            </div>
-        </div>
-    {% endif %}
     
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        {% if origin or destination or date %}
-            <h2 class="h4 fw-bold mb-0">
-                <i class="bi bi-search me-2 text-primary"></i>Résultats de recherche
-            </h2>
-            <a href="{{ path('app_home') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-x me-1"></i>Réinitialiser
-            </a>
-        {% else %}
-            <h2 class="h4 fw-bold mb-0">
-                <i class="bi bi-clock me-2 text-primary"></i>Prochains trajets disponibles
-            </h2>
-            <a href="{{ path('app_trip_index') }}" class="btn btn-outline-primary btn-sm">
-                Voir tous les trajets <i class="bi bi-arrow-right ms-1"></i>
-            </a>
-        {% endif %}
-    </div>
+    <section class="py-5">
+        <div class="container">
+            <h2 class="h4 fw-bold mb-4">Prochains trajets disponibles</h2>
 
-    {% if trips is empty %}
-        <div class="text-center py-5 text-muted">
-            <div class="display-4 mb-3">🔍</div>
-            <p class="fs-5">Aucun trajet trouvé pour ces critères.</p>
-            <a href="{{ path('app_home') }}" class="btn btn-primary">Voir tous les trajets</a>
-        </div>
-    {% else %} 
-        <div class="row g-4 mb-5">
-            {% for trip in trips %}
-                <div class="col-md-6 col-lg-4">
-                    <div class="card border-0 shadow-sm rounded-4 h-100">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center gap-2 mb-3">
-                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-semibold">
-                                    {{ trip.origin }}
-                                </span>
-                                <i class="bi bi-arrow-right text-muted"></i>
-                                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-semibold">
-                                    {{ trip.destination }}
-                                </span>
-                            </div>
+            {% if nextTrips is empty %}
+                <div class="text-center text-muted py-5">
+                    <p class="fs-5">Aucun trajet disponible pour le moment.</p>
+                    {% if app.user %}
+                        <a href="#" class="btn btn-primary">Proposer le premier trajet</a>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="row g-4">
+                    {% for trip in nextTrips %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 shadow-sm border-0 hover-shadow">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="badge bg-success">{{ trip.availableSeats }} place{{ trip.availableSeats > 1 ? 's' : '' }}</span>
+                                        <span class="fw-bold text-primary fs-5">{{ trip.pricePerSeat }}€</span>
+                                    </div>
 
-                            <p class="text-muted small mb-1">
-                                <i class="bi bi-calendar2 me-1"></i>
-                                {{ trip.departureAt|date('d/m/Y à H:i') }}
-                            </p>
-                            <p class="text-muted small mb-1">
-                                <i class="bi bi-people me-1"></i>
-                                {{ trip.availableSeats }} place(s) disponible(s)
-                            </p>
-                            <p class="text-muted small mb-3">
-                                <i class="bi bi-person me-1"></i>
-                                {{ trip.driver.firstName }} {{ trip.driver.lastName }}
-                            </p>
+                                    <h5 class="card-title fw-bold">
+                                        {{ trip.origin }} → {{ trip.destination }}
+                                    </h5>
 
-                            <div class="d-flex justify-content-between align-items-center mt-auto">
-                                <span class="fs-5 fw-bold text-primary">
-                                    {{ trip.pricePerSeat }}€ <small class="text-muted fw-normal fs-6">/ place</small>
-                                </span>
-                                {% if app.user %}
-                                    <a href="{{ path('app_trip_show', {id: trip.id}) }}"
-                                       class="btn btn-primary btn-sm rounded-pill px-3">
-                                        Voir <i class="bi bi-arrow-right ms-1"></i>
-                                    </a>
-                                {% else %}
-                                    <a href="{{ path('app_login') }}"
-                                       class="btn btn-outline-primary btn-sm rounded-pill px-3">
-                                        Connexion
-                                    </a>
-                                {% endif %}
+                                    <p class="text-muted small mb-1">
+                                        📅 {{ trip.departureAt|date('d/m/Y à H:i') }}
+                                    </p>
+                                    <p class="text-muted small mb-3">
+                                        🚗 {{ trip.vehicle.brand }} {{ trip.vehicle.model }}
+                                    </p>
+
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <span class="text-muted small">
+                                            👤 {{ trip.driver.firstName }} {{ trip.driver.lastName }}
+                                        </span>
+                                        <a href="#" class="btn btn-outline-primary btn-sm">
+                                            Voir
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
+
+                <div class="text-center mt-4">
+                    <a href="#" class="btn btn-outline-primary">
+                        Voir tous les trajets →
+                    </a>
+                </div>
+            {% endif %}
         </div>
-    {% endif %}
-    #}
-    {% if not app.user %}
-        <section class="row g-4 mt-2 mb-3">
-            <div class="col-md-6">
-                <div class="card border-0 rounded-4 p-4 h-100"
-                     style="background: linear-gradient(135deg, #eef2ff, #e0e7ff);">
-                    <h4 class="fw-bold text-primary text-center">Vous êtes conducteur ?</h4>
-                    <p class="text-muted">Publiez vos trajets, partagez vos frais et rencontrez de nouvelles personnes.</p>
-                    <a href="#" class="btn btn-primary mt-auto align-self-center">
-                        Créer un compte
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card border-0 rounded-4 p-4 h-100"
-                     style="background: linear-gradient(135deg, #f0fdf4, #dcfce7);">
-                    <h4 class="fw-bold text-success text-center">Vous êtes passager ?</h4>
-                    <p class="text-muted">Trouvez un trajet, réservez en quelques clics et voyagez sereinement.</p>
-                    <a href="#" class="btn btn-success mt-auto align-self-center">
-                        S'inscrire gratuitement
-                    </a>
-                </div>
-            </div>
-        </section>
-    {% endif %}
+    </section>
 
 
     <section class="bg-white py-5 border-top">
