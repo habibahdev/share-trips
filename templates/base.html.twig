@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}Share Trips{% endblock %}</title>
+        <title>{% block title %}ShareTrips{% endblock %}</title>
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
@@ -16,13 +16,11 @@
 
         {% include "base/navbar.html.twig" %}
 
-        {% for type, messages in app.flashes %}
+        {% for label, messages in app.flashes %}
             {% for message in messages %}
                 <div class="alert alert-{{ label }} alert-dismissible fade show mb-0 rounded-0" role="alert">
-                    <div class="container">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             {% endfor %}
         {% endfor %}
