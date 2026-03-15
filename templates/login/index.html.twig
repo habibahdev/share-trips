@@ -1,7 +1,5 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Connexion - ShareTrips{% endblock %}
-
 {% block body %}
     <div class="container py-5">
         <div class="row justify-content-center">
@@ -27,10 +25,9 @@
                                 <label for="floatingPassword">Mot de passe</label>
                             </div>
 
-                            {# If you want to control the URL the user is redirected to on success
-                            <input type="hidden" name="_target_path" value="/account"> #}
+                            <input type="hidden" name="_target_path" value="{{ path('app_profile') }}">
 
-                            <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+                            <button type="submit" class="btn btn-primary w-100 btn-lg">Se connecter</button>
                         </form>
         
                     </div>

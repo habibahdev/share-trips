@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <a href="{{ path('app_profile_trip') }}" class="text-decoration-none text-muted small">
+                    ⬅️ Mes trajets
+                </a>
+
+                <h1 class="h3 fw-bold mt-1 mb-4">{{ title }}</h1>
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4">
+                        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Ville de départ</label>
+                                    {{ form_widget(form.origin, {'attr': {
+                                        'class': 'form-control' ~ (form.origin.vars.errors|length ? ' is-invalid' : ''),
+                                        'id': 'trip_origin',
+                                        'placeholder': 'Ex : Paris'
+                                    }}) }}
+                                    {{ form_errors(form.origin) }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Ville d'arrivée</label>
+                                    {{ form_widget(form.destination, {'attr': {
+                                        'class': 'form-control' ~ (form.destination.vars.errors|length ? ' is-invalid' : ''),
+                                        'id': 'trip_destination',
+                                        'placeholder': 'Ex : Lyon'
+                                    }}) }}
+                                    {{ form_errors(form.destination) }}
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label fw-medium">Date et heure de départ</label>
+                                    {{ form_widget(form.departureAt, {'attr': {
+                                        'class': 'form-control' ~ (form.departureAt.vars.errors|length ? ' is-invalid' : '')
+                                    }}) }}
+                                    {{ form_errors(form.departureAt) }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Places proposées</label>
+                                    {{ form_widget(form.availableSeats, {'attr': {
+                                        'class': 'form-control' ~ (form.availableSeats.vars.errors|length ? ' is-invalid' : ''),
+                                        'min': 1, 'max': 8
+                                    }}) }}
+                                    {{ form_errors(form.availableSeats) }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Prix / place (€)</label>
+                                    {{ form_widget(form.pricePerSeat, {'attr': {
+                                        'class': 'form-control' ~ (form.pricePerSeat.vars.errors|length ? ' is-invalid' : '')
+                                    }}) }}
+                                    {{ form_errors(form.pricePerSeat) }}
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label fw-medium">Véhicule</label>
+                                    {{ form_widget(form.vehicle, {'attr': {
+                                        'class': 'form-select' ~ (form.vehicle.vars.errors|length ? ' is-invalid' : '')
+                                    }}) }}
+                                    {{ form_errors(form.vehicle) }}
+                                    <div class="form-text">
+                                        <a href="{{ path('app_profile_vehicle_form') }}" target="_blank">
+                                            <i class="ri-add-line me-1"></i> Ajouter un véhicule
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary rounded-pill px-4">
+                                    {{ trip ? 'Enregistrer' : 'Publier le trajet' }}
+                                </button>
+                                <a href="{{ path('app_profile_trip') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                                    Annuler
+                                </a>
+                            </div>
+
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
