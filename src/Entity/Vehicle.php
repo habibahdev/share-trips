@@ -47,6 +47,11 @@ class Vehicle
         $this->trips = new ArrayCollection();
     }
 
+    public function __toString()
+    {
+        return $this->brand . ' - ' . $this->model;
+    }
+
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {

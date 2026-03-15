@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="row align-items-center mb-4">
+            <div class="col">
+                <a href="{{ path('app_profile') }}" class="text-decoration-none text-muted small">
+                    ⬅️ Mon profil
+                </a>
+                <h1 class="h3 fw-bold mt-1 mb-0">Mes trajets</h1>
+                <p class="text-muted mb-0">Trajets que vous avez proposés en tant que conducteur</p>
+            </div>
+            <div class="col-auto">
+                <a href="{{ path('app_profile_trip_form') }}" class="btn btn-primary rounded-pill px-4">
+                    ➕ Publier un trajet
+                </a>
+            </div>
+        </div>
+
+
+        {% if trips is empty %}
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body text-center py-5">
+                    <div class="fs-1 mb-3">🗺️</div>
+                    <h5 class="fw-bold mb-2">Aucun trajet publié</h5>
+                    <p class="text-muted mb-4">Proposez votre premier trajet et partagez vos frais.</p>
+                    <a href="{{ path('app_profile_trip_form') }}" class="btn btn-primary rounded-pill px-4">
+                        ➕ Publier un trajet
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div class="row g-3">
+                {% for trip in trips %}
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm rounded-4">
+                            <div class="card-body p-4">
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <span class="badge rounded-pill px-3 py-2 fw-semibold"
+                                                style="background: linear-gradient(135deg, #ecfdf5, #e0f2fe); color: #059669;">
+                                                {{ trip.origin }}
+                                            </span>
+                                            <span class="text-muted"><i class="ri-arrow-right-long-line"></i></span>
+                                            <span class="badge rounded-pill px-3 py-2 fw-semibold"
+                                                style="background: linear-gradient(135deg, #ecfdf5, #e0f2fe); color: #059669;">
+                                                {{ trip.destination }}
+                                            </span>
+                                        </div>
+                                        <p class="text-muted small mb-0">
+                                            📅 {{ trip.departureAt|date('d/m/Y à H:i') }}
+                                        </p>
+                                    </div>
+
+
+                                    <div class="col-md-3 mt-2 mt-md-0">
+                                        <p class="text-muted small mb-1">
+                                            💺 {{ trip.availableSeats }} place{{ trip.availableSeats > 1 ? 's' : '' }} disponible{{ trip.availableSeats > 1 ? 's' : '' }}
+                                        </p>
+                                        <p class="text-muted small mb-0">
+                                            🚗 {{ trip.vehicle.brand }} {{ trip.vehicle.model }}
+                                        </p>
+                                    </div>
+
+                                    <div class="col-md-2 mt-2 mt-md-0 text-md-center">
+                                        <div class="fw-bold text-primary fs-5">{{ trip.pricePerSeat }}€</div>
+                                        <span class="badge rounded-pill px-3
+                                            {% if trip.status.value == 'open' %}bg-success
+                                            {% elseif trip.status.value == 'full' %}bg-warning text-dark
+                                            {% elseif trip.status.value == 'cancelled' %}bg-danger
+                                            {% else %}bg-secondary{% endif %}">
+                                            {% if trip.status.value == 'open' %}Disponible
+                                            {% elseif trip.status.value == 'full' %}Complet
+                                            {% elseif trip.status.value == 'cancelled' %}Annulé
+                                            {% else %}Terminé{% endif %}
+                                        </span>
+                                    </div>
+
+
+                                    <div class="col-md-3 mt-3 mt-md-0 d-flex gap-2 justify-content-md-end">
+                                        {% if trip.status.value == 'open' or trip.status.value == 'full' %}
+                                            <a href="{{ path('app_profile_trip_form', { id: trip.id }) }}"
+                                            class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                                ✍️ Modifier
+                                            </a>
+                                        {% endif %}
+
+                                        {% if trip.status.value != 'cancelled' and trip.status.value != 'completed' %}
+                                            <a href="{{ path('app_profile_trip_cancel', { id: trip.id }) }}" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                                🗑️
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock %}

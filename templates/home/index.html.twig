@@ -1,7 +1,5 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil - ShareTrips{% endblock %}
-
 {% block body %}
     <section class="bg-primary text-white p-5 mb-5"
          style="background: linear-gradient(135deg, #059669, #0284c7) !important;">
@@ -117,7 +115,7 @@
                                         <span class="text-muted small">
                                             👤 {{ trip.driver.firstName }} {{ trip.driver.lastName }}
                                         </span>
-                                        <a href="#" class="btn btn-outline-primary btn-sm">
+                                        <a href="{{ path('app_profile_trip_show', { id: trip.id }) }}" class="btn btn-outline-primary btn-sm">
                                             Voir
                                         </a>
                                     </div>
@@ -129,7 +127,7 @@
 
                 <div class="text-center mt-4">
                     <a href="#" class="btn btn-outline-primary">
-                        Voir tous les trajets →
+                        Voir tous les trajets <i class="ri-arrow-right-long-fill me-1"></i>
                     </a>
                 </div>
             {% endif %}
@@ -142,17 +140,17 @@
             <h2 class="h4 fw-bold text-center mb-5">Comment ça marche ?</h2>
             <div class="row g-4 text-center">
                 <div class="col-md-4">
-                    <div class="fs-1 mb-3"><i class="ri-search-line"></i></div>
+                    <div class="fs-1 mb-3">🔍</div>
                     <h5 class="fw-bold">1. Recherchez</h5>
                     <p class="text-muted">Entrez votre ville de départ, d'arrivée et la date souhaitée.</p>
                 </div>
                 <div class="col-md-4">
-                    <div class="fs-1 mb-3"><i class="ri-hand"></i></div>
+                    <div class="fs-1 mb-3">✋</div>
                     <h5 class="fw-bold">2. Réservez</h5>
                     <p class="text-muted">Choisissez un trajet et réservez votre place en quelques secondes.</p>
                 </div>
                 <div class="col-md-4">
-                    <div class="fs-1 mb-3"><i class="ri-space-ship-2-line"></i></div>
+                    <div class="fs-1 mb-3">🚀</div>
                     <h5 class="fw-bold">3. Voyagez</h5>
                     <p class="text-muted">Retrouvez le conducteur et profitez du trajet ensemble.</p>
                 </div>

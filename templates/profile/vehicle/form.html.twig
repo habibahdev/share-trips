@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <a href="{{ path('app_profile_vehicle') }}" class="text-decoration-none text-muted small">
+                    ⬅️ Mes véhicules
+                </a>
+                <h1 class="h3 fw-bold mt-1 mb-4">Ajouter un véhicule</h1>
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Marque</label>
+                                    {{ form_widget(form.brand, {'attr': {'class': 'form-control' ~ (form.brand.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'Ex : Renault'}}) }}
+                                    {{ form_errors(form.brand) }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Modèle</label>
+                                    {{ form_widget(form.model, {'attr': {'class': 'form-control' ~ (form.model.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'Ex : Clio'}}) }}
+                                    {{ form_errors(form.model) }}
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Couleur <span class="text-muted">(optionnel)</span></label>
+                                    {{ form_widget(form.color, {'attr': {'class': 'form-control' ~ (form.color.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'Ex : Bleu'}}) }}
+                                    {{ form_errors(form.color) }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Immatriculation</label>
+                                    {{ form_widget(form.plate, {'attr': {'class': 'form-control' ~ (form.plate.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'AB-123-CD'}}) }}
+                                    {{ form_errors(form.plate) }}
+                                    <div class="form-text">Format : AB-123-CD</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium">Nombre de places</label>
+                                    {{ form_widget(form.seats, {'attr': {'class': 'form-control' ~ (form.seats.vars.errors|length ? ' is-invalid' : ''), 'min': 1, 'max': 9}}) }}
+                                    {{ form_errors(form.seats) }}
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary px-4">Enregistrer</button>
+                                <a href="{{ path('app_profile_vehicle') }}" class="btn btn-outline-secondary">Annuler</a>
+                            </div>
+
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

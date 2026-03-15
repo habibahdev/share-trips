@@ -1,0 +1,105 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="row align-items-center mb-4">
+            <div class="col">
+                <a href="{{ path('app_profile') }}" class="text-decoration-none text-muted small">
+                ⬅️ Mon profil
+            </a>
+            <h1 class="h3 fw-bold mt-1 mb-0">Mes réservations</h1>
+            <p class="text-muted mb-0">Trajets que vous avez réservés en tant que passager</p>
+        </div>
+        <div class="col-auto">
+            <a href="#" class="btn btn-primary rounded-pill px-4">
+                🔍 Trouver un trajet
+            </a>
+        </div>
+    </div>
+
+
+    {% if bookings is empty %}
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body text-center py-5">
+                <div class="fs-1 mb-3">🎫</div>
+                <h5 class="fw-bold mb-2">Aucune réservation</h5>
+                <p class="text-muted mb-4">Trouvez un trajet et réservez votre place en quelques clics.</p>
+                <a href="#" class="btn btn-primary rounded-pill px-4">
+                    🔍 Trouver un trajet
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <div class="row g-3">
+            {% for booking in bookings %}
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4">
+                        <div class="card-body p-4">
+                            <div class="row align-items-center">
+
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <span class="badge rounded-pill px-3 py-2 fw-semibold"
+                                              style="background: linear-gradient(135deg, #ecfdf5, #e0f2fe); color: #059669;">
+                                            {{ booking.trip.origin }}
+                                        </span>
+                                        <span class="text-muted">→</span>
+                                        <span class="badge rounded-pill px-3 py-2 fw-semibold"
+                                              style="background: linear-gradient(135deg, #ecfdf5, #e0f2fe); color: #059669;">
+                                            {{ booking.trip.destination }}
+                                        </span>
+                                    </div>
+                                    <p class="text-muted small mb-0">
+                                        📅 {{ booking.trip.departureAt|date('d/m/Y à H:i') }}
+                                    </p>
+                                </div>
+
+                                <div class="col-md-3 mt-2 mt-md-0">
+                                    <p class="text-muted small mb-1">
+                                        👤 {{ booking.trip.driver.firstName ?? '' }} {{ booking.trip.driver.lastName ?? '' }}
+                                    </p>
+                                    <p class="text-muted small mb-0">
+                                        💺 {{ booking.seatsBooked }} place{{ booking.seatsBooked > 1 ? 's' : '' }}
+                                    </p>
+                                </div>
+
+                                <div class="col-md-2 mt-2 mt-md-0 text-md-center">
+                                    <div class="fw-bold text-primary fs-5">
+                                        {{ booking.seatsBooked * booking.trip.pricePerSeat }}€
+                                    </div>
+                                    <span class="badge rounded-pill px-3
+                                        {% if booking.status.value == 'confirmed' %}bg-success
+                                        {% elseif booking.status.value == 'pending' %}bg-warning text-dark
+                                        {% else %}bg-secondary{% endif %}">
+                                        {% if booking.status.value == 'confirmed' %}Confirmée
+                                        {% elseif booking.status.value == 'pending' %}En attente
+                                        {% else %}Annulée{% endif %}
+                                    </span>
+                                </div>
+
+                                <div class="col-md-3 mt-3 mt-md-0 d-flex gap-2 justify-content-md-end">
+                                    <a href="#"
+                                       class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                                        Détail
+                                    </a>
+                                    {% if booking.status.value != 'cancelled' %}
+                                        <form method="post"
+                                              action="#"
+                                              onsubmit="return confirm('Annuler cette réservation ?')">
+                                            <input type="hidden" name="_token"
+                                                   value="">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                                Annuler
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
