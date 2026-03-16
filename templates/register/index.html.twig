@@ -1,45 +1,103 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
+<div class="register-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
 
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <a href="{{ path('app_home') }}" class="register-brand">
+                        Share<span>Trips</span>
+                    </a>
+                    <p class="text-muted mt-2 mb-0" style="font-size:.9rem;">
+                        Rejoignez la communauté 🚗
+                    </p>
+                </div>
 
-                    <h1 class="h3 fw-bold text-center mb-4">Créer un compte</h1>
+                <div class="register-card">
 
-                    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                    <h1 style="font-size:1.4rem;font-weight:800;color:#1e3a5f;margin-bottom:1.5rem;">
+                        Créer un compte
+                    </h1>
+
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'style': 'font-family: Plus Jakarta Sans, sans-serif;'}}) }}
+
                         <div class="mb-3">
-                            <label class="form-label fw-medium">{{ form_label(form.email) }}</label>
-                            {{ form_widget(form.email, {'attr': {'class': 'form-control' ~ (form.email.vars.errors|length ? ' is-invalid' : '')}}) }}
-                            {{ form_errors(form.email) }}
+                            <label class="register-label">
+                                <i class="bi bi-envelope me-1"></i>Adresse email
+                            </label>
+                            {{ form_widget(form.email, {
+                                'attr': {
+                                    'class': 'register-input' ~ (form.email.vars.errors|length ? ' is-invalid' : '')
+                                }
+                            }) }}
+                            {% if form.email.vars.errors|length %}
+                                {% for error in form.email.vars.errors %}
+                                    <div class="invalid-feedback-st">
+                                        <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-medium">{{ form_label(form.plainPassword.first) }}</label>
-                            {{ form_widget(form.plainPassword.first, {'attr': {'class': 'form-control' ~ (form.plainPassword.vars.errors|length ? ' is-invalid' : '')}}) }}
+                            <label class="register-label">
+                                <i class="bi bi-lock me-1"></i>Mot de passe
+                            </label>
+                            {{ form_widget(form.plainPassword.first, {
+                                'attr': {
+                                    'class': 'register-input' ~ (form.plainPassword.vars.errors|length ? ' is-invalid' : ''),
+                                    'placeholder': '••••••••'
+                                }
+                            }) }}
+                            <div class="password-hint">
+                                <i class="bi bi-info-circle"></i> 8 caractères minimum
+                            </div>
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label fw-medium">{{ form_label(form.plainPassword.second) }}</label>
-                            {{ form_widget(form.plainPassword.second, {'attr': {'class': 'form-control' ~ (form.plainPassword.vars.errors|length ? ' is-invalid' : '')}}) }}
-                            {{ form_errors(form.plainPassword) }}
+                            <label class="register-label">
+                                <i class="bi bi-lock-fill me-1"></i>Confirmer le mot de passe
+                            </label>
+                            {{ form_widget(form.plainPassword.second, {
+                                'attr': {
+                                    'class': 'register-input' ~ (form.plainPassword.vars.errors|length ? ' is-invalid' : ''),
+                                    'placeholder': '••••••••'
+                                }
+                            }) }}
+                            {% if form.plainPassword.vars.errors|length %}
+                                {% for error in form.plainPassword.vars.errors %}
+                                    <div class="invalid-feedback-st">
+                                        <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
+                        <button type="submit" class="btn-register">
+                            Créer mon compte
+                        </button>
 
                     {{ form_end(form) }}
 
+                    <div class="divider-or">ou</div>
+
+                    <a href="{{ path('app_login') }}"
+                       style="display:block;text-align:center;background:#eff6ff;color:#1e3a5f;border:none;border-radius:14px;padding:.9rem;font-size:.95rem;font-weight:700;text-decoration:none;transition:background .2s;font-family:'Plus Jakarta Sans',sans-serif;"
+                       onmouseover="this.style.background='#dbeafe'"
+                       onmouseout="this.style.background='#eff6ff'">
+                        J'ai déjà un compte
+                    </a>
+
                 </div>
+
+                <p class="text-center mt-4" style="font-size:.8rem;color:#94a3b8;">
+                    En créant un compte, vous acceptez nos
+                    <a href="#" style="color:#1d4ed8;text-decoration:none;">conditions d'utilisation</a>
+                </p>
+
             </div>
-
-            <p class="text-center mt-3 text-muted small">
-                Vous avez déjà un compte ?
-                <a href="{{ path('app_login') }}" class="text-decoration-none">Se connecter</a>
-            </p>
-
         </div>
     </div>
 </div>

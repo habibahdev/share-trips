@@ -1,88 +1,167 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="container py-5">
+<div class="trip-form-page">
+    <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-7">
-                <a href="{{ path('app_profile_trip') }}" class="text-decoration-none text-muted small">
-                    ⬅️ Mes trajets
+
+                <a href="{{ path('app_profile_trip') }}" class="back-link mb-3 d-inline-flex">
+                    <i class="bi bi-arrow-left"></i> Mes trajets
                 </a>
 
-                <h1 class="h3 fw-bold mt-1 mb-4">{{ title }}</h1>
-                <div class="card border-0 shadow-sm rounded-4">
-                    <div class="card-body p-4">
-                        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                <h1 style="font-size:1.5rem;font-weight:800;color:#1e3a5f;margin:.5rem 0 1.5rem;">
+                    {{ title }}
+                </h1>
 
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-medium">Ville de départ</label>
-                                    {{ form_widget(form.origin, {'attr': {
-                                        'class': 'form-control' ~ (form.origin.vars.errors|length ? ' is-invalid' : ''),
+                <div class="form-card">
+
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                        <div class="section-label">
+                            <i class="bi bi-map"></i> Itinéraire
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="trip-label">
+                                    <i class="bi bi-geo-alt-fill me-1" style="color:#1d4ed8;"></i>Ville de départ
+                                </label>
+                                {{ form_widget(form.origin, {
+                                    'attr': {
+                                        'class': 'trip-input' ~ (form.origin.vars.errors|length ? ' is-invalid' : ''),
                                         'id': 'trip_origin',
-                                        'placeholder': 'Ex : Paris'
-                                    }}) }}
-                                    {{ form_errors(form.origin) }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-medium">Ville d'arrivée</label>
-                                    {{ form_widget(form.destination, {'attr': {
-                                        'class': 'form-control' ~ (form.destination.vars.errors|length ? ' is-invalid' : ''),
+                                    }
+                                }) }}
+                                {% if form.origin.vars.errors|length %}
+                                    {% for error in form.origin.vars.errors %}
+                                        <div class="invalid-feedback-st">
+                                            <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="trip-label">
+                                    <i class="bi bi-geo-fill me-1" style="color:#1e3a5f;"></i>Ville d'arrivée
+                                </label>
+                                {{ form_widget(form.destination, {
+                                    'attr': {
+                                        'class': 'trip-input' ~ (form.destination.vars.errors|length ? ' is-invalid' : ''),
                                         'id': 'trip_destination',
-                                        'placeholder': 'Ex : Lyon'
-                                    }}) }}
-                                    {{ form_errors(form.destination) }}
-                                </div>
+                                    }
+                                }) }}
+                                {% if form.destination.vars.errors|length %}
+                                    {% for error in form.destination.vars.errors %}
+                                        <div class="invalid-feedback-st">
+                                            <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
 
-                                <div class="col-md-12">
-                                    <label class="form-label fw-medium">Date et heure de départ</label>
-                                    {{ form_widget(form.departureAt, {'attr': {
-                                        'class': 'form-control' ~ (form.departureAt.vars.errors|length ? ' is-invalid' : '')
-                                    }}) }}
-                                    {{ form_errors(form.departureAt) }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-medium">Places proposées</label>
-                                    {{ form_widget(form.availableSeats, {'attr': {
-                                        'class': 'form-control' ~ (form.availableSeats.vars.errors|length ? ' is-invalid' : ''),
+                        <hr class="section-divider">
+
+                        <div class="section-label">
+                            <i class="bi bi-calendar3"></i> Date &amp; tarif
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-12">
+                                <label class="trip-label">
+                                    <i class="bi bi-calendar3 me-1"></i>Date et heure de départ
+                                </label>
+                                {{ form_widget(form.departureAt, {
+                                    'attr': {
+                                        'class': 'trip-input' ~ (form.departureAt.vars.errors|length ? ' is-invalid' : '')
+                                    }
+                                }) }}
+                                {% if form.departureAt.vars.errors|length %}
+                                    {% for error in form.departureAt.vars.errors %}
+                                        <div class="invalid-feedback-st">
+                                            <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="trip-label">
+                                    <i class="bi bi-person-check me-1"></i>Places proposées
+                                </label>
+                                {{ form_widget(form.availableSeats, {
+                                    'attr': {
+                                        'class': 'trip-input' ~ (form.availableSeats.vars.errors|length ? ' is-invalid' : ''),
                                         'min': 1, 'max': 8
-                                    }}) }}
-                                    {{ form_errors(form.availableSeats) }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-medium">Prix / place (€)</label>
-                                    {{ form_widget(form.pricePerSeat, {'attr': {
-                                        'class': 'form-control' ~ (form.pricePerSeat.vars.errors|length ? ' is-invalid' : '')
-                                    }}) }}
-                                    {{ form_errors(form.pricePerSeat) }}
-                                </div>
+                                    }
+                                }) }}
+                                {% if form.availableSeats.vars.errors|length %}
+                                    {% for error in form.availableSeats.vars.errors %}
+                                        <div class="invalid-feedback-st">
+                                            <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="trip-label">
+                                    <i class="bi bi-cash-coin me-1"></i>Prix par place (€)
+                                </label>
+                                {{ form_widget(form.pricePerSeat, {
+                                    'attr': {
+                                        'class': 'trip-input' ~ (form.pricePerSeat.vars.errors|length ? ' is-invalid' : '')
+                                    }
+                                }) }}
+                                {% if form.pricePerSeat.vars.errors|length %}
+                                    {% for error in form.pricePerSeat.vars.errors %}
+                                        <div class="invalid-feedback-st">
+                                            <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
 
-                                <div class="col-12">
-                                    <label class="form-label fw-medium">Véhicule</label>
-                                    {{ form_widget(form.vehicle, {'attr': {
-                                        'class': 'form-select' ~ (form.vehicle.vars.errors|length ? ' is-invalid' : '')
-                                    }}) }}
-                                    {{ form_errors(form.vehicle) }}
-                                    <div class="form-text">
-                                        <a href="{{ path('app_profile_vehicle_form') }}" target="_blank">
-                                            <i class="ri-add-line me-1"></i> Ajouter un véhicule
-                                        </a>
+                        <hr class="section-divider">
+
+                        <div class="section-label">
+                            <i class="bi bi-car-front"></i> Véhicule
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form_widget(form.vehicle, {
+                                'attr': {
+                                    'class': 'trip-input' ~ (form.vehicle.vars.errors|length ? ' is-invalid' : '')
+                                }
+                            }) }}
+                            {% if form.vehicle.vars.errors|length %}
+                                {% for error in form.vehicle.vars.errors %}
+                                    <div class="invalid-feedback-st">
+                                        <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
                                     </div>
-                                </div>
-                            </div>
+                                {% endfor %}
+                            {% endif %}
+                            <a href="{{ path('app_profile_vehicle_form') }}" target="_blank" class="add-vehicle-link">
+                                <i class="bi bi-plus-circle"></i> Ajouter un véhicule
+                            </a>
+                        </div>
 
-                            <div class="d-flex gap-2 mt-4">
-                                <button type="submit" class="btn btn-primary rounded-pill px-4">
-                                    {{ trip ? 'Enregistrer' : 'Publier le trajet' }}
-                                </button>
-                                <a href="{{ path('app_profile_trip') }}" class="btn btn-outline-secondary rounded-pill px-4">
-                                    Annuler
-                                </a>
-                            </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn-save">
+                                <i class="bi bi-check2"></i>
+                                {{ trip ? 'Enregistrer' : 'Publier le trajet' }}
+                            </button>
+                            <a href="{{ path('app_profile_trip') }}" class="btn-cancel">
+                                Annuler
+                            </a>
+                        </div>
 
-                        {{ form_end(form) }}
-                    </div>
+                    {{ form_end(form) }}
+
                 </div>
+
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

@@ -1,0 +1,118 @@
+.edit-page {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #f8fafc;
+    min-height: calc(100vh - 70px);
+    padding: 2.5rem 0;
+}
+
+.edit-card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1.5px solid #f1f5f9;
+    box-shadow: 0 8px 24px rgba(30,58,95,.06);
+    padding: 2rem;
+}
+
+.edit-input {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    border: 2px solid #f1f5f9;
+    border-radius: 12px;
+    padding: .75rem 1rem;
+    font-size: .95rem;
+    background: #f8fafc;
+    transition: border-color .2s, background .2s;
+    width: 100%;
+}
+
+.edit-input:focus {
+    border-color: #1d4ed8;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(29,78,216,.08);
+    outline: none;
+}
+
+.edit-input.is-invalid {
+    border-color: #fca5a5;
+    background: #fff;
+}
+
+.edit-label {
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: #64748b;
+    margin-bottom: .4rem;
+    display: block;
+}
+
+.invalid-feedback-st {
+    font-size: .78rem;
+    color: #dc2626;
+    font-weight: 500;
+    margin-top: .3rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-save {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #1e3a5f;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: .7rem 1.5rem;
+    font-size: .9rem;
+    font-weight: 700;
+    transition: background .2s, transform .1s;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-save:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.btn-save:active {
+    transform: translateY(0);
+}
+
+.btn-cancel {
+    background: #f8fafc;
+    color: #475569;
+    border: 1.5px solid #f1f5f9;
+    border-radius: 12px;
+    padding: .7rem 1.5rem;
+    font-size: .9rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .15s, border-color .15s;
+}
+
+.btn-cancel:hover {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #1e3a5f;
+}
+
+.back-link {
+    font-size: .82rem;
+    font-weight: 600;
+    color: #94a3b8;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: color .15s;
+}
+
+.back-link:hover {
+    color: #1e3a5f;
+}
