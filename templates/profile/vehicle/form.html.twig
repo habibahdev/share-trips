@@ -1,57 +1,138 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="container py-5">
+<div class="vehicle-form-page">
+    <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-5">
-                <a href="{{ path('app_profile_vehicle') }}" class="text-decoration-none text-muted small">
-                    ⬅️ Mes véhicules
+
+                <a href="{{ path('app_profile_vehicle') }}" class="back-link mb-3 d-inline-flex">
+                    <i class="bi bi-arrow-left"></i> Mes véhicules
                 </a>
-                <h1 class="h3 fw-bold mt-1 mb-4">Ajouter un véhicule</h1>
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-4">
-                        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-medium">Marque</label>
-                                    {{ form_widget(form.brand, {'attr': {'class': 'form-control' ~ (form.brand.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'Ex : Renault'}}) }}
-                                    {{ form_errors(form.brand) }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-medium">Modèle</label>
-                                    {{ form_widget(form.model, {'attr': {'class': 'form-control' ~ (form.model.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'Ex : Clio'}}) }}
-                                    {{ form_errors(form.model) }}
-                                </div>
+                <h1 style="font-size:1.5rem;font-weight:800;color:#1e3a5f;margin:.5rem 0 1.5rem;">
+                    Ajouter un véhicule
+                </h1>
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-medium">Couleur <span class="text-muted">(optionnel)</span></label>
-                                    {{ form_widget(form.color, {'attr': {'class': 'form-control' ~ (form.color.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'Ex : Bleu'}}) }}
-                                    {{ form_errors(form.color) }}
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-medium">Immatriculation</label>
-                                    {{ form_widget(form.plate, {'attr': {'class': 'form-control' ~ (form.plate.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'AB-123-CD'}}) }}
-                                    {{ form_errors(form.plate) }}
-                                    <div class="form-text">Format : AB-123-CD</div>
-                                </div>
+                <div class="form-card">
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-medium">Nombre de places</label>
-                                    {{ form_widget(form.seats, {'attr': {'class': 'form-control' ~ (form.seats.vars.errors|length ? ' is-invalid' : ''), 'min': 1, 'max': 9}}) }}
-                                    {{ form_errors(form.seats) }}
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                        <div class="section-label">
+                            <i class="bi bi-car-front"></i> Identification
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="vf-label">
+                                    Marque
+                                </label>
+                                {{ form_widget(form.brand, {
+                                    'attr': {
+                                        'class': 'vf-input' ~ (form.brand.vars.errors|length ? ' is-invalid' : '')
+                                    }
+                                }) }}
+                                {% if form.brand.vars.errors|length %}
+                                    {% for error in form.brand.vars.errors %}
+                                        <div class="invalid-feedback-st">
+                                            <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="vf-label">Modèle</label>
+                                {{ form_widget(form.model, {
+                                    'attr': {
+                                        'class': 'vf-input' ~ (form.model.vars.errors|length ? ' is-invalid' : '')
+                                    }
+                                }) }}
+                                {% if form.model.vars.errors|length %}
+                                    {% for error in form.model.vars.errors %}
+                                        <div class="invalid-feedback-st">
+                                            <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="vf-label">
+                                    Couleur <span class="vf-optional">(optionnel)</span>
+                                </label>
+                                {{ form_widget(form.color, {
+                                    'attr': {
+                                        'class': 'vf-input' ~ (form.color.vars.errors|length ? ' is-invalid' : '')
+                                    }
+                                }) }}
+                                {% if form.color.vars.errors|length %}
+                                    {% for error in form.color.vars.errors %}
+                                        <div class="invalid-feedback-st">
+                                            <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="vf-label">Immatriculation</label>
+                                {{ form_widget(form.plate, {
+                                    'attr': {
+                                        'class': 'vf-input' ~ (form.plate.vars.errors|length ? ' is-invalid' : '')
+                                    }
+                                }) }}
+                                {% if form.plate.vars.errors|length %}
+                                    {% for error in form.plate.vars.errors %}
+                                        <div class="invalid-feedback-st">
+                                            <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                                <div class="vf-hint">
+                                    <i class="bi bi-info-circle"></i> Format : AB-123-CD
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="d-flex gap-2 mt-4">
-                                <button type="submit" class="btn btn-primary px-4">Enregistrer</button>
-                                <a href="{{ path('app_profile_vehicle') }}" class="btn btn-outline-secondary">Annuler</a>
+                        <hr class="section-divider">
+
+                        <div class="section-label">
+                            <i class="bi bi-people"></i> Capacité
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="vf-label">Nombre de places</label>
+                            {{ form_widget(form.seats, {
+                                'attr': {
+                                    'class': 'vf-input' ~ (form.seats.vars.errors|length ? ' is-invalid' : ''),
+                                    'min': 1, 'max': 9
+                                }
+                            }) }}
+                            {% if form.seats.vars.errors|length %}
+                                {% for error in form.seats.vars.errors %}
+                                    <div class="invalid-feedback-st">
+                                        <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="vf-hint">
+                                <i class="bi bi-info-circle"></i> Entre 1 et 9 places
                             </div>
+                        </div>
 
-                        {{ form_end(form) }}
-                    </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn-save">
+                                <i class="bi bi-check2"></i> Enregistrer
+                            </button>
+                            <a href="{{ path('app_profile_vehicle') }}" class="btn-cancel">
+                                Annuler
+                            </a>
+                        </div>
+
+                    {{ form_end(form) }}
+
                 </div>
+
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

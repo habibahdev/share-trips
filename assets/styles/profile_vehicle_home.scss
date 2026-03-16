@@ -1,0 +1,159 @@
+.vehicles-page {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #f8fafc;
+    min-height: calc(100vh - 70px);
+    padding: 2.5rem 0;
+}
+
+.vehicle-card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1.5px solid #f1f5f9;
+    box-shadow: 0 8px 24px rgba(30,58,95,.06);
+    padding: 1.5rem;
+    transition: border-color .2s, box-shadow .2s, transform .15s;
+    height: 100%;
+}
+
+.vehicle-card:hover {
+    border-color: #dbeafe;
+    box-shadow: 0 12px 32px rgba(30,58,95,.1);
+    transform: translateY(-2px);
+}
+
+.empty-card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1.5px solid #f1f5f9;
+    padding: 3rem;
+    text-align: center;
+}
+
+.vehicle-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    background: #eff6ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.vehicle-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e3a5f;
+    margin: 0;
+}
+
+.vehicle-color {
+    font-size: .78rem;
+    color: #94a3b8;
+}
+
+.vehicle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .6rem 0;
+    border-bottom: 1.5px solid #f8fafc;
+    font-size: .8rem;
+}
+
+.vehicle-row:last-child {
+    border-bottom: none;
+}
+
+.vehicle-row-label {
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.vehicle-row-value {
+    color: #1e3a5f;
+    font-weight: 600;
+}
+
+.seats-badge {
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: .75rem;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: .2rem .65rem;
+}
+
+.btn-action {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    flex: 1;
+    height: 36px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .85rem;
+    border: 1.5px solid;
+    transition: background .15s, color .15s;
+    text-decoration: none;
+    font-weight: 600;
+    gap: 5px;
+    font-size: .8rem;
+}
+
+.btn-action-edit {
+    border-color: #dbeafe;
+    color: #1d4ed8;
+    background: #eff6ff;
+}
+
+.btn-action-edit:hover {
+    background: #dbeafe;
+    color: #1e3a5f;
+}
+
+.btn-action-delete {
+    border-color: #fecaca;
+    color: #dc2626;
+    background: #fff;
+}
+
+.btn-action-delete:hover {
+    background: #fee2e2;
+}
+
+.btn-new {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #1e3a5f;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: .6rem 1.25rem;
+    font-size: .875rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .2s;
+}
+
+.btn-new:hover {
+    background: #1d4ed8;
+    color: #fff;
+}
+
+.back-link {
+    font-size: .82rem;
+    font-weight: 600;
+    color: #94a3b8;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: color .15s;
+}
+
+.back-link:hover {
+    color: #1e3a5f;
+}

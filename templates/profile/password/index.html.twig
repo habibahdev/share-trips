@@ -1,41 +1,98 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="container py-5">
+<div class="password-page">
+    <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-6">
-                <a href="{{ path('app_profile') }}" class="text-decoration-none text-muted small">
-                    ⬅️ Mon profil
+            <div class="col-lg-5">
+
+                <a href="{{ path('app_profile') }}" class="back-link mb-3 d-inline-flex">
+                    <i class="bi bi-arrow-left"></i> Mon profil
                 </a>
-                <h1 class="h3 fw-bold mt-1 mb-4">Changer le mot de passe</h1>
-                <div class="card border-0 shadow-sm">
-                    <div class="card-body p-4">
-                        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-                        <div class="mb-3">
-                            <label class="form-label fw-medium">Mot de passe actuel</label>
-                            {{ form_widget(form.actualPassword, {'attr': {'class': 'form-control' ~ (form.actualPassword.vars.errors|length ? ' is-invalid' : '')}}) }}
-                            {{ form_errors(form.actualPassword) }}
-                        </div>
+
+                <h1 style="font-size:1.5rem;font-weight:800;color:#1e3a5f;margin:.5rem 0 1.5rem;">
+                    Changer le mot de passe
+                </h1>
+
+                <div class="password-card">
+
+                    <div class="security-tip">
+                        <i class="bi bi-shield-check"></i>
+                        <p>Choisissez un mot de passe fort d'au moins 8 caractères, avec des lettres, chiffres et symboles.</p>
+                    </div>
+
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 
                         <div class="mb-3">
-                            <label class="form-label fw-medium">Nouveau mot de passe</label>
-                            {{ form_widget(form.newPassword.first, {'attr': {'class': 'form-control' ~ (form.newPassword.vars.errors|length ? ' is-invalid' : '')}}) }}
+                            <label class="pw-label">
+                                <i class="bi bi-lock me-1"></i>Mot de passe actuel
+                            </label>
+                            {{ form_widget(form.actualPassword, {
+                                'attr': {
+                                    'class': 'pw-input' ~ (form.actualPassword.vars.errors|length ? ' is-invalid' : ''),
+                                    'placeholder': '••••••••'
+                                }
+                            }) }}
+                            {% if form.actualPassword.vars.errors|length %}
+                                {% for error in form.actualPassword.vars.errors %}
+                                    <div class="invalid-feedback-st">
+                                        <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <hr class="pw-divider">
+
+                        <div class="mb-3">
+                            <label class="pw-label">
+                                <i class="bi bi-lock-fill me-1"></i>Nouveau mot de passe
+                            </label>
+                            {{ form_widget(form.newPassword.first, {
+                                'attr': {
+                                    'class': 'pw-input' ~ (form.newPassword.vars.errors|length ? ' is-invalid' : ''),
+                                    'placeholder': '••••••••'
+                                }
+                            }) }}
+                            <div class="pw-hint">
+                                <i class="bi bi-info-circle"></i> 8 caractères minimum
+                            </div>
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label fw-medium">Confirmez le nouveau mot de passe</label>
-                            {{ form_widget(form.newPassword.second, {'attr': {'class': 'form-control' ~ (form.newPassword.vars.errors|length ? ' is-invalid' : '')}}) }}
-                            {{ form_errors(form.newPassword) }}
+                            <label class="pw-label">
+                                <i class="bi bi-lock-fill me-1"></i>Confirmer le nouveau mot de passe
+                            </label>
+                            {{ form_widget(form.newPassword.second, {
+                                'attr': {
+                                    'class': 'pw-input' ~ (form.newPassword.vars.errors|length ? ' is-invalid' : ''),
+                                    'placeholder': '••••••••'
+                                }
+                            }) }}
+                            {% if form.newPassword.vars.errors|length %}
+                                {% for error in form.newPassword.vars.errors %}
+                                    <div class="invalid-feedback-st">
+                                        <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
                         </div>
 
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary rounded-pill px-4">💾 Enregistrer</button>
-                            <a href="{{ path('app_profile') }}" class="btn btn-outline-secondary rounded-pill px-4">Annuler</a>
+                            <button type="submit" class="btn-save">
+                                <i class="bi bi-check2"></i> Enregistrer
+                            </button>
+                            <a href="{{ path('app_profile') }}" class="btn-cancel">
+                                Annuler
+                            </a>
                         </div>
+
                     {{ form_end(form) }}
-                    </div>
+
                 </div>
+
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

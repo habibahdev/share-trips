@@ -38,7 +38,7 @@ DATABASE_URL="postgresql://tripsadmin:tripsadmin@127.0.0.1:5433/sharetrips?serve
 ```
 
 ## Développement local
-Le développement local utilise **PostgreSQL dans docker** et **Symfony en local**.
+Le développement local utilise **PostgreSQL avec docker** et **Symfony en local**.
 
 ### 1. Lancer PostgreSQL via Docker
 ```
@@ -46,7 +46,7 @@ docker compose -f docker-compose.dev.yaml up -d
 ```
 
 ### 2. Base de données et migrations
-Lors du lancement du conteneur, la base de données est créée directement. 
+Lors du lancement du conteneur, la base de données est créée directement. Il suffit ensuite de jouer les migrations.
 
 ```
 symfony console make:migration
@@ -55,7 +55,10 @@ symfony console doctrine:migrations:migrate -n
 
 ### 3. Compiler les ressources externes
 ```
+# Pour compiler une seule fois
 npm run build
+
+# Pour recompiler css & js à chaque modification
 npm run watch
 ```
 
@@ -64,7 +67,7 @@ npm run watch
 symfony serve -d
 ```
 
-L'application est accessible sur **http://127.0.0.1:8000**
+L'application est accessible sur http://127.0.0.1:8000
 
 ### Arrêt
 ```

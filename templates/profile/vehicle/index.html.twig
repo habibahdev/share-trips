@@ -1,84 +1,79 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="container py-5">
-        <div class="row align-items-center mb-4">
-            <div class="col">
-                <a href="{{ path('app_profile') }}" class="text-decoration-none text-muted small">
-                    ⬅️ Mon profil
+<div class="vehicles-page">
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-start mb-4">
+            <div>
+                <a href="{{ path('app_profile') }}" class="back-link mb-2 d-inline-flex">
+                    <i class="bi bi-arrow-left"></i> Mon profil
                 </a>
-                <h1 class="h3 fw-bold mt-1 mb-0">Mes véhicules</h1>
-                <p class="text-muted mb-0">Gérez vos véhicules pour proposer des trajets</p>
+                <h1 style="font-size:1.5rem;font-weight:800;color:#1e3a5f;margin:.25rem 0 .2rem;">Mes véhicules</h1>
+                <p style="font-size:.85rem;color:#94a3b8;margin:0;">Gérez vos véhicules pour proposer des trajets</p>
             </div>
-            <div class="col-auto">
-                <a href="{{ path('app_profile_vehicle_form') }}" class="btn btn-primary rounded-pill px-4">
-                    ➕ Ajouter un véhicule
-                </a>
-            </div>
+            <a href="{{ path('app_profile_vehicle_form') }}" class="btn-new mt-1">
+                <i class="bi bi-plus-lg"></i> Ajouter un véhicule
+            </a>
         </div>
 
-
-
         {% if vehicles is empty %}
-            <div class="card border-0 shadow-sm rounded-4">
-                <div class="card-body text-center py-5">
-                    <div class="fs-1 mb-3">🚗</div>
-                    <h5 class="fw-bold mb-2">Aucun véhicule enregistré</h5>
-                    <p class="text-muted mb-4">Ajoutez un véhicule pour pouvoir proposer des trajets.</p>
-                    <a href="{{ path('app_profile_vehicle_form') }}" class="btn btn-primary rounded-pill px-4">
-                        ➕ Ajouter un véhicule
-                    </a>
-                </div>
+            <div class="empty-card">
+                <i class="bi bi-car-front d-block mb-3" style="font-size:3rem;color:#bfdbfe;"></i>
+                <h5 style="font-weight:800;color:#1e3a5f;margin-bottom:.5rem;">Aucun véhicule enregistré</h5>
+                <p class="text-muted mb-4" style="font-size:.9rem;">Ajoutez un véhicule pour pouvoir proposer des trajets.</p>
+                <a href="{{ path('app_profile_vehicle_form') }}" class="btn-new">
+                    <i class="bi bi-plus-lg"></i> Ajouter un véhicule
+                </a>
             </div>
         {% else %}
             <div class="row g-4">
                 {% for vehicle in vehicles %}
                     <div class="col-md-6 col-lg-4">
-                        <div class="card border-0 shadow-sm rounded-4 h-100">
-                            <div class="card-body p-4">
-                                <div class="d-flex align-items-center gap-3 mb-3">
-                                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fs-4"
-                                        style="width: 55px; height: 55px; background: linear-gradient(135deg, #059669, #0284c7); flex-shrink: 0;">
-                                        🚗
-                                    </div>
-                                    <div>
-                                        <h5 class="fw-bold mb-0">{{ vehicle.brand }} {{ vehicle.model }}</h5>
-                                        {% if vehicle.color %}
-                                            <small class="text-muted">{{ vehicle.color }}</small>
-                                        {% endif %}
-                                    </div>
+                        <div class="vehicle-card">
+
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="vehicle-icon">
+                                    <i class="bi bi-car-front" style="color:#1d4ed8;"></i>
                                 </div>
-
-                                <ul class="list-unstyled mb-4">
-                                    <li class="d-flex justify-content-between py-2 border-bottom">
-                                        <span class="text-muted small">Immatriculation</span>
-                                        <span class="fw-semibold small">{{ vehicle.plate }}</span>
-                                    </li>
-                                    <li class="d-flex justify-content-between py-2">
-                                        <span class="text-muted small">Nombre de places</span>
-                                        <span class="badge rounded-pill px-3"
-                                            style="background: linear-gradient(135deg, #ecfdf5, #e0f2fe); color: #059669;">
-                                            {{ vehicle.seats }} places
-                                        </span>
-                                    </li>
-                                </ul>
-
-
-                                <div class="d-flex gap-2">
-                                    <a href="{{ path('app_profile_vehicle_form', { id: vehicle.id }) }}"
-                                        class="btn btn-outline-primary btn-sm rounded-pill flex-grow-1">
-                                        ✍️ Modifier
-                                    </a>
-                                    <a href="{{ path('app_profile_vehicle_delete', { id: vehicle.id }) }}"
-                                        class="btn btn-outline-danger btn-sm rounded-pill flex-grow-1">
-                                        🗑️
-                                    </a>
+                                <div>
+                                    <p class="vehicle-name">{{ vehicle.brand }} {{ vehicle.model }}</p>
+                                    {% if vehicle.color %}
+                                        <span class="vehicle-color">{{ vehicle.color }}</span>
+                                    {% endif %}
                                 </div>
                             </div>
+
+                            <div class="mb-4">
+                                <div class="vehicle-row">
+                                    <span class="vehicle-row-label">Immatriculation</span>
+                                    <span class="vehicle-row-value">{{ vehicle.plate }}</span>
+                                </div>
+                                <div class="vehicle-row">
+                                    <span class="vehicle-row-label">Nombre de places</span>
+                                    <span class="seats-badge">
+                                        <i class="bi bi-person-check me-1"></i>{{ vehicle.seats }} places
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <a href="{{ path('app_profile_vehicle_form', { id: vehicle.id }) }}"
+                                   class="btn-action btn-action-edit">
+                                    <i class="bi bi-pencil"></i> Modifier
+                                </a>
+                                <a href="{{ path('app_profile_vehicle_delete', { id: vehicle.id }) }}"
+                                   class="btn-action btn-action-delete">
+                                    <i class="bi bi-trash2"></i> Supprimer
+                                </a>
+                            </div>
+
                         </div>
                     </div>
                 {% endfor %}
             </div>
         {% endif %}
+
     </div>
+</div>
 {% endblock %}

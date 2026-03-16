@@ -1,133 +1,137 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="container py-5">
-        <div class="row align-items-center mb-4">
-            <div class="col">
-                <h1 class="h3 fw-bold mb-0">Mon profil</h1>
-                <p class="text-muted mb-0">Gérez vos informations personnelles</p>
+<div class="profile-page">
+    <div class="container">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 style="font-size:1.5rem;font-weight:800;color:#1e3a5f;margin:0;">Mon profil</h1>
+                <p class="text-muted mb-0" style="font-size:.9rem;">Gérez vos informations personnelles</p>
             </div>
-            <div class="col-auto">
-                <a href="{{ path('app_profile_info') }}" class="btn btn-primary rounded-pill px-4">
-                    ✍️ Modifier mes infos personnelles
-                </a>
-            </div>
+            <a href="{{ path('app_profile_info') }}" class="btn-edit">
+                <i class="bi bi-pencil"></i> Modifier
+            </a>
         </div>
-
-
 
         <div class="row g-4">
             <div class="col-lg-4">
-                <div class="card border-0 shadow-sm rounded-4 h-100">
-                    <div class="card-body p-4 text-center">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3 text-white fw-bold fs-2"
-                            style="width: 100px; height: 100px; background: linear-gradient(135deg, #059669, #0284c7);">
-                            {{ user.firstName|first|upper }}{{ user.lastName|first|upper }}
-                        </div>
-                        
-                        <h4 class="fw-bold mb-1">{{ user.firstName }} {{ user.lastName }}</h4>
-                        <p class="text-muted small mb-3">{{ user.email }}</p>
-                        <span class="badge rounded-pill px-3 py-2"
-                            style="background: linear-gradient(135deg, #ecfdf5, #e0f2fe); color: #059669;">
-                            Membre depuis {{ user.createdAt|date('d/m/Y') }}
-                        </span>
+                <div class="profile-card p-4 text-center h-100">
+
+                    <div class="avatar-lg">
+                        {{ user.firstName ? user.firstName|first|upper : '?' }}{{ user.lastName ? user.lastName|first|upper : '' }}
                     </div>
+
+                    <h4 style="font-weight:800;color:#1e3a5f;margin-bottom:.25rem;">
+                        {{ user.firstName ?? '' }} {{ user.lastName ?? '' }}
+                    </h4>
+                    <p style="color:#94a3b8;font-size:.875rem;margin-bottom:1rem;">
+                        {{ user.email }}
+                    </p>
+
+                    <span class="member-badge">
+                        <i class="bi bi-calendar3"></i>
+                        Membre depuis {{ user.createdAt|date('d/m/Y') }}
+                    </span>
+
                 </div>
             </div>
-
-
 
             <div class="col-lg-8">
-                <div class="card border-0 shadow-sm rounded-4">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold mb-4">Informations personnelles</h5>
+                <div class="profile-card p-4 h-100">
 
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="text-muted small fw-semibold text-uppercase">Prénom</label>
-                                <p class="fw-medium mb-0">{{ user.firstName ?? 'Non renseigné'  }}</p>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="text-muted small fw-semibold text-uppercase">Nom</label>
-                                <p class="fw-medium mb-0">{{ user.lastName ?? 'Non renseigné'  }}</p>
-                            </div>
-                            <div class="col-12"><hr class="my-2"></div>
-                            <div class="col-md-6">
-                                <label class="text-muted small fw-semibold text-uppercase">Email</label>
-                                <p class="fw-medium mb-0">{{ user.email }}</p>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="text-muted small fw-semibold text-uppercase">Téléphone</label>
-                                <p class="fw-medium mb-0">{{ user.phone ?? 'Non renseigné' }}</p>
-                            </div>
+                    <div class="section-title">
+                        <i class="bi bi-person me-1"></i> Informations personnelles
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-sm-6">
+                            <div class="info-label">Prénom</div>
+                            <p class="info-value {{ not user.firstName ? 'empty' : '' }}">
+                                {{ user.firstName ?? 'Non renseigné' }}
+                            </p>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="info-label">Nom</div>
+                            <p class="info-value {{ not user.lastName ? 'empty' : '' }}">
+                                {{ user.lastName ?? 'Non renseigné' }}
+                            </p>
+                        </div>
+
+                        <div class="col-12" style="border-top:1.5px solid #f1f5f9;margin:0 .75rem;padding-top:1rem;"></div>
+
+                        <div class="col-sm-6">
+                            <div class="info-label">Email</div>
+                            <p class="info-value">{{ user.email }}</p>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="info-label">Téléphone</div>
+                            <p class="info-value {{ not user.phone ? 'empty' : '' }}">
+                                {{ user.phone ?? 'Non renseigné' }}
+                            </p>
                         </div>
                     </div>
+
                 </div>
             </div>
-
-
-
 
             <div class="col-12">
-                <div class="card border-0 shadow-sm rounded-4">
-                    <div class="card-body p-4">
-                        <h5 class="fw-bold mb-4">Accès rapides</h5>
+                <div class="profile-card p-4">
 
-                        <div class="row g-3">
-                            <div class="col-md-3 col-sm-6">
-                                <a href="{{ path('app_profile_vehicle') }}"
-                                    class="card border-0 rounded-4 p-3 text-center text-decoration-none h-100"
-                                    style="background: linear-gradient(135deg, #f0f9ff, #e0f2fe);">
-                                    
-                                    <div class="fs-2 mb-2">🚗</div>
-                                    <div class="fw-semibold text-dark small">Mes véhicules</div>
-                                    <div class="text-muted" style="font-size: 0.75rem;">
-                                        {{ user.vehicles|length }} véhicule{{ user.vehicles|length > 1 ? 's' : '' }}
-                                    </div>
-                                </a>
-                            </div>
+                    <div class="section-title">
+                        <i class="bi bi-grid me-1"></i> Accès rapides
+                    </div>
 
+                    <div class="row g-3">
+                        <div class="col-6 col-md-3">
+                            <a href="{{ path('app_profile_vehicle') }}" class="quick-link">
+                                <div class="quick-link-icon" style="background:#eff6ff;">
+                                    <i class="bi bi-car-front" style="color:#1d4ed8;"></i>
+                                </div>
+                                <div class="quick-link-label">Mes véhicules</div>
+                                <div class="quick-link-sub">
+                                    {{ user.vehicles|length }} véhicule{{ user.vehicles|length > 1 ? 's' : '' }}
+                                </div>
+                            </a>
+                        </div>
 
-                            <div class="col-md-3 col-sm-6">
-                                <a href="{{ path('app_profile_booking') }}"
-                                    class="card border-0 rounded-4 p-3 text-center text-decoration-none h-100"
-                                    style="background: linear-gradient(135deg, #ecfdf5, #d1fae5);">
-                                    
-                                    <div class="fs-2 mb-2">🎫</div>
-                                    <div class="fw-semibold text-dark small">Mes réservations</div>
-                                    <div class="text-muted" style="font-size: 0.75rem;">
-                                        {{ user.bookings|length }} réservation{{ user.bookings|length > 1 ? 's' : '' }}
-                                    </div>
-                                </a>
-                            </div>
+                        <div class="col-6 col-md-3">
+                            <a href="{{ path('app_profile_booking') }}" class="quick-link">
+                                <div class="quick-link-icon" style="background:#eff6ff;">
+                                    <i class="bi bi-ticket-perforated" style="color:#1d4ed8;"></i>
+                                </div>
+                                <div class="quick-link-label">Mes réservations</div>
+                                <div class="quick-link-sub">
+                                    {{ user.bookings|length }} réservation{{ user.bookings|length > 1 ? 's' : '' }}
+                                </div>
+                            </a>
+                        </div>
 
+                        <div class="col-6 col-md-3">
+                            <a href="{{ path('app_profile_trip') }}" class="quick-link">
+                                <div class="quick-link-icon" style="background:#eff6ff;">
+                                    <i class="bi bi-map" style="color:#1d4ed8;"></i>
+                                </div>
+                                <div class="quick-link-label">Mes trajets</div>
+                                <div class="quick-link-sub">Gérer mes trajets</div>
+                            </a>
+                        </div>
 
-                            <div class="col-md-3 col-sm-6">
-                                <a href="{{ path('app_profile_trip') }}"
-                                    class="card border-0 rounded-4 p-3 text-center text-decoration-none h-100"
-                                    style="background: linear-gradient(135deg, #fef9ec, #fef3c7);">
-
-                                    <div class="fs-2 mb-2">🗺️</div>
-                                    <div class="fw-semibold text-dark small">Publier un trajet</div>
-                                    <div class="text-muted" style="font-size: 0.75rem;">Proposer un covoiturage</div>
-                                </a>
-                            </div>
-
-
-                            <div class="col-md-3 col-sm-6">
-                                <a href="{{ path('app_profile_password') }}"
-                                    class="card border-0 rounded-4 p-3 text-center text-decoration-none h-100"
-                                    style="background: linear-gradient(135deg, #fdf2f8, #fce7f3);">
-                                    
-                                    <div class="fs-2 mb-2">🔒</div>
-                                    <div class="fw-semibold text-dark small">Mot de passe</div>
-                                    <div class="text-muted" style="font-size: 0.75rem;">Modifier le mot de passe</div>
-                                </a>
-                            </div>
+                        <div class="col-6 col-md-3">
+                            <a href="{{ path('app_profile_password') }}" class="quick-link">
+                                <div class="quick-link-icon" style="background:#eff6ff;">
+                                    <i class="bi bi-lock" style="color:#1d4ed8;"></i>
+                                </div>
+                                <div class="quick-link-label">Mot de passe</div>
+                                <div class="quick-link-sub">Modifier</div>
+                            </a>
                         </div>
                     </div>
+
                 </div>
             </div>
+
         </div>
     </div>
+</div>
 {% endblock %}

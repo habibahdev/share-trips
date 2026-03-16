@@ -1,0 +1,174 @@
+.trips-page {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #f8fafc;
+    min-height: calc(100vh - 70px);
+    padding: 2.5rem 0;
+}
+
+.trip-row {
+    background: #fff;
+    border-radius: 16px;
+    border: 1.5px solid #f1f5f9;
+    padding: 1.25rem 1.5rem;
+    transition: border-color .2s, box-shadow .2s, transform .15s;
+}
+
+.trip-row:hover {
+    border-color: #dbeafe;
+    box-shadow: 0 6px 20px rgba(30,58,95,.07);
+    transform: translateY(-1px);
+}
+
+.empty-card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1.5px solid #f1f5f9;
+    padding: 3rem;
+    text-align: center;
+}
+
+.route-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #eff6ff;
+    color: #1e3a5f;
+    font-size: .8rem;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: .3rem .75rem;
+}
+
+.route-arrow {
+    color: #cbd5e1;
+    font-size: .85rem;
+}
+
+.trip-meta {
+    font-size: .8rem;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: .3rem;
+}
+
+.trip-meta i {
+    font-size: .75rem;
+}
+
+.price-tag {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #1e3a5f;
+}
+
+.status-badge {
+    font-size: .72rem;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: .25rem .7rem;
+    display: inline-block;
+}
+
+.status-open {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-full {
+    background: #fef9c3;
+    color: #854d0e;
+}
+
+.status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-completed {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.btn-action {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .85rem;
+    border: 1.5px solid;
+    transition: background .15s, color .15s;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.btn-action-edit {
+    border-color: #dbeafe;
+    color: #1d4ed8;
+    background: #eff6ff;
+}
+
+.btn-action-edit:hover {
+    background: #dbeafe;
+    color: #1e3a5f;
+}
+
+.btn-action-cancel {
+    border-color: #fecaca;
+    color: #dc2626;
+    background: #fff;
+}
+
+.btn-action-cancel:hover {
+    background: #fee2e2;
+}
+
+.btn-action-show {
+    border-color: #f1f5f9;
+    color: #475569;
+    background: #f8fafc;
+}
+
+.btn-action-show:hover {
+    background: #f1f5f9;
+    color: #1e3a5f;
+}
+
+.btn-new {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #1e3a5f;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: .6rem 1.25rem;
+    font-size: .875rem;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .2s;
+}
+
+.btn-new:hover {
+    background: #1d4ed8;
+    color: #fff;
+}
+
+.back-link {
+    font-size: .82rem;
+    font-weight: 600;
+    color: #94a3b8;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: color .15s;
+}
+
+.back-link:hover {
+    color: #1e3a5f;
+}

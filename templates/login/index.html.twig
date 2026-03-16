@@ -1,44 +1,94 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="container py-5">
+<div class="login-page">
+    <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-6">
-                {% if error %}
-                    <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-                {% endif %}
+            <div class="col-md-5 col-lg-4">
 
-                <div class="card shadow-sm border-0">
-                    <div class="card-body p-4">
-
-                        <h1 class="h3 fw-bold text-center mb-4">Se connecter</h1>
-
-                        <form action="{{ path('app_login') }}" method="post">
-                            <div class="form-floating mb-3">
-                                <input type="email" class="form-control" id="floatingInput" name="_username"
-                                    value="{{ last_username }}" placeholder="name@example.com" required>
-                                <label for="floatingInput">Adresse email</label>
-                            </div>
-                            <div class="form-floating mb-3">
-                                <input type="password" class="form-control" id="floatingPassword" name="_password"
-                                    placeholder="Password" required>
-                                <label for="floatingPassword">Mot de passe</label>
-                            </div>
-
-                            <input type="hidden" name="_target_path" value="{{ path('app_profile') }}">
-
-                            <button type="submit" class="btn btn-primary w-100 btn-lg">Se connecter</button>
-                        </form>
-        
-                    </div>
+                <div class="text-center mb-4">
+                    <a href="{{ path('app_home') }}" class="login-brand">
+                        Share<span>Trips</span>
+                    </a>
+                    <p class="text-muted mt-2 mb-0" style="font-size:.9rem;">
+                        Bon retour parmi nous 👋
+                    </p>
                 </div>
 
-                <p class="text-center mt-3 text-muted small">
-                    Pas encore client ?
-                    <a href="{{ path('app_register') }}" class="text-decoration-none">Créer un compte</a>
+                <div class="login-card">
+
+                    <h1 style="font-size:1.4rem;font-weight:800;color:#1e3a5f;margin-bottom:1.5rem;">
+                        Se connecter
+                    </h1>
+
+                    {% if error %}
+                        <div class="alert-error">
+                            <i class="bi bi-exclamation-circle-fill"></i>
+                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                        </div>
+                    {% endif %}
+
+                    <form action="{{ path('app_login') }}" method="post">
+
+                        <div class="mb-3">
+                            <label class="login-label" for="email">
+                                <i class="bi bi-envelope me-1"></i>Adresse email
+                            </label>
+                            <input type="email"
+                                   class="login-input"
+                                   id="email"
+                                   name="_username"
+                                   value="{{ last_username }}"
+                                   required
+                                   autofocus>
+                        </div>
+
+                        <div class="mb-1">
+                            <label class="login-label" for="password">
+                                <i class="bi bi-lock me-1"></i>Mot de passe
+                            </label>
+                            <input type="password"
+                                   class="login-input"
+                                   id="password"
+                                   name="_password"
+                                   placeholder="••••••••"
+                                   required>
+                        </div>
+
+                        <div class="text-end mb-4">
+                            <a href="#" style="font-size:.8rem;color:#1d4ed8;text-decoration:none;font-weight:600;">
+                                Mot de passe oublié ?
+                            </a>
+                        </div>
+
+                        <input type="hidden" name="_target_path" value="{{ path('app_profile') }}">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                        <button type="submit" class="btn-login">
+                            Se connecter
+                        </button>
+
+                    </form>
+
+                    <div class="divider-or">ou</div>
+
+                    <a href="{{ path('app_register') }}"
+                       style="display:block;text-align:center;background:#eff6ff;color:#1e3a5f;border:none;border-radius:14px;padding:.9rem;font-size:.95rem;font-weight:700;text-decoration:none;transition:background .2s;font-family:'Plus Jakarta Sans',sans-serif;"
+                       onmouseover="this.style.background='#dbeafe'"
+                       onmouseout="this.style.background='#eff6ff'">
+                        Créer un compte gratuit
+                    </a>
+
+                </div>
+
+                <p class="text-center mt-4" style="font-size:.8rem;color:#94a3b8;">
+                    En vous connectant, vous acceptez nos
+                    <a href="#" style="color:#1d4ed8;text-decoration:none;">conditions d'utilisation</a>
                 </p>
 
             </div>
         </div>
     </div>
+</div>
+
 {% endblock %}

@@ -1,8 +1,8 @@
-<nav class="navbar navbar-expand-md bg-white sticky-top shadow-sm">
+<nav class="navbar navbar-expand-md navbar-sharetrips sticky-top">
     <div class="container">
 
-        <a class="navbar-brand" href="{{ path('app_home') }}">
-            ShareTrips
+        <a class="navbar-brand-st" href="{{ path('app_home') }}">
+            Share<span>Trips</span>
         </a>
 
         <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
@@ -10,36 +10,69 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarMain">
-            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0 gap-1 ms-3">
                 <li class="nav-item">
-                    <a class="nav-link {{ app.request.attributes.get('_route') starts with 'app_trip' ? 'active' }}"
-                        href="#">
-                        🗺️ Trajets
+                    <a class="nav-link-st {{ app.request.attributes.get('_route') starts with 'app_trip' ? 'active' }}"
+                       href="#">
+                        <i class="bi bi-map"></i> Trajets
                     </a>
                 </li>
-            </ul>
-
-            <ul class="navbar-nav ms-auto mb-2 mb-md-0 align-items-md-center">
                 {% if app.user %}
                     <li class="nav-item">
-                        <a class="nav-link {{ app.request.attributes.get('_route') starts with 'app_booking' ? 'active' }}"
-                            href="{{ path('app_profile') }}">
-                            👤 {{ app.user.firstName }}
+                        <a class="btn-propose" href="{{ path('app_profile_trip_form') }}">
+                            <i class="bi bi-plus-circle"></i> Proposer un trajet
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link rounded-pill px-3" href="{{ path('app_login') }}">
-                            <i class="ri-logout-box-line me-1"></i> Déconnexion
+                {% endif %}
+            </ul>
+
+            <ul class="navbar-nav ms-auto mb-2 mb-md-0 align-items-md-center gap-2">
+                {% if app.user %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link-st dropdown-toggle"
+                           href="#" role="button" data-bs-toggle="dropdown">
+                            <div class="avatar-st">
+                                {{ app.user.firstName ? app.user.firstName|first|upper : '?' }}
+                            </div>
+                            <span>{{ app.user.firstName ?? 'Mon compte' }}</span>
                         </a>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-st">
+                            <li>
+                                <a class="dropdown-item-st" href="{{ path('app_profile') }}">
+                                    <i class="bi bi-person"></i> Mon profil
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item-st" href="{{ path('app_profile_vehicle') }}">
+                                    <i class="bi bi-car-front"></i> Mes véhicules
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item-st" href="{{ path('app_profile_trip') }}">
+                                    <i class="bi bi-map"></i> Mes trajets
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item-st" href="#">
+                                    <i class="bi bi-ticket-perforated"></i> Mes réservations
+                                </a>
+                            </li>
+                            <li><div class="dropdown-divider-st"></div></li>
+                            <li>
+                                <a class="dropdown-item-st danger" href="{{ path('app_logout') }}">
+                                    <i class="bi bi-box-arrow-right"></i> Déconnexion
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 {% else %}
                     <li class="nav-item">
-                        <a class="nav-link rounded-pill px-3" href="{{ path('app_login') }}">
-                            <i class="ri-login-box-line me-1"></i></i> Se connecter
+                        <a class="btn-login-st" href="{{ path('app_login') }}">
+                            <i class="bi bi-box-arrow-in-right" style="color:#1d4ed8;"></i> Se connecter
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="btn btn-primary fw-semibold btn-sm ms-2 rounded-pill px-3" href="{{ path('app_register') }}">
+                        <a class="btn-register-st" href="{{ path('app_register') }}">
                             S'inscrire
                         </a>
                     </li>
