@@ -114,7 +114,7 @@
                     <i class="bi bi-signpost-2 d-block mb-3" style="font-size:3rem;color:#bfdbfe;"></i>
                     <p class="text-muted mb-3" style="font-size:1.1rem;">Aucun trajet disponible pour le moment.</p>
                     {% if app.user %}
-                        <a href="{{ path('app_profile_trip_form') }}" class="btn-reserve px-4 py-2 text-decoration-none d-inline-block">
+                        <a href="#" class="btn-reserve px-4 py-2 text-decoration-none d-inline-block">
                             <i class="bi bi-plus-circle me-2"></i>Proposer le premier trajet
                         </a>
                     {% endif %}
@@ -171,7 +171,7 @@
                                 {# Prix + bouton #}
                                 <div class="d-flex align-items-center gap-3 ms-auto">
                                     <span class="price-pill">{{ trip.pricePerSeat }}€</span>
-                                    <a href="{{ path('app_profile_trip_show', { id: trip.id }) }}" class="btn-reserve text-decoration-none">
+                                    <a href="#" class="btn-reserve text-decoration-none">
                                         Réserver
                                     </a>
                                 </div>

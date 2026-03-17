@@ -49,8 +49,7 @@ docker compose -f docker-compose.dev.yaml up -d
 Lors du lancement du conteneur, la base de données est créée directement. Il suffit ensuite de jouer les migrations.
 
 ```
-symfony console make:migration
-symfony console doctrine:migrations:migrate -n
+docker compose -f docker-compose.dev.yaml exec app php bin/console make:migration
 ```
 
 ### 3. Compiler les ressources externes
