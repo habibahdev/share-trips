@@ -28,6 +28,7 @@ cd share-trips
 ```
 composer install
 npm install
+rm -f migrations/*.php
 ```
 
 ### 3. Variables d'environnement
@@ -50,9 +51,15 @@ Lors du lancement du conteneur, la base de données est créée directement. Il 
 
 ```
 docker compose -f docker-compose.dev.yaml exec app php bin/console make:migration
+docker compose -f docker-compose.dev.yaml exec app php bin/console d:m:m -n
 ```
 
-### 3. Compiler les ressources externes
+### 3. Lancer le serveur
+```
+symfony serve -d
+```
+
+### 4. Compiler les ressources externes
 ```
 # Pour compiler une seule fois
 npm run build
@@ -61,14 +68,7 @@ npm run build
 npm run watch
 ```
 
-### 4. Lancer le serveur
-```
-symfony serve -d
-```
-
-L'application est accessible sur http://127.0.0.1:8000
-
-### Arrêt
+### 5. Arrêt
 ```
 symfony server:stop
 docker compose -f docker-compose.dev.yaml stop
