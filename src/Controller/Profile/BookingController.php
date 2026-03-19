@@ -2,11 +2,13 @@
 
 namespace App\Controller\Profile;
 
+use App\Entity\Booking;
 use App\Entity\User;
 use App\Enum\BookingStatus;
 use App\Repository\BookingRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -23,27 +25,26 @@ final class BookingController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/booking/{id}', name: 'app_profile_booking_show')]
-    public function show(int $id, BookingRepository $bookingRepository): Response
+    #[Route('/profile/booking/{booking}', name: 'app_profile_booking_show')]
+    public function show(Booking $booking): Response
     {
-        $booking = $bookingRepository->findOneBy(['id' => $id]);
-        if (!$booking) {
-            return $this->redirectToRoute('app_profile');
+        $user = $this->getUser();
+        assert($user instanceof User);
+        if ($booking->getPassenger()->getId() !== $user->getId()) {
+            return $this->redirectToRoute('app_profile_booking');
         }
         return $this->render('profile/booking/show.html.twig', [
             'booking' => $booking
         ]);
     }
 
-    #[Route('/profile/booking/cancel/{id}', name: 'app_profile_booking_cancel')]
-    public function cancel(
-        int $id,
-        BookingRepository $bookingRepository,
-        EntityManagerInterface $entityManager
-    ): Response {
-        $booking = $bookingRepository->findOneBy(['id' => $id]);
-        if (!$booking) {
-            return $this->redirectToRoute('app_profile');
+    #[Route('/profile/booking/{booking}/cancel', name: 'app_profile_booking_cancel')]
+    public function cancel(Booking $booking, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        assert($user instanceof User);
+        if ($booking->getPassenger()->getId() !== $user->getId()) {
+            return $this->redirectToRoute('app_profile_booking');
         }
         $booking->setStatus(BookingStatus::Cancelled);
         $entityManager->flush();
@@ -52,5 +53,33 @@ final class BookingController extends AbstractController
             'Réservation annulée.'
         );
         return $this->redirectToRoute('app_profile_booking');
+    }
+
+    #[Route('/profile/trip/booking/{booking}/confirm', name: 'app_profile_trip_booking_confirm', methods: ['POST'])]
+    public function confirm(Request $request, Booking $booking, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        assert($user instanceof User);
+        $trip = $booking->getTrip();
+        if ($trip->getDriver()->getId() !== $user->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
+        $submittedToken = (string) $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('confirm_' . $booking->getId(), $submittedToken)) {
+            $this->addFlash('error', 'Token invalide.');
+            return $this->redirectToRoute('app_profile_trip_show', ['id' => $booking->getTrip()->getId()]);
+        }
+        if ($booking->getStatus() === BookingStatus::Confirmed) {
+            $this->addFlash('info', 'Cette réservation est déjà confirmée.');
+            return $this->redirectToRoute('app_profile_trip_show', ['id' => $booking->getTrip()->getId()]);
+        }
+        $booking->setStatus(BookingStatus::Confirmed);
+
+        $em->persist($booking);
+        $em->flush();
+
+        $this->addFlash('success', 'Réservation confirmée avec succès.');
+
+        return $this->redirectToRoute('app_profile_trip_show', ['id' => $booking->getTrip()->getId()]);
     }
 }

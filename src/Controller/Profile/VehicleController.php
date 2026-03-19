@@ -5,7 +5,6 @@ namespace App\Controller\Profile;
 use App\Entity\User;
 use App\Entity\Vehicle;
 use App\Form\VehicleType;
-use App\Repository\VehicleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,21 +23,15 @@ final class VehicleController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/vehicle/add/{id}', name: 'app_profile_vehicle_form', defaults: ['id' => null])]
-    public function form(
-        ?int $id,
-        VehicleRepository $vehicleRepository,
-        Request $request,
-        EntityManagerInterface $entityManager
-    ): Response {
+    #[Route('/profile/vehicle/add/{vehicle}', name: 'app_profile_vehicle_form', defaults: ['vehicle' => null])]
+    public function form(?Vehicle $vehicle, Request $request, EntityManagerInterface $entityManager): Response
+    {
         $user = $this->getUser();
         assert($user instanceof User);
-        if ($id) {
-            $vehicle = $vehicleRepository->findOneBy(['id' => $id]);
-            if (!$vehicle || $vehicle->getUsser() !== $user) {
-                return $this->redirectToRoute('app_profile');
-            }
-        } else {
+        if ($vehicle && $vehicle->getUsser() !== $user) {
+            return $this->redirectToRoute('app_profile_vehicle');
+        }
+        if (!$vehicle) {
             $vehicle = new Vehicle();
             $vehicle->setUsser($user);
         }
@@ -58,14 +51,12 @@ final class VehicleController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/vehicle/delete/{id}', name: 'app_profile_vehicle_delete')]
-    public function delete(
-        VehicleRepository $vehicleRepository,
-        int $id,
-        EntityManagerInterface $entityManager
-    ): Response {
-        $vehicle = $vehicleRepository->findOneBy(['id' => $id]);
-        if ($vehicle && $vehicle->getUsser() == $this->getUser()) {
+    #[Route('/profile/vehicle/delete/{vehicle}', name: 'app_profile_vehicle_delete')]
+    public function delete(Vehicle $vehicle, EntityManagerInterface $entityManager): Response
+    {
+        $user = $this->getUser();
+        assert($user instanceof User);
+        if ($vehicle->getUsser() === $this->getUser()) {
             $entityManager->remove($vehicle);
             $entityManager->flush();
             $this->addFlash(

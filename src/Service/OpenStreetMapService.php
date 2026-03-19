@@ -23,7 +23,7 @@ class OpenStreetMapService
                 'q' => $query,
                 'format' => 'json',
                 'addressdetails' => 1,
-                'limit' => 5,
+                'limit' => 8,
                 'countrycodes' => 'fr'
             ],
             'headers' => [

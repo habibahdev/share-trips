@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de la réservation | Share Trips{% endblock %}
+
+{% block body %}
+<div class="booking-detail-page">
+    <div class="container">
+        <a href="{{ path('app_profile_booking') }}" class="back-link"><i class="bi bi-arrow-left"></i> Retour aux réservations</a>
+
+        <div class="booking-card">
+
+            <div class="trip-summary">
+                <div class="trip-summary-route">
+                    <span>{{ booking.trip.origin }}</span>
+                    <i class="bi bi-arrow-right"></i>
+                    <span>{{ booking.trip.destination }}</span>
+                </div>
+                <div class="trip-summary-meta">
+                    <i class="bi bi-calendar3"></i> {{ booking.trip.departureAt|date('d/m/Y à H:i') }}
+                </div>
+                <div class="trip-summary-meta">
+                    <i class="bi bi-person-check"></i> {{ booking.seatsBooked }} place{{ booking.seatsBooked > 1 ? 's' : '' }} réservée{{ booking.seatsBooked > 1 ? 's' : '' }}
+                </div>
+                <div class="trip-summary-meta">
+                    <span class="status-badge {% if booking.trip.status.value == 'open' %}status-open{% elseif booking.trip.status.value == 'full' %}status-full{% elseif booking.trip.status.value == 'cancelled' %}status-cancelled{% else %}status-completed{% endif %}">
+                        {% if booking.trip.status.value == 'open' %}Disponible{% elseif booking.trip.status.value == 'full' %}Complet{% elseif booking.trip.status.value == 'cancelled' %}Annulé{% else %}Terminé{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div style="margin-bottom:1rem;">
+                <div class="info-label">Conducteur</div>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="driver-avatar">{{ booking.trip.driver.firstName ? booking.trip.driver.firstName|first|upper : '?' }}</div>
+                    <div>
+                        <div class="info-value">{{ booking.trip.driver.firstName ?? '' }} {{ booking.trip.driver.lastName ?? '' }}</div>
+                        {% if booking.trip.driver.phone %}
+                            <div class="vehicle-info"><i class="bi bi-telephone me-1"></i>{{ booking.trip.driver.phone }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom:1rem;">
+                <div class="info-label">Véhicule</div>
+                <div class="vehicle-info">{{ booking.trip.vehicle.brand }} {{ booking.trip.vehicle.model }}{% if booking.trip.vehicle.color %} - {{ booking.trip.vehicle.color }}{% endif %}</div>
+                <div class="vehicle-info">Places: {{ booking.trip.vehicle.seats }}</div>
+            </div>
+
+            <div class="price-breakdown">
+                <div class="price-row"><span>Prix par place</span><span>{{ booking.trip.pricePerSeat }}€</span></div>
+                <div class="price-row"><span>Nombre de places</span><span>{{ booking.seatsBooked }}</span></div>
+                <div class="price-row total"><span>Total</span><span>{{ (booking.seatsBooked * booking.trip.pricePerSeat)|number_format(2, ',', ' ') }}€</span></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

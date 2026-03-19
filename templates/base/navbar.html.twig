@@ -13,7 +13,7 @@
             <ul class="navbar-nav me-auto mb-2 mb-md-0 gap-1 ms-3">
                 <li class="nav-item">
                     <a class="nav-link-st {{ app.request.attributes.get('_route') starts with 'app_trip' ? 'active' }}"
-                       href="#">
+                       href="{{ path('app_trips') }}">
                         <i class="bi bi-map"></i> Trajets
                     </a>
                 </li>
@@ -53,7 +53,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item-st" href="#">
+                                <a class="dropdown-item-st" href="{{ path('app_profile_booking') }}">
                                     <i class="bi bi-ticket-perforated"></i> Mes réservations
                                 </a>
                             </li>

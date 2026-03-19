@@ -61,7 +61,7 @@
                             </a>
                         </div>
 
-                        <input type="hidden" name="_target_path" value="{{ path('app_profile') }}">
+                        <input type="hidden" name="_target_path" value="{{ app.request.get('_target_path') ?? path('app_profile') }}">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
                         <button type="submit" class="btn-login">

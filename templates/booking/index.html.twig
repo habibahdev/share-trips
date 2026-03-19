@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réserver - {{ trip.origin }} → {{ trip.destination }} | Share Trips{% endblock %}
+
+{% block body %}
+<div class="booking-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+
+                <a href="{{ path('app_trip_show', { id: trip.id }) }}" class="back-link mb-3 d-inline-flex">
+                    <i class="bi bi-arrow-left"></i> Retour au trajet
+                </a>
+
+                <h1 style="font-size:1.5rem;font-weight:800;color:#1e3a5f;margin:.5rem 0 1.5rem;">
+                    Réserver une place
+                </h1>
+
+                <div class="booking-card">
+
+                    <div class="trip-summary">
+                        <div class="trip-summary-route">
+                            <span>{{ trip.origin }}</span>
+                            <i class="bi bi-arrow-right" style="opacity:.6;"></i>
+                            <span>{{ trip.destination }}</span>
+                        </div>
+                        <div class="d-flex flex-wrap gap-3">
+                            <div class="trip-summary-meta"><i class="bi bi-calendar3"></i>{{ trip.departureAt|date('d/m/Y à H:i') }}</div>
+                            <div class="trip-summary-meta"><i class="bi bi-person-check"></i>{{ trip.availableSeats }} place{{ trip.availableSeats > 1 ? 's' : '' }} dispo</div>
+                        </div>
+                    </div>
+
+                    <div style="border-bottom:1.5px solid #f1f5f9;margin-bottom:1.25rem;padding-bottom:1.25rem;">
+                        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:.6rem;">Conducteur</div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="driver-avatar-sm">{{ trip.driver.firstName ? trip.driver.firstName|first|upper : '?' }}</div>
+                            <div>
+                                <div style="font-weight:600;color:#1e3a5f;font-size:.9rem;">{{ trip.driver.firstName ?? '' }} {{ trip.driver.lastName ?? '' }}</div>
+                                <div style="font-size:.78rem;color:#94a3b8;"><i class="bi bi-car-front me-1"></i>{{ trip.vehicle.brand }} {{ trip.vehicle.model }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'booking-form'}}) }}
+
+                        <div class="mb-3">
+                            <label class="booking-label"><i class="bi bi-person-check me-1"></i>Nombre de places</label>
+                            {{ form_widget(form.seatsBooked, {
+                                'attr': {
+                                    'class': 'booking-input' ~ (form.seatsBooked.vars.errors|length ? ' is-invalid' : ''),
+                                    'id': 'seats-input',
+                                    'min': 1,
+                                    'max': trip.availableSeats
+                                }
+                            }) }}
+                            {% if form.seatsBooked.vars.errors|length %}
+                                {% for error in form.seatsBooked.vars.errors %}
+                                    <div class="invalid-feedback-st"><i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="price-breakdown">
+                            <div class="price-row"><span>Prix par place</span><span>{{ trip.pricePerSeat }}€</span></div>
+                            <div class="price-row"><span>Nombre de places</span><span id="seats-count">1</span></div>
+                            <div class="price-row total"><span>Total</span><span id="total-price">{{ trip.pricePerSeat }}€</span></div>
+                        </div>
+
+                        <button type="submit" class="btn-book">
+                            <i class="bi bi-check2-circle"></i> Confirmer la réservation
+                        </button>
+
+                    {{ form_end(form) }}
+
+                    <a href="{{ path('app_trip_show', { id: trip.id }) }}" class="btn-cancel">Annuler</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const seatsInput = document.getElementById('seats-input');
+    const totalPrice = document.getElementById('total-price');
+    const seatsCount = document.getElementById('seats-count');
+    if (!seatsInput) return;
+    const pricePerSeat = {{ trip.pricePerSeat }};
+    seatsInput.addEventListener('input', function () {
+        const seats = parseInt(this.value) || 1;
+        if (seatsCount) seatsCount.textContent = seats;
+        if (totalPrice) totalPrice.textContent = (seats * pricePerSeat).toFixed(2) + '€';
+    });
+});
+</script>
+{% endblock %}

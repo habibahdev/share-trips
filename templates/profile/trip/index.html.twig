@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Mes trajets | Share Trips{% endblock %}
+
 {% block body %}
 <div class="trips-page">
     <div class="container">
@@ -22,78 +24,43 @@
                 <i class="bi bi-map d-block mb-3" style="font-size:3rem;color:#bfdbfe;"></i>
                 <h5 style="font-weight:800;color:#1e3a5f;margin-bottom:.5rem;">Aucun trajet publié</h5>
                 <p class="text-muted mb-4" style="font-size:.9rem;">Proposez votre premier trajet et partagez vos frais.</p>
-                <a href="{{ path('app_profile_trip_form') }}" class="btn-new">
-                    <i class="bi bi-plus-lg"></i> Publier un trajet
-                </a>
+                <a href="{{ path('app_profile_trip_form') }}" class="btn-new"><i class="bi bi-plus-lg"></i> Publier un trajet</a>
             </div>
         {% else %}
             <div class="d-flex flex-column gap-3">
                 {% for trip in trips %}
                     <div class="trip-row">
                         <div class="row align-items-center g-3">
-
                             <div class="col-md-4">
                                 <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
-                                    <span class="route-badge">
-                                        <i class="bi bi-geo-alt-fill" style="color:#1d4ed8;font-size:.7rem;"></i>
-                                        {{ trip.origin }}
-                                    </span>
-                                    <i class="bi bi-arrow-right route-arrow"></i>
-                                    <span class="route-badge">
-                                        <i class="bi bi-geo-fill" style="color:#1e3a5f;font-size:.7rem;"></i>
-                                        {{ trip.destination }}
-                                    </span>
+                                    <span class="route-badge"><i class="bi bi-geo-alt-fill" style="color:#1d4ed8;font-size:.7rem;"></i>{{ trip.origin }}</span>
+                                    <i class="bi bi-arrow-right" style="color:#cbd5e1;font-size:.85rem;"></i>
+                                    <span class="route-badge"><i class="bi bi-geo-fill" style="color:#1e3a5f;font-size:.7rem;"></i>{{ trip.destination }}</span>
                                 </div>
-                                <div class="trip-meta">
-                                    <i class="bi bi-calendar3"></i>
-                                    {{ trip.departureAt|date('d/m/Y à H:i') }}
-                                </div>
+                                <div class="trip-meta"><i class="bi bi-calendar3"></i>{{ trip.departureAt|date('d/m/Y à H:i') }}</div>
                             </div>
-
                             <div class="col-md-3">
-                                <div class="trip-meta mb-1">
-                                    <i class="bi bi-car-front"></i>
-                                    {{ trip.vehicle.brand }} {{ trip.vehicle.model }}
-                                </div>
-                                <div class="trip-meta">
-                                    <i class="bi bi-person-check"></i>
-                                    {{ trip.availableSeats }} place{{ trip.availableSeats > 1 ? 's' : '' }} disponible{{ trip.availableSeats > 1 ? 's' : '' }}
-                                </div>
+                                <div class="trip-meta mb-1"><i class="bi bi-car-front"></i>{{ trip.vehicle.brand }} {{ trip.vehicle.model }}</div>
+                                <div class="trip-meta"><i class="bi bi-person-check"></i>{{ trip.availableSeats }} place{{ trip.availableSeats > 1 ? 's' : '' }} dispo</div>
                             </div>
-
                             <div class="col-md-2 text-md-center">
                                 <div class="price-tag mb-1">{{ trip.pricePerSeat }}€</div>
-                                <span class="status-badge
-                                    {% if trip.status.value == 'open' %}status-open
-                                    {% elseif trip.status.value == 'full' %}status-full
-                                    {% elseif trip.status.value == 'cancelled' %}status-cancelled
-                                    {% else %}status-completed{% endif %}">
-                                    {% if trip.status.value == 'open' %}Disponible
-                                    {% elseif trip.status.value == 'full' %}Complet
-                                    {% elseif trip.status.value == 'cancelled' %}Annulé
-                                    {% else %}Terminé{% endif %}
+                                <span class="status-badge {% if trip.status.value == 'open' %}status-open{% elseif trip.status.value == 'full' %}status-full{% elseif trip.status.value == 'cancelled' %}status-cancelled{% else %}status-completed{% endif %}">
+                                    {% if trip.status.value == 'open' %}Disponible{% elseif trip.status.value == 'full' %}Complet{% elseif trip.status.value == 'cancelled' %}Annulé{% else %}Terminé{% endif %}
                                 </span>
                             </div>
-
                             <div class="col-md-3 d-flex gap-2 justify-content-md-end">
-                                <a href="{{ path('app_profile_trip_show', { id: trip.id }) }}"
-                                   class="btn-action btn-action-show" title="Voir le détail">
-                                    <i class="bi bi-eye"></i>
-                                </a>
+                                <a href="{{ path('app_profile_trip_show', { trip: trip.id}) }}" class="btn-action btn-action-show" title="Voir"><i class="bi bi-eye"></i></a>
                                 {% if trip.status.value == 'open' or trip.status.value == 'full' %}
-                                    <a href="{{ path('app_profile_trip_form', { id: trip.id }) }}"
-                                       class="btn-action btn-action-edit" title="Modifier">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
+                                    <a href="{{ path('app_profile_trip_form', { trip: trip.id}) }}" class="btn-action btn-action-edit" title="Modifier"><i class="bi bi-pencil"></i></a>
                                 {% endif %}
                                 {% if trip.status.value != 'cancelled' and trip.status.value != 'completed' %}
-                                    <a href="{{ path('app_profile_trip_cancel', { id: trip.id }) }}"
-                                       class="btn-action btn-action-cancel" title="Annuler">
-                                        <i class="bi bi-x-lg"></i>
-                                    </a>
+                                    <form method="post" action="{{ path('app_profile_trip_cancel', { trip: trip.id}) }}" onsubmit="return confirm('Annuler ce trajet ?')" style="display:contents;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('cancel_trip_' ~ trip.id) }}">
+                                        <button type="submit" class="btn-action btn-action-cancel" title="Annuler"><i class="bi bi-x-lg"></i></button>
+                                    </form>
                                 {% endif %}
                             </div>
-
                         </div>
                     </div>
                 {% endfor %}
