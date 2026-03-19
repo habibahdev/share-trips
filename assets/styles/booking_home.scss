@@ -1,0 +1,182 @@
+.booking-page {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #f8fafc;
+    min-height: calc(100vh - 70px);
+    padding: 2.5rem 0;
+}
+
+.booking-card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1.5px solid #f1f5f9;
+    box-shadow: 0 8px 24px rgba(30, 58, 95, 0.06);
+    padding: 1.75rem;
+}
+
+.trip-summary {
+    background: #1e3a5f;
+    border-radius: 16px;
+    padding: 1.5rem;
+    color: #fff;
+    margin-bottom: 1.5rem;
+}
+
+.trip-summary-route {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.trip-summary-meta {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.booking-input {
+    border: 2px solid #f1f5f9;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #f8fafc;
+    transition: border-color 0.2s, background 0.2s;
+    width: 100%;
+}
+
+.booking-input:focus {
+    border-color: #1d4ed8;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.08);
+    outline: none;
+}
+
+.booking-input.is-invalid {
+    border-color: #fca5a5;
+}
+
+.booking-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #64748b;
+    margin-bottom: 0.4rem;
+    display: block;
+}
+
+.price-breakdown {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1rem;
+    margin: 1.25rem 0;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    color: #94a3b8;
+}
+
+.price-row.total {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1e3a5f;
+    margin: 0;
+    padding-top: 0.6rem;
+    border-top: 1.5px solid #f1f5f9;
+    margin-top: 0.6rem;
+}
+
+.btn-book {
+    background: #1e3a5f;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 0.9rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    width: 100%;
+    transition: background 0.2s, transform 0.1s;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.btn-book:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.btn-cancel {
+    background: #f8fafc;
+    color: #475569;
+    border: 1.5px solid #f1f5f9;
+    border-radius: 12px;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.15s;
+    margin-top: 0.75rem;
+}
+
+.btn-cancel:hover {
+    background: #f1f5f9;
+    color: #1e3a5f;
+}
+
+.back-link {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #94a3b8;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.15s;
+}
+
+.back-link:hover {
+    color: #1e3a5f;
+}
+
+.invalid-feedback-st {
+    font-size: 0.78rem;
+    color: #dc2626;
+    font-weight: 500;
+    margin-top: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.driver-avatar-sm {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #1e3a5f;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}

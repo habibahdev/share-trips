@@ -55,7 +55,7 @@
                                     <i class="bi bi-person"></i>
                                     {{ booking.trip.driver.firstName ?? '' }} {{ booking.trip.driver.lastName ?? '' }}
                                 </div>
-                                <div class="trip-meta">
+                                <div class="trip-meta mb-1">
                                     <i class="bi bi-person-check"></i>
                                     {{ booking.seatsBooked }} place{{ booking.seatsBooked > 1 ? 's' : '' }} réservée{{ booking.seatsBooked > 1 ? 's' : '' }}
                                 </div>
@@ -76,14 +76,14 @@
                             </div>
 
                             <div class="col-md-3 d-flex gap-2 justify-content-md-end">
-                                <a href="#" class="btn-detail">
+                                <a href="{{ path('app_profile_booking_show', { booking: booking.id }) }}" class="btn-detail">
                                     <i class="bi bi-eye"></i> Détail
                                 </a>
                                 {% if booking.status.value != 'cancelled' %}
-                                    <form method="post" action="#"
+                                    <form method="post" action="{{ path('app_profile_booking_cancel', { booking: booking.id }) }}"
                                           onsubmit="return confirm('Annuler cette réservation ?')"
                                           style="display:contents;">
-                                        <input type="hidden" name="_token" value="">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('cancel_booking_' ~ booking.id) }}">
                                         <button type="submit" class="btn-cancel-booking">
                                             <i class="bi bi-x-lg"></i> Annuler
                                         </button>

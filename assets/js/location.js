@@ -14,8 +14,10 @@ document.addEventListener('DOMContentLoaded', function () {
     function autocomplete(input) {
         let timer = null;
         let curIndex = -1;
+        const wrapper = input.closest('.autocomplete-wrapper');
+        if (!wrapper) return;
         const dropdown = document.createElement('ul');
-        dropdown.className = 'list-group position-absolutew-100 shadow-sm';
+        dropdown.className = 'list-group position-absolute w-100 shadow-sm';
         dropdown.style.cssText = [
             'z-index: 1050',
             'top: 100%',
@@ -27,8 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
             'margin-top: 2px',
         ].join(';');
 
-        input.parentElement.style.position = 'relative';
-        input.parentElement.appendChild(dropdown);
+        wrapper.appendChild(dropdown);
         input.addEventListener('input', function () {
             clearTimeout(timer);
             curIndex = -1;
@@ -37,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 hideDropdown();
                 return;
             }
-            timer = setTimeout(() => fetchCities(q), 350);
+            timer = setTimeout(() => fetchCities(q), 300);
         });
 
         input.addEventListener('keydown', function (e) {
@@ -59,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         document.addEventListener('click', function (e) {
-            if (!input.parentElement.contains(e.target)) {
+            if (!wrapper.contains(e.target)) {
                 hideDropdown();
             }
         });
@@ -78,6 +79,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+        function highlight(text, query) {
+            if (!query) {
+                return text;
+            }
+            const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<strong>$1</strong>');
+        }
+
         function renderDropdown(cities) {
             dropdown.innerHTML = '';
             curIndex = -1;
@@ -89,8 +98,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 const li = document.createElement('li');
                 li.className = 'list-group-item list-group-item-action py-2 px-3';
                 li.style.cursor = 'pointer';
-                li.style.fontSize = '0.9rem';
-                li.textContent = city.city;
+                li.style.padding = '10px 12px';
+                li.innerHTML = `
+                    <div style="font-weight: 600;">
+                        ${highlight(city.label, query)}
+                    </div>
+                    <div style="font-size:0.8rem; color:#64748b;">
+                        ${city.postcode ?? ''} ${city.state ?? ''} ${city.country ?? ''}
+                    </div>
+                `;
 
                 li.addEventListener('mouseenter', () => {
                     dropdown.querySelectorAll('.list-group-item').forEach(i => i.classList.remove('active'));
@@ -98,7 +114,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
                 li.addEventListener('mouseleave', () => li.classList.remove('active'));
                 li.addEventListener('click', () => {
-                    input.value = city.city;
+                    input.value = city.label;
+                    input.dataset.lat = city.latitude;
+                    input.dataset.lon = city.longitude;
                     input.dispatchEvent(new Event('change'));
                     hideDropdown();
                 });

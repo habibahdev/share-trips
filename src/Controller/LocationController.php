@@ -21,36 +21,21 @@ class LocationController extends AbstractController
         $cities = [];
         $seen = [];
         foreach ($results as $r) {
-            $cityName = $r['address']['city']
-                    ?? $r['address']['town']
-                    ?? $r['address']['village']
-                    ?? $r['address']['municipality']
-                    ?? $r['display_name'];
-            $suburb = $r['address']['suburb'] ?? null;
-            $district = $r['address']['city_district'] ?? null;
-            $postcode = $r['address']['postcode'] ?? null;
-            $state = $r['address']['state'] ?? null;
-            $label = $cityName;
-            if ($suburb) {
-                $label = $cityName . ', ' . $suburb;
-            } elseif ($district) {
-                $label = $cityName . ', ' . $district;
-            } elseif ($postcode) {
-                $label = $cityName . ' (' . $postcode . ')';
-            } elseif ($state) {
-                $label = $cityName . ', ' . $state;
-            } else {
-                $label = $cityName;
-            }
-            if (in_array($label, $seen)) {
+            $label = $r['display_name'];
+            if (in_array($label, $seen, true)) {
                 continue;
             }
             $seen[] = $label;
             $cities[] = [
-                'name' => $r['display_name'],
-                'city' => $label,
+                'label' => $label,
+                'city' => $r['address']['city'] ?? $r['address']['town'] ?? $r['address']['village'] ?? null,
+                'road' => $r['address']['road'] ?? null,
+                'suburb' => $r['address']['suburb'] ?? null,
+                'postcode' => $r['address']['postcode'] ?? null,
+                'state' => $r['address']['state'] ?? null,
+                'country' => $r['address']['country'] ?? null,
                 'latitude' => $r['lat'],
-                'longitude' => $r['lon']
+                'longitude' => $r['lon'],
             ];
         }
         return $this->json($cities);

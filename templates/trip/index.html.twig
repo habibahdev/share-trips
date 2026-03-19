@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tous les trajets | Share Trips{% endblock %}
+
+{% block body %}
+<div class="trips-page container">
+    <h1 style="font-weight:800;color:#1e3a5f;margin-bottom:2rem;">Trajets disponibles</h1>
+
+    {% if trips is empty %}
+        <div class="alert alert-info">
+            Aucun trajet disponible pour le moment.
+        </div>
+    {% endif %}
+
+    {% for trip in trips %}
+        <div class="trip-card">
+            <div class="trip-info">
+                <div class="trip-route">
+                    {{ trip.origin }} → {{ trip.destination }}
+                </div>
+                <div class="trip-meta">
+                    <span><i class="bi bi-calendar3"></i> {{ trip.departureAt|date('d/m/Y H:i') }}</span>
+                    <span><i class="bi bi-person-check"></i> {{ trip.availableSeats }} place{{ trip.availableSeats > 1 ? 's' : '' }} dispo</span>
+                </div>
+                <div class="trip-meta" style="margin-top:.5rem;">
+                    <span>Conducteur: {{ trip.driver.firstName ?? '' }} {{ trip.driver.lastName ?? '' }}</span>
+                </div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:.75rem;">
+                <span class="status-badge {% if trip.status.value == 'open' %}status-open{% else %}status-full{% endif %}">
+                    {% if trip.status.value == 'open' %}Disponible{% else %}Complet{% endif %}
+                </span>
+
+                {% if trip.status.value == 'open' %}
+                    <a href="{{ path('app_trip_show', {id: trip.id}) }}" class="btn-book">
+                        <i class="bi bi-check2-circle"></i> Réserver
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

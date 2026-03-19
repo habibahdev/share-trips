@@ -26,8 +26,7 @@
                                 </label>
                                 {{ form_widget(form.firstName, {
                                     'attr': {
-                                        'class': 'edit-input' ~ (form.firstName.vars.errors|length ? ' is-invalid' : ''),
-                                        'placeholder': 'Votre prénom'
+                                        'class': 'edit-input' ~ (form.firstName.vars.errors|length ? ' is-invalid' : '')
                                     }
                                 }) }}
                                 {% if form.firstName.vars.errors|length %}
@@ -45,8 +44,7 @@
                                 </label>
                                 {{ form_widget(form.lastName, {
                                     'attr': {
-                                        'class': 'edit-input' ~ (form.lastName.vars.errors|length ? ' is-invalid' : ''),
-                                        'placeholder': 'Votre nom'
+                                        'class': 'edit-input' ~ (form.lastName.vars.errors|length ? ' is-invalid' : '')
                                     }
                                 }) }}
                                 {% if form.lastName.vars.errors|length %}
@@ -84,8 +82,7 @@
                                 </label>
                                 {{ form_widget(form.phone, {
                                     'attr': {
-                                        'class': 'edit-input' ~ (form.phone.vars.errors|length ? ' is-invalid' : ''),
-                                        'placeholder': '06 00 00 00 00'
+                                        'class': 'edit-input' ~ (form.phone.vars.errors|length ? ' is-invalid' : '')
                                     }
                                 }) }}
                                 {% if form.phone.vars.errors|length %}

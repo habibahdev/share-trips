@@ -269,3 +269,32 @@ body {
     padding: .3rem .8rem;
     margin-bottom: .75rem;
 }
+
+.autocomplete-wrapper {
+    position: relative;
+}
+
+.autocomplete-wrapper .list-group {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 1050;
+}
+
+.list-group {
+    border: 1px solid #e2e8f0;
+    background: white;
+}
+
+.list-group-item {
+    transition: background 0.15s;
+}
+
+.list-group-item:hover {
+    background: #f1f5f9;
+}
+
+.search-card {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
