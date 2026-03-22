@@ -20,7 +20,8 @@ class DashboardController extends AbstractDashboardController
         private TripRepository $tripRepository,
         private BookingRepository $bookingRepository,
         private ReportRepository $reportRepository
-    ) {}
+    ) {
+    }
 
     public function index(): Response
     {

@@ -66,7 +66,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'reporter', targetEntity: Report::class)]
     private Collection $reportsMade;
 
-    /** @var Collection<int, Reposrt> */
+    /** @var Collection<int, Report> */
     #[ORM\OneToMany(mappedBy: 'reported', targetEntity: Report::class)]
     private Collection $reportsReceived;
 

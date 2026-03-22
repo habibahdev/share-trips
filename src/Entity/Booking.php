@@ -61,7 +61,10 @@ class Booking
 
     public function __toString()
     {
-        return $this->trip->getOrigin() . ' -> ' . $this->trip->getDestination() . ' (' . $this->passenger->getFullName() . ')';
+        return $this->trip->getOrigin() . ' -> ' .
+            $this->trip->getDestination() . ' (' .
+            $this->passenger->getFullName() . ')'
+        ;
     }
 
     #[ORM\PrePersist]

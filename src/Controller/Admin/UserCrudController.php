@@ -18,6 +18,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 
+/**
+ * @extends AbstractCrudController<User>
+ */
 class UserCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
@@ -30,7 +33,7 @@ class UserCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInPlural('Utilisateurs')
             ->setEntityLabelInSingular('Utilisateur')
-            ->setDefaultSort(['id' => 'desc'])
+            ->setDefaultSort(['id' => 'DESC'])
         ;
     }
 

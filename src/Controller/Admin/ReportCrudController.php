@@ -13,6 +13,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 
+/**
+ * @extends AbstractCrudController<Report>
+ */
 class ReportCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
@@ -25,7 +28,7 @@ class ReportCrudController extends AbstractCrudController
         return $crud
             ->setEntityLabelInPlural('Signalements')
             ->setEntityLabelInSingular('Signalement')
-            ->setDefaultSort(['createdAt' => 'desc'])
+            ->setDefaultSort(['createdAt' => 'DESC'])
             ->showEntityActionsInlined()
         ;
     }
