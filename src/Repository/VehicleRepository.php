@@ -18,8 +18,6 @@ class VehicleRepository extends ServiceEntityRepository
     }
 
     /**
-     * Undocumented function
-     *
      * @param User $user
      * @return Vehicle[]
      */
@@ -36,8 +34,6 @@ class VehicleRepository extends ServiceEntityRepository
     }
 
     /**
-     * Undocumented function
-     *
      * @param string $licensePlate
      * @param integer|null $excludeId
      * @return boolean

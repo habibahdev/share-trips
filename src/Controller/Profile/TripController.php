@@ -27,19 +27,6 @@ final class TripController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/trip/{trip}', name: 'app_profile_trip_show')]
-    public function show(Trip $trip): Response
-    {
-        $user = $this->getUser();
-        assert($user instanceof User);
-        if ($trip->getDriver()->getId() !== $user->getId()) {
-            return $this->redirectToRoute('app_profile_trip');
-        }
-        return $this->render('profile/trip/show.html.twig', [
-            'trip' => $trip
-        ]);
-    }
-
     #[Route('/profile/trip/form/{trip}', name: 'app_profile_trip_form', defaults: ['trip' => null])]
     public function form(?Trip $trip, Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -109,6 +96,19 @@ final class TripController extends AbstractController
         $this->addFlash('success', 'Réservation confirmée.');
         return $this->redirectToRoute('app_profile_trip_show', [
             'trip' => $trip->getId()
+        ]);
+    }
+
+    #[Route('/profile/trip/{trip}', name: 'app_profile_trip_show')]
+    public function show(Trip $trip): Response
+    {
+        $user = $this->getUser();
+        assert($user instanceof User);
+        if ($trip->getDriver()->getId() !== $user->getId()) {
+            return $this->redirectToRoute('app_profile_trip');
+        }
+        return $this->render('profile/trip/show.html.twig', [
+            'trip' => $trip
         ]);
     }
 }

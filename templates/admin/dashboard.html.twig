@@ -1,0 +1,65 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block page_title %}Tableau de bord{% endblock %}
+
+{% block main %}
+<div style="font-family:'Plus Jakarta Sans',sans-serif;">
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div style="background:#fff;border-radius:16px;border:1.5px solid #f1f5f9;padding:1.5rem;">
+                <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:#94a3b8;margin-bottom:.5rem;">Utilisateurs</div>
+                <div style="font-size:2rem;font-weight:800;color:#1e3a5f;">{{ totalUsers }}</div>
+                <div style="font-size:.78rem;color:#dc2626;margin-top:.25rem;">{{ bannedUsers }} bannis · {{ suspendedUsers }} suspendus</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div style="background:#fff;border-radius:16px;border:1.5px solid #f1f5f9;padding:1.5rem;">
+                <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:#94a3b8;margin-bottom:.5rem;">Trajets</div>
+                <div style="font-size:2rem;font-weight:800;color:#1e3a5f;">{{ totalTrips }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div style="background:#fff;border-radius:16px;border:1.5px solid #f1f5f9;padding:1.5rem;">
+                <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:#94a3b8;margin-bottom:.5rem;">Réservations</div>
+                <div style="font-size:2rem;font-weight:800;color:#1e3a5f;">{{ totalBookings }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div style="background:{% if pendingReports > 0 %}#fef9c3{% else %}#fff{% endif %};border-radius:16px;border:1.5px solid {% if pendingReports > 0 %}#fde68a{% else %}#f1f5f9{% endif %};padding:1.5rem;">
+                <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;color:#94a3b8;margin-bottom:.5rem;">Signalements en attente</div>
+                <div style="font-size:2rem;font-weight:800;color:{% if pendingReports > 0 %}#854d0e{% else %}#1e3a5f{% endif %};">{{ pendingReports }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;border:1.5px solid #f1f5f9;padding:1.5rem;">
+        <h2 style="font-size:1rem;font-weight:700;color:#1e3a5f;margin-bottom:1rem;">Signalements récents</h2>
+        {% if recentReports is empty %}
+            <p style="color:#94a3b8;font-size:.875rem;">Aucun signalement en attente.</p>
+        {% else %}
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th style="font-size:.72rem;color:#94a3b8;font-weight:700;text-transform:uppercase;">Signalé par</th>
+                        <th style="font-size:.72rem;color:#94a3b8;font-weight:700;text-transform:uppercase;">Utilisateur signalé</th>
+                        <th style="font-size:.72rem;color:#94a3b8;font-weight:700;text-transform:uppercase;">Motif</th>
+                        <th style="font-size:.72rem;color:#94a3b8;font-weight:700;text-transform:uppercase;">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for report in recentReports %}
+                        <tr>
+                            <td style="font-size:.875rem;">{{ report.reporter.firstName }} {{ report.reporter.lastName }}</td>
+                            <td style="font-size:.875rem;font-weight:600;color:#1e3a5f;">{{ report.reported.firstName }} {{ report.reported.lastName }}</td>
+                            <td style="font-size:.875rem;color:#475569;">{{ report.reason|slice(0, 60) }}{% if report.reason|length > 60 %}...{% endif %}</td>
+                            <td style="font-size:.78rem;color:#94a3b8;">{{ report.createdAt|date('d/m/Y') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

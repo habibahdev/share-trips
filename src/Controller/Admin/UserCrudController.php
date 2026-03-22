@@ -1,0 +1,87 @@
+<?php
+
+namespace App\Controller\Admin;
+
+use App\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
+
+/**
+ * @extends AbstractCrudController<User>
+ */
+class UserCrudController extends AbstractCrudController
+{
+    public static function getEntityFqcn(): string
+    {
+        return User::class;
+    }
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setEntityLabelInPlural('Utilisateurs')
+            ->setEntityLabelInSingular('Utilisateur')
+            ->setDefaultSort(['id' => 'DESC'])
+        ;
+    }
+
+    public function configureFields(string $pageName): iterable
+    {
+        $disabled = $pageName === Crud::PAGE_EDIT;
+        return [
+            IdField::new('id')->onlyOnIndex(),
+            TextField::new('fullName', 'Nom - Prénom')
+                ->setFormTypeOption('disabled', $disabled),
+            EmailField::new('email', 'Adresse e-mail')
+                ->setFormTypeOption('disabled', $disabled),
+            ChoiceField::new('status', 'Statut')
+                ->setChoices([
+                    'Actif' => 'active',
+                    'Suspendu' => 'suspended',
+                    'Banni' => 'banned'
+                ])
+                ->renderAsBadges([
+                    'active' => 'success',
+                    'suspended' => 'warning',
+                    'banned' => 'danger'
+                ]),
+            DateField::new('suspendedUntil', 'Suspendu jusqu\'au')->hideOnIndex(),
+            TextareaField::new('adminNote', 'Note admin')->hideOnIndex(),
+            DateTimeField::new('createdAt', 'Inscrit le')->onlyOnIndex()->hideOnForm()
+        ];
+    }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->remove(Crud::PAGE_INDEX, Action::DELETE)
+            ->remove(Crud::PAGE_INDEX, Action::NEW)
+            ->setPermission(Action::DELETE, 'ROLE_ADMIN')
+        ;
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add(TextFilter::new('email'))
+            ->add(ChoiceFilter::new('status')->setChoices([
+                'Actif' => 'active',
+                'Suspendu' => 'suspended',
+                'Banni' => 'banned'
+            ]))
+        ;
+    }
+}

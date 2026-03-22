@@ -93,6 +93,13 @@
                                                     {% endif %}
                                                 </div>
                                             </div>
+                                            {% if booking.status.value == 'confirmed' and trip.departureAt < date() %}
+                                                <a href="{{ path('app_report_add', { id: booking.id }) }}"
+                                                style="font-size:.72rem;color:#dc2626;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
+                                                    <i class="bi bi-flag"></i> Signaler
+                                                </a>
+                                            {% endif %}
+                                            
                                         {% endif %}
                                     {% endfor %}
                                 </div>

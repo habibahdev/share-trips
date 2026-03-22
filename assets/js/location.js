@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function autocomplete(input) {
         let timer = null;
         let curIndex = -1;
+        let curQuery = '';
         const wrapper = input.closest('.autocomplete-wrapper');
         if (!wrapper) return;
         const dropdown = document.createElement('ul');
@@ -34,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
             clearTimeout(timer);
             curIndex = -1;
             const q = this.value.trim();
+            curQuery = q;
             if (q.length < 2) {
                 hideDropdown();
                 return;
@@ -98,23 +100,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 const li = document.createElement('li');
                 li.className = 'list-group-item list-group-item-action py-2 px-3';
                 li.style.cursor = 'pointer';
-                li.style.padding = '10px 12px';
                 li.innerHTML = `
-                    <div style="font-weight: 600;">
-                        ${highlight(city.label, query)}
-                    </div>
-                    <div style="font-size:0.8rem; color:#64748b;">
-                        ${city.postcode ?? ''} ${city.state ?? ''} ${city.country ?? ''}
+                    <div style="font-weight:600;">
+                        ${highlight(city.city, curQuery)}
                     </div>
                 `;
-
                 li.addEventListener('mouseenter', () => {
                     dropdown.querySelectorAll('.list-group-item').forEach(i => i.classList.remove('active'));
                     li.classList.add('active');
                 });
                 li.addEventListener('mouseleave', () => li.classList.remove('active'));
                 li.addEventListener('click', () => {
-                    input.value = city.label;
+                    input.value = city.city;
                     input.dataset.lat = city.latitude;
                     input.dataset.lon = city.longitude;
                     input.dispatchEvent(new Event('change'));

@@ -7,10 +7,6 @@
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
-
-        {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
-        {% endblock %}
     </head>
     <body class="d-flex flex-column min-vh-100 bg-light">
 
@@ -19,8 +15,21 @@
         <div class="container">
             {% for label, messages in app.flashes %}
                 {% for message in messages %}
-                    <div class="alert alert-{{ label }} alert-dismissible fade show mb-0 rounded-0" role="alert">
-                        {{ message }}
+                    <div class="alert alert-{{ label }} alert-dismissible fade show d-flex align-items-center custom-alert" role="alert">
+                        <span class="alert-icon me-2">
+                            {% if label == 'success' %}
+                                <i class="bi bi-check-circle-fill"></i>
+                            {% elseif label == 'danger' %}
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                            {% elseif label == 'warning' %}
+                                <i class="bi bi-exclamation-circle-fill"></i>
+                            {% else %}
+                                <i class="bi bi-info-circle-fill"></i>
+                            {% endif %}
+                        </span>
+                        <div class="flex-grow-1">
+                            {{ message }}
+                        </div>
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 {% endfor %}
@@ -34,5 +43,9 @@
         </main>
 
         {% include "base/footer.html.twig" %}
+
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+        {% endblock %}
     </body>
 </html>

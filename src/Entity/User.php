@@ -62,11 +62,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'passenger', targetEntity: Booking::class)]
     private Collection $bookings;
 
+    /** @var Collection<int, Report> */
+    #[ORM\OneToMany(mappedBy: 'reporter', targetEntity: Report::class)]
+    private Collection $reportsMade;
+
+    /** @var Collection<int, Report> */
+    #[ORM\OneToMany(mappedBy: 'reported', targetEntity: Report::class)]
+    private Collection $reportsReceived;
+
+    #[ORM\Column(length: 20)]
+    private ?string $status = 'active';
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $suspendedUntil = null;
+
+    #[ORM\Column(nullable: true, type: 'text')]
+    private ?string $adminNote = null;
+
     public function __construct()
     {
         $this->vehicles = new ArrayCollection();
         $this->tripsAsDriver = new ArrayCollection();
         $this->bookings = new ArrayCollection();
+        $this->reportsMade = new ArrayCollection();
+        $this->reportsReceived = new ArrayCollection();
+    }
+
+    public function __toString()
+    {
+        return $this->firstName . ' ' . $this->lastName . ' (' . $this->email . ')';
     }
 
     #[ORM\PrePersist]
@@ -273,6 +297,77 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $booking->setPassenger(null);
             }
         }
+        return $this;
+    }
+
+    /** @return Collection<int, Report> */
+    public function getReportsMade(): Collection
+    {
+        return $this->reportsMade;
+    }
+
+    /** @return Collection<int, Report> */
+    public function getReportsReceived(): Collection
+    {
+        return $this->reportsReceived;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getSuspendedUntil(): ?\DateTimeImmutable
+    {
+        return $this->suspendedUntil;
+    }
+
+    public function setSuspendedUntil(?\DateTimeImmutable $suspendedUntil): static
+    {
+        $this->suspendedUntil = $suspendedUntil;
+
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->status === 'banned';
+    }
+
+    public function isSuspended(): bool
+    {
+        return $this->status === 'suspended'
+            && $this->suspendedUntil !== null
+            && $this->suspendedUntil > new \DateTimeImmutable()
+        ;
+    }
+
+    public function isBlocked(): bool
+    {
+        return $this->isBanned() || $this->isSuspended();
+    }
+
+    public function getAdminNote(): ?string
+    {
+        return $this->adminNote;
+    }
+
+    public function setAdminNote(?string $adminNote): static
+    {
+        $this->adminNote = $adminNote;
+
         return $this;
     }
 }
