@@ -7,6 +7,8 @@ use App\Repository\BookingRepository;
 use App\Validator\AvailableSeats;
 use App\Validator\NotTripDriver;
 use App\Validator\TripOpen;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -47,6 +49,20 @@ class Booking
 
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    /** @var Collection<int, Report> */
+    #[ORM\OneToMany(mappedBy: 'booking', targetEntity: Report::class, orphanRemoval: true)]
+    private Collection $reports;
+
+    public function __construct()
+    {
+        $this->reports = new ArrayCollection();
+    }
+
+    public function __toString()
+    {
+        return $this->trip->getOrigin() . ' -> ' . $this->trip->getDestination() . ' (' . $this->passenger->getFullName() . ')';
+    }
 
     #[ORM\PrePersist]
     public function onPrePersist(): void
@@ -123,5 +139,40 @@ class Booking
     public function getTotalPrice(): float
     {
         return $this->trip->getPricePerSeat() * $this->seatsBooked;
+    }
+
+    /** @return Collection<int, Report> */
+    public function getReports(): Collection
+    {
+        return $this->reports;
+    }
+
+    public function addReport(Report $report): static
+    {
+        if (!$this->reports->contains($report)) {
+            $this->reports->add($report);
+            $report->setBooking($this);
+        }
+        return $this;
+    }
+
+    public function removeReport(Report $report): static
+    {
+        if ($this->reports->removeElement($report)) {
+            if ($report->getBooking() === $this) {
+                $report->setBooking(null);
+            }
+        }
+        return $this;
+    }
+
+    public function hasBeeanReportedBy(User $user): bool
+    {
+        foreach ($this->reports as $report) {
+            if ($report->getReporter()->getId() === $user->getId()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

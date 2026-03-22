@@ -11,25 +11,22 @@ class OpenStreetMapService
     }
 
     /**
-     * Undocumented function
-     *
-     * @param string $query
      * @return array<int, array<string, mixed>>
      */
     public function searchCity(string $query): array
     {
-        $response = $this->client->request('GET', 'https://nominatim.openstreetmap.org/search', [
+        $response = $this->client->request('GET', 'https://photon.komoot.io/api/', [
             'query' => [
                 'q' => $query,
-                'format' => 'json',
-                'addressdetails' => 1,
-                'limit' => 8,
-                'countrycodes' => 'fr'
+                'limit' => 10,
+                'lang' => 'fr',
+                'bbox' => '-5.142,41.333,9.561,51.089'
             ],
             'headers' => [
                 'User-Agent' => 'ShareTrips/1.0 constact@sharetrips.fr',
             ]
         ]);
-        return $response->toArray();
+        $data = $response->toArray();
+        return $data['features'] ?? [];
     }
 }

@@ -20,8 +20,6 @@ class TripRepository extends ServiceEntityRepository
     }
 
     /**
-     * Undocumented function
-     *
      * @param string|null $origin
      * @param string|null $destination
      * @param \DateTimeImmutable|null $date
@@ -46,12 +44,12 @@ class TripRepository extends ServiceEntityRepository
                 ->setParameter('start', $date->setTime(0, 0, 0))
                 ->setParameter('end', $date->setTime(23, 59, 59));
         }
+        $query->orderBy('t.departureAt', 'asc')
+            ->setMaxResults(10);
         return $query->getQuery()->getResult();
     }
 
     /**
-     * Undocumented function
-     *
      * @param integer $limit
      * @return Trip[]
      */
@@ -65,8 +63,6 @@ class TripRepository extends ServiceEntityRepository
     }
 
     /**
-     * Undocumented function
-     *
      * @param User $driver
      * @return Trip[]
      */

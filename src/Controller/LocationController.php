@@ -21,21 +21,34 @@ class LocationController extends AbstractController
         $cities = [];
         $seen = [];
         foreach ($results as $r) {
-            $label = $r['display_name'];
+            $props = $r['properties'];
+            $coords = $r['geometry']['coordinates'];
+
+            $name = $props['name'] ?? null;
+            $city = $props['city'] ?? $props['town'] ?? $props['village'] ?? null;
+            $street = $props['street'] ?? null;
+            $postcode = $props['postcode'] ?? null;
+            $state = $props['state'] ?? null;
+
+            if ($name && $city && $name !== $city) {
+                $label = $name . ', ' . $city;
+            } elseif ($street && $city) {
+                $label = $street . ', ' . $city;
+            } elseif ($city && $postcode) {
+                $label = $city . ' (' . $postcode . ')';
+            } elseif ($name && $state) {
+                $label = $name . ', ' . $state;
+            } else {
+                $label = $name ?? $city ?? 'Lieu inconnu';
+            }
             if (in_array($label, $seen, true)) {
                 continue;
             }
             $seen[] = $label;
             $cities[] = [
-                'label' => $label,
-                'city' => $r['address']['city'] ?? $r['address']['town'] ?? $r['address']['village'] ?? null,
-                'road' => $r['address']['road'] ?? null,
-                'suburb' => $r['address']['suburb'] ?? null,
-                'postcode' => $r['address']['postcode'] ?? null,
-                'state' => $r['address']['state'] ?? null,
-                'country' => $r['address']['country'] ?? null,
-                'latitude' => $r['lat'],
-                'longitude' => $r['lon'],
+                'city' => $label,
+                'latitude' => (string) $coords[1],
+                'longitude' => (string) $coords[0],
             ];
         }
         return $this->json($cities);

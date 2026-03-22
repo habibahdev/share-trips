@@ -20,8 +20,6 @@ class BookingRepository extends ServiceEntityRepository
     }
 
     /**
-     * Undocumented function
-     *
      * @param User $passenger
      * @return Booking[]
      */
@@ -40,8 +38,6 @@ class BookingRepository extends ServiceEntityRepository
     }
 
     /**
-     * Undocumented function
-     *
      * @param Trip $trip
      * @return Booking[]
      */
@@ -60,8 +56,6 @@ class BookingRepository extends ServiceEntityRepository
     }
 
     /**
-     * Undocumented function
-     *
      * @param Trip $trip
      * @param integer|null $excludeBookingId
      * @return integer
@@ -83,8 +77,6 @@ class BookingRepository extends ServiceEntityRepository
     }
 
     /**
-     * Undocumented function
-     *
      * @param Trip $trip
      * @param User $passenger
      * @return boolean
