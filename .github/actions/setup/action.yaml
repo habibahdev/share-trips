@@ -6,9 +6,6 @@ inputs:
     description: 'Coverage driver (none, xdebug, pcov)'
     required: false
     default: 'none'
-env:
-  MAILER_FROM: "noreply@sharetrips.fr"
-  MAILER_FROM_NAME: "ShareTrips"
 runs:
   using: composite
   steps:

@@ -14,8 +14,11 @@ permissions:
   contents: read
   pull-requests: write
 
-jobs:
+env:
+  MAILER_FROM: "noreply@sharetrips.fr"
+  MAILER_FROM_NAME: "ShareTrips"
 
+jobs:
   security-checker:
     name: Security Checker
     runs-on: ubuntu-latest
