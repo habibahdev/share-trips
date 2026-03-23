@@ -6,11 +6,10 @@ inputs:
     description: 'Coverage driver (none, xdebug, pcov)'
     required: false
     default: 'none'
-
+env:
+  MAILER_FROM: "noreply@sharetrips.fr"
 runs:
   using: composite
-  env:
-    MAILER_FROM: "noreply@sharetrips.fr"
   steps:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
