@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Enum\BookingStatus;
 use App\Enum\TripStatus;
 use App\Form\TripType;
+use App\Service\MailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,7 +80,8 @@ final class TripController extends AbstractController
     public function confirmBooking(
         Booking $booking,
         EntityManagerInterface $entityManager,
-        Request $request
+        Request $request,
+        MailService $mailer
     ): Response {
         $user = $this->getUser();
         assert($user instanceof User);
@@ -93,6 +95,7 @@ final class TripController extends AbstractController
         }
         $booking->setStatus(BookingStatus::Confirmed);
         $entityManager->flush();
+        $mailer->sendBookingApproved($booking);
         $this->addFlash('success', 'Réservation confirmée.');
         return $this->redirectToRoute('app_profile_trip_show', [
             'trip' => $trip->getId()

@@ -6,6 +6,7 @@ use App\Entity\Booking;
 use App\Entity\Trip;
 use App\Entity\User;
 use App\Form\BookingType;
+use App\Service\MailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,8 +16,12 @@ use Symfony\Component\Routing\Attribute\Route;
 final class BookingController extends AbstractController
 {
     #[Route('/trip/{trip}/booking/add', name: 'app_booking_add')]
-    public function index(Trip $trip, Request $request, EntityManagerInterface $entityManager): Response
-    {
+    public function index(
+        Trip $trip,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        MailService $mailer
+    ): Response {
         $user = $this->getUser();
         assert($user instanceof User);
         $booking = new Booking();
@@ -28,8 +33,10 @@ final class BookingController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($booking);
+            $mailer->sendBookingConfirmation($booking);
+            $mailer->sendNewBookingToDriver($booking);
             $entityManager->flush();
-            $this->addFlash('success', 'Réservation confirmée.');
+            $this->addFlash('success', 'Réservation effectuée.');
             return $this->redirectToRoute('app_trip_show', ['id' => $trip->getId()]);
         }
         return $this->render('booking/index.html.twig', [

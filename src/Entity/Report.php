@@ -23,7 +23,7 @@ class Report
     #[ORM\JoinColumn(nullable: false)]
     private ?User $reported = null;
 
-    #[ORM\ManyToOne(targetEntity: Booking::class)]
+    #[ORM\ManyToOne(targetEntity: Booking::class, inversedBy: 'reports')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Booking $booking = null;
 

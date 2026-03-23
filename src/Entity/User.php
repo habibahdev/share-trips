@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use DateInterval;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -79,6 +80,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true, type: 'text')]
     private ?string $adminNote = null;
 
+    #[ORM\Column]
+    private ?bool $isVerified = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $tokenRegister = null;
+
+    #[ORM\Column]
+    private ?\DateTime $tokenRegisterLifetime = null;
+
     public function __construct()
     {
         $this->vehicles = new ArrayCollection();
@@ -86,6 +96,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->bookings = new ArrayCollection();
         $this->reportsMade = new ArrayCollection();
         $this->reportsReceived = new ArrayCollection();
+        $this->isVerified = false;
+        $this->tokenRegisterLifetime = (new \DateTime('now'))->add(new DateInterval('P1D'));
     }
 
     public function __toString()
@@ -367,6 +379,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setAdminNote(?string $adminNote): static
     {
         $this->adminNote = $adminNote;
+
+        return $this;
+    }
+
+    public function isVerified(): ?bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    public function getTokenRegister(): ?string
+    {
+        return $this->tokenRegister;
+    }
+
+    public function setTokenRegister(?string $tokenRegister): static
+    {
+        $this->tokenRegister = $tokenRegister;
+
+        return $this;
+    }
+
+    public function getTokenRegisterLifetime(): ?\DateTime
+    {
+        return $this->tokenRegisterLifetime;
+    }
+
+    public function setTokenRegisterLifetime(\DateTime $tokenRegisterLifetime): static
+    {
+        $this->tokenRegisterLifetime = $tokenRegisterLifetime;
 
         return $this;
     }

@@ -3,6 +3,7 @@ includes:
 
 parameters:
     level: 7
+    treatPhpDocTypesAsCertain: false
     excludePaths:
         - tests/bootstrap.php
         - src/Kernel.php

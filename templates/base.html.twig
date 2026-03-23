@@ -12,7 +12,14 @@
 
         {% include "base/navbar.html.twig" %}
 
-        <div class="container">
+        {% if app.user and app.user.isVerified == false %}
+            <div class="alert alert-info d-flex align-items-center custom-alert" role="alert">
+                Adresse e-mail non vérifiée <a href="{{ path('app_resend') }}" class="alert-link">Renvoyer le lien</a>.
+            </div>
+        {% endif %}
+        
+
+        <div class="container mt-2">
             {% for label, messages in app.flashes %}
                 {% for message in messages %}
                     <div class="alert alert-{{ label }} alert-dismissible fade show d-flex align-items-center custom-alert" role="alert">

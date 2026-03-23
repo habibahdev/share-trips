@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;padding:2rem;">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:20px;border:1.5px solid #f1f5f9;padding:2rem;">
+
+    <div style="text-align:center;margin-bottom:2rem;">
+        <h1 style="color:#1e3a5f;font-size:1.5rem;font-weight:800;">
+            Share<span style="color:#1d4ed8;">Trips</span>
+        </h1>
+    </div>
+
+    <h2 style="color:#1e3a5f;font-weight:700;">Nouvelle demande de réservation 🎉</h2>
+    <p style="color:#475569;">
+        Bonjour {{ booking.trip.driver.firstName }},
+        <strong>{{ booking.passenger.firstName }} {{ booking.passenger.lastName }}</strong>
+        souhaite réserver une place sur votre trajet.
+    </p>
+
+    <div style="background:#eff6ff;border-radius:12px;padding:1.25rem;margin:1.5rem 0;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
+            <span style="color:#94a3b8;font-size:.875rem;">Trajet</span>
+            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">
+                {{ booking.trip.origin }} → {{ booking.trip.destination }}
+            </span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
+            <span style="color:#94a3b8;font-size:.875rem;">Date</span>
+            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">
+                {{ booking.trip.departureAt|date('d/m/Y à H:i') }}
+            </span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
+            <span style="color:#94a3b8;font-size:.875rem;">Passager</span>
+            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">
+                {{ booking.passenger.firstName }} {{ booking.passenger.lastName }}
+            </span>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+            <span style="color:#94a3b8;font-size:.875rem;">Places demandées</span>
+            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">
+                {{ booking.seatsBooked }} place{{ booking.seatsBooked > 1 ? 's' : '' }}
+            </span>
+        </div>
+    </div>
+
+    <div style="text-align:center;margin:1.5rem 0;">
+        <a href="{{ absolute_url(path('app_profile_trip_show', { trip: booking.trip.id } )) }}"
+           style="background:#1e3a5f;color:#fff;border-radius:12px;padding:.85rem 2rem;font-weight:700;text-decoration:none;display:inline-block;">
+            Voir la demande et confirmer
+        </a>
+    </div>
+
+    <p style="color:#94a3b8;font-size:.8rem;text-align:center;">
+        © {{ "now"|date("Y") }} ShareTrips — Tous droits réservés
+    </p>
+</div>
+</body>
+</html>

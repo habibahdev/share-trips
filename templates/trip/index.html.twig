@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Tous les trajets | Share Trips{% endblock %}
+{% block title %}Tous les trajets - Share Trips{% endblock %}
 
 {% block body %}
 <div class="trips-page container">
@@ -8,7 +8,14 @@
 
     {% if trips is empty %}
         <div class="alert alert-info">
-            Aucun trajet disponible pour le moment.
+            {% if origin or destination or date %}
+                Aucun trajet ne correspond à votre recherche.
+                {% if origin %} Départ : <strong>{{ origin }}</strong>. {% endif %}
+                {% if destination %} Arrivée : <strong>{{ destination }}</strong>. {% endif %}
+                {% if date %} Date : <strong>{{ date|date('d/m/Y') }}</strong>. {% endif %}
+            {% else %}
+                Aucun trajet disponible pour le moment.
+            {% endif %}
         </div>
     {% endif %}
 
