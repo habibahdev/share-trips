@@ -9,6 +9,8 @@ inputs:
 
 runs:
   using: composite
+  env:
+    MAILER_FROM: "noreply@sharetrips.fr"
   steps:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
