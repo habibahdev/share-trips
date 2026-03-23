@@ -8,6 +8,7 @@ inputs:
     default: 'none'
 env:
   MAILER_FROM: "noreply@sharetrips.fr"
+  MAILER_FROM_NAME: "ShareTrips"
 runs:
   using: composite
   steps:
