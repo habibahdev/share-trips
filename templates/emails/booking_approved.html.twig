@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;padding:2rem;">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:20px;border:1.5px solid #f1f5f9;padding:2rem;">
+
+    <div style="text-align:center;margin-bottom:2rem;">
+        <h1 style="color:#1e3a5f;font-size:1.5rem;font-weight:800;">
+            Share<span style="color:#1d4ed8;">Trips</span>
+        </h1>
+    </div>
+
+    <div style="text-align:center;margin-bottom:1.5rem;">
+        <div style="width:64px;height:64px;border-radius:50%;background:#dcfce7;display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;">✓</div>
+    </div>
+
+    <h2 style="color:#1e3a5f;font-weight:700;text-align:center;">Réservation confirmée !</h2>
+    <p style="color:#475569;text-align:center;">Bonjour {{ booking.passenger.firstName }}, votre réservation a été confirmée par le conducteur.</p>
+
+    <div style="background:#eff6ff;border-radius:12px;padding:1.25rem;margin:1.5rem 0;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
+            <span style="color:#94a3b8;font-size:.875rem;">Trajet</span>
+            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">{{ booking.trip.origin }} → {{ booking.trip.destination }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
+            <span style="color:#94a3b8;font-size:.875rem;">Date</span>
+            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">{{ booking.trip.departureAt|date('d/m/Y à H:i') }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
+            <span style="color:#94a3b8;font-size:.875rem;">Conducteur</span>
+            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">{{ booking.trip.driver.fullName }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+            <span style="color:#94a3b8;font-size:.875rem;">Total payé</span>
+            <span style="color:#1e3a5f;font-weight:800;">{{ booking.totalPrice }}€</span>
+        </div>
+    </div>
+
+    <p style="color:#94a3b8;font-size:.8rem;text-align:center;">
+        © {{ "now"|date("Y") }} ShareTrips — Tous droits réservés
+    </p>
+</div>
+</body>
+</html>

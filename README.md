@@ -74,5 +74,10 @@ symfony server:stop
 docker compose -f docker-compose.dev.yaml stop
 ```
 
+## Maildev
+```
+npm run maildev
+```
+
 ## Remerciements
 [Florian](https://github.com/florianppn) pour ces conseils et remarques aiguisées. Mais également pour être le testeur officiel de l'application. Coeur sur lui

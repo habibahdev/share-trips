@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Service\MailService;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -23,6 +25,28 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
  */
 class UserCrudController extends AbstractCrudController
 {
+    public function __construct(private MailService $mailer)
+    {
+    }
+
+    public function updateEntity(EntityManagerInterface $entityManager, object $entityInstance): void
+    {
+        if (!$entityInstance instanceof User) {
+            parent::updateEntity($entityManager, $entityInstance);
+            return;
+        }
+
+        $originalStatus = $entityManager->getUnitOfWork()->getOriginalEntityData($entityInstance)['status'] ?? null;
+        parent::updateEntity($entityManager, $entityInstance);
+        if ($originalStatus !== $entityInstance->getStatus()) {
+            if ($entityInstance->isBanned()) {
+                $this->mailer->sendBan($entityInstance);
+            } elseif ($entityInstance->isSuspended()) {
+                $this->mailer->sendSuspension($entityInstance);
+            }
+        }
+    }
+
     public static function getEntityFqcn(): string
     {
         return User::class;

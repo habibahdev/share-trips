@@ -6,6 +6,7 @@ use App\Entity\Booking;
 use App\Entity\User;
 use App\Enum\BookingStatus;
 use App\Repository\BookingRepository;
+use App\Repository\TripRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,13 +16,32 @@ use Symfony\Component\Routing\Attribute\Route;
 final class BookingController extends AbstractController
 {
     #[Route('/profile/booking', name: 'app_profile_booking')]
-    public function index(BookingRepository $bookingRepository): Response
-    {
+    public function index(
+        BookingRepository $bookingRepository,
+        TripRepository $tripRepository,
+        Request $request
+    ): Response {
         $user = $this->getUser();
         assert($user instanceof User);
+        $origin = $request->query->get('origin');
+        $destination = $request->query->get('destination');
+        $dateString = $request->query->get('date');
+        $date = $dateString ? new \DateTimeImmutable($dateString) : null;
+        $availableTrips = null;
+        if ($origin || $destination || $date) {
+            $availableTrips = $tripRepository->findAvailableTrips(
+                $origin,
+                $destination,
+                $date
+            );
+        }
         $bookings = $bookingRepository->findByPassenger($user);
         return $this->render('profile/booking/index.html.twig', [
             'bookings' => $bookings,
+            'availableTrips' => $availableTrips,
+            'origin' => $origin,
+            'destination' => $destination,
+            'date' => $date
         ]);
     }
 
