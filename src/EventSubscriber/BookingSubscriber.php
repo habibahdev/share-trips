@@ -6,10 +6,10 @@ use App\Entity\Booking;
 use App\Enum\BookingStatus;
 use App\Enum\TripStatus;
 use Doctrine\Common\EventSubscriber;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
-use Doctrine\Persistence\ObjectManager;
 
 class BookingSubscriber implements EventSubscriber
 {
@@ -30,12 +30,13 @@ class BookingSubscriber implements EventSubscriber
         if (!$args->hasChangedField('status')) {
             return;
         }
-        $om = $args->getObjectManager();
-        $this->updateTripSeats($entity, $om);
+        /** @var EntityManagerInterface $em */
+        $em = $args->getObjectManager();
+        $this->updateTripSeats($entity, $em);
     }
 
     /**
-     * @param LifecycleEventArgs<ObjectManager> $args
+     * @param LifecycleEventArgs<EntityManagerInterface> $args
      */
     public function postPersist(LifecycleEventArgs $args): void
     {
@@ -49,7 +50,7 @@ class BookingSubscriber implements EventSubscriber
         $this->updateTripSeats($entity, $args->getObjectManager());
     }
 
-    private function updateTripSeats(Booking $booking, ObjectManager $entityManager): void
+    private function updateTripSeats(Booking $booking, EntityManagerInterface $entityManager): void
     {
         $trip = $booking->getTrip();
         if (!$trip) {
@@ -71,8 +72,18 @@ class BookingSubscriber implements EventSubscriber
         $trip->setAvailableSeats($availableSeats);
         if ($availableSeats <= 0) {
             $trip->setStatus(TripStatus::Full);
-        } elseif ($trip->getStatus() === TripStatus::Full) {
-            $trip->setStatus(TripStatus::Open);
+        } elseif ($availableSeats > 0) {
+            if (!in_array($trip->getStatus(), [TripStatus::Cancelled, TripStatus::Completed])) {
+                $trip->setStatus(TripStatus::Open);
+            }
         }
+
+        $em = $entityManager;
+        if (!$em->contains($trip)) {
+            $em->persist($trip);
+        }
+        $uow = $em->getUnitOfWork();
+        $meta = $em->getClassMetadata($trip::class);
+        $uow->recomputeSingleEntityChangeSet($meta, $trip);
     }
 }

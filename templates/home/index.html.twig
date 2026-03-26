@@ -13,8 +13,8 @@
                         <i class="bi bi-stars me-1"></i> Covoiturage simple &amp; économique
                     </span>
                     <h1 style="font-size:clamp(2.2rem,5vw,3.5rem);font-weight:800;line-height:1.15;margin-bottom:1rem;">
-                        Phrase d'accorche<br>
-                        <span style="color:#60a5fa;">pas d'idée pour.</span>
+                        Voyagez ensemble,<br>
+                        <span style="color:#60a5fa;">dépensez moins.</span>
                     </h1>
                     <p style="font-size:1.15rem;opacity:.75;max-width:480px;margin:0 auto 0;">
                         Rejoignez des milliers de voyageurs qui partagent la route chaque jour partout en France.
@@ -41,15 +41,15 @@
         <div class="container">
             <div class="row g-4 text-center">
                 <div class="col-4">
-                    <div style="font-size:2rem;font-weight:800;color:#1e3a5f;">Stat</div>
+                    <div style="font-size:2rem;font-weight:800;color:#1e3a5f;">+50k</div>
                     <div class="text-muted small fw-medium">Trajets publiés</div>
                 </div>
                 <div class="col-4" style="border-left:1.5px solid #f1f5f9;border-right:1.5px solid #f1f5f9;">
-                    <div style="font-size:2rem;font-weight:800;color:#1d4ed8;">Stat</div>
+                    <div style="font-size:2rem;font-weight:800;color:#1d4ed8;">-60%</div>
                     <div class="text-muted small fw-medium">Sur les frais de transport</div>
                 </div>
                 <div class="col-4">
-                    <div style="font-size:2rem;font-weight:800;color:#1e3a5f;">Stat <i class="bi bi-star-fill" style="font-size:1.2rem;color:#f59e0b;"></i></div>
+                    <div style="font-size:2rem;font-weight:800;color:#1e3a5f;">4.8 <i class="bi bi-star-fill" style="font-size:1.2rem;color:#f59e0b;"></i></div>
                     <div class="text-muted small fw-medium">Note moyenne</div>
                 </div>
             </div>
@@ -144,7 +144,7 @@
                                 <div class="d-flex align-items-center gap-3 ms-auto">
                                     <span class="price-pill">{{ trip.pricePerSeat }}€</span>
                                     {% if trip.status.value == 'open' %}
-                                        <a href="{{ path('app_booking_add', { trip: trip.id }) }}" class="btn-reserve text-decoration-none">
+                                        <a href="{{ path('app_booking_add', { tripId: trip.id }) }}" class="btn-reserve text-decoration-none">
                                             Réserver
                                         </a>
                                     {% else %}

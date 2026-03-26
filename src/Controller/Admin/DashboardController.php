@@ -48,5 +48,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Gestion');
         yield MenuItem::linkTo(UserCrudController::class, 'Utilisateurs', 'fa fa-users');
         yield MenuItem::linkTo(ReportCrudController::class, 'Signalements', 'fa fa-flag');
+        yield MenuItem::linkTo(PaymentCrudController::class, 'Paiements', 'fa fa-coins');
     }
 }

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Réserver - {{ trip.origin }} → {{ trip.destination }} | Share Trips{% endblock %}
+{% block title %}Réservation - {{ trip.origin }} → {{ trip.destination }} - Share Trips{% endblock %}
 
 {% block body %}
 <div class="booking-page">
@@ -93,5 +93,15 @@ document.addEventListener('DOMContentLoaded', function () {
         if (totalPrice) totalPrice.textContent = (seats * pricePerSeat).toFixed(2) + '€';
     });
 });
+
+function updatePaymentStyle() {
+    document.querySelectorAll('[id^="payment-option-"]').forEach(el => {
+        el.style.borderColor = '#f1f5f9';
+    });
+    const checked = document.querySelector('input[name="payment[method]"]:checked');
+    if (checked) {
+        document.getElementById('payment-option-' + checked.value).style.borderColor = '#1d4ed8';
+    }
+}
 </script>
 {% endblock %}

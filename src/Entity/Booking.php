@@ -54,6 +54,9 @@ class Booking
     #[ORM\OneToMany(mappedBy: 'booking', targetEntity: Report::class, orphanRemoval: true)]
     private Collection $reports;
 
+    #[ORM\OneToOne(mappedBy: 'booking', targetEntity: Payment::class, cascade: ['persist', 'remove'])]
+    private ?Payment $payment = null;
+
     public function __construct()
     {
         $this->reports = new ArrayCollection();
@@ -177,5 +180,21 @@ class Booking
             }
         }
         return false;
+    }
+
+    public function getPayment(): ?Payment
+    {
+        return $this->payment;
+    }
+
+    public function setPayment(?Payment $payment): static
+    {
+        $this->payment = $payment;
+        return $this;
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->payment?->getStatus() === 'completed';
     }
 }

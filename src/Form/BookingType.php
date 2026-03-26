@@ -3,7 +3,9 @@
 namespace App\Form;
 
 use App\Entity\Booking;
+use App\Enum\PaymentMethod;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -29,6 +31,14 @@ class BookingType extends AbstractType
                         notInRangeMessage: "Vous pouvez réserver au plus {{ max }} place(s)."
                     )
                 ]
+            ])
+            ->add('payment', ChoiceType::class, [
+                'choices' => PaymentMethod::cases(),
+                'choice_label' => fn(PaymentMethod $choice) => $choice->label(),
+                'mapped' => false,
+                'label' => false,
+                'expanded' => true,
+                'multiple' => false,
             ])
         ;
     }

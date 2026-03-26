@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ trip.origin }} → {{ trip.destination }} | Share Trips{% endblock %}
+{% block title %}{{ trip.origin }} → {{ trip.destination }} - Share Trips{% endblock %}
 
 {% block body %}
 <div class="trip-show-page">
@@ -50,7 +50,16 @@
                         </div>
                         <div class="col-sm-4">
                             <div class="info-label">Places</div>
-                            <span class="seats-badge"><i class="bi bi-person-check"></i>{{ trip.availableSeats }} dispo</span>
+                            <span class="seats-badge">
+                                <i class="bi bi-person-check"></i>
+                                {% if trip.availableSeats <= 0 %}
+                                    Complet
+                                {% elseif trip.availableSeats <= 2 %}
+                                    {{ trip.availableSeats }} (presque complet)
+                                {% else %}
+                                    {{ trip.availableSeats }} dispo
+                                {% endif %}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -97,7 +106,7 @@
                         <span class="price-hero">{{ trip.pricePerSeat }}€</span>
                     </div>
 
-                    {% if trip.status.value == 'open' %}
+                    {% if trip.status.value == 'open' and trip.availableSeats > 0 %}
                         {% if not app.user %}
                             <div class="alert-info-st mb-3">
                                 <i class="bi bi-info-circle-fill" style="color:#1d4ed8;flex-shrink:0;"></i>
@@ -122,19 +131,25 @@
                                     <span>{{ trip.pricePerSeat }}€</span>
                                 </div>
                             </div>
-                            <a href="{{ path('app_booking_add', { trip: trip.id }) }}" class="btn-book">
-                                <i class="bi bi-check2-circle"></i> Réserver ce trajet
-                            </a>
-                            {% if app.user %}
+                            {% if trip.availableSeats > 0 %}
+                                <a href="{{ path('app_booking_add', { tripId: trip.id }) }}" class="btn-book">
+                                    <i class="bi bi-check2-circle"></i> Réserver ce trajet
+                                </a>
+                            {% else %}
+                                <button class="btn-book" disabled style="opacity:.6;cursor:not-allowed;">
+                                    Complet
+                                </button>
+                            {% endif %}
+                            {#{% if app.user %}
                                 <a href="#"
                                    style="display:block;text-align:center;background:#eff6ff;color:#1e3a5f;border-radius:12px;padding:.75rem;font-size:.875rem;font-weight:700;text-decoration:none;margin-top:.75rem;transition:background .2s;"
                                    onmouseover="this.style.background='#dbeafe'"
                                    onmouseout="this.style.background='#eff6ff'">
                                     <i class="bi bi-chat-dots me-2"></i> Contacter le conducteur
                                 </a>
-                            {% endif %}
+                            {% endif %}#}
                         {% endif %}
-                    {% elseif trip.status.value == 'full' %}
+                    {% elseif trip.availableSeats <= 0 %}
                         <div class="alert-info-st" style="background:#fef9c3;border-color:#fde68a;color:#854d0e;">
                             <i class="bi bi-exclamation-circle-fill" style="color:#d97706;flex-shrink:0;"></i>
                             Ce trajet est complet.

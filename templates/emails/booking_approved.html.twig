@@ -33,10 +33,14 @@
             <span style="color:#94a3b8;font-size:.875rem;">Total payé</span>
             <span style="color:#1e3a5f;font-weight:800;">{{ booking.totalPrice }}€</span>
         </div>
+        <div style="display:flex;justify-content:space-between;">
+            <span style="color:#94a3b8;font-size:.875rem;">Méthode de paiement</span>
+            <span style="color:#1e3a5f;font-weight:800;">{{ booking.payment }}</span>
+        </div>
     </div>
 
     <p style="color:#94a3b8;font-size:.8rem;text-align:center;">
-        © {{ "now"|date("Y") }} ShareTrips — Tous droits réservés
+        © {{ "now"|date("Y") }} ShareTrips - Tous droits réservés
     </p>
 </div>
 </body>

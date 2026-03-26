@@ -14,7 +14,7 @@
                 {% if destination %} Arrivée : <strong>{{ destination }}</strong>. {% endif %}
                 {% if date %} Date : <strong>{{ date|date('d/m/Y') }}</strong>. {% endif %}
             {% else %}
-                Aucun trajet disponible pour le moment.
+                <i class="bi bi-info-circle-fill"></i> Aucun trajet disponible pour le moment.
             {% endif %}
         </div>
     {% endif %}
