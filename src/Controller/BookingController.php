@@ -3,9 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Booking;
-use App\Entity\Trip;
+use App\Entity\Payment;
 use App\Entity\User;
 use App\Form\BookingType;
+use App\Repository\TripRepository;
 use App\Service\MailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,33 +16,77 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class BookingController extends AbstractController
 {
-    #[Route('/trip/{trip}/booking/add', name: 'app_booking_add')]
+    #[Route('/booking/add/{tripId}', name: 'app_booking_add')]
     public function index(
-        Trip $trip,
+        int $tripId,
+        TripRepository $tripRepository,
         Request $request,
         EntityManagerInterface $entityManager,
         MailService $mailer
     ): Response {
         $user = $this->getUser();
         assert($user instanceof User);
+        $trip = $tripRepository->findOneBy(['id' => $tripId]);
+        if (!$trip) {
+            return $this->redirectToRoute('app_home');
+        }
+        if ($trip->getDriver()->getId() === $user->getId()) {
+            $this->addFlash(
+                'danger',
+                'Vous ne pouvez pas réserver vore propre trajet.'
+            );
+            return $this->redirectToRoute('app_trip_show', ['id' => $tripId]);
+        }
+        if ($trip->getAvailableSeats() <= 0 || $trip->getStatus()->value === 'full') {
+            $this->addFlash(
+                'danger',
+                'Ce trajet est complet.'
+            );
+            return $this->redirectToRoute('app_trip_show', ['id' => $tripId]);
+        }
         $booking = new Booking();
         $booking->setPassenger($user);
         $booking->setTrip($trip);
         $form = $this->createForm(BookingType::class, $booking, [
             'available_seats' => $trip->getAvailableSeats()
         ]);
+
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $method = $form->get('payment')->getData();
+            $payment = new Payment();
+            $payment->setPayer($user);
+            $payment->setAmount($booking->getTotalPrice());
+            $payment->setMethod($method);
+            $payment->setBooking($booking);
+            $booking->setPayment($payment);
             $entityManager->persist($booking);
+            $entityManager->persist($payment);
+            $entityManager->flush();
             $mailer->sendBookingConfirmation($booking);
             $mailer->sendNewBookingToDriver($booking);
             $entityManager->flush();
-            $this->addFlash('success', 'Réservation effectuée.');
-            return $this->redirectToRoute('app_trip_show', ['id' => $trip->getId()]);
+            return $this->redirectToRoute('app_booking_add_success');
         }
         return $this->render('booking/index.html.twig', [
             'trip' => $trip,
             'form' => $form
+        ]);
+    }
+
+    #[Route('/booking/success/{tripId}', name: 'app_booking_add_success')]
+    public function success(
+        int $tripId,
+        TripRepository $tripRepository
+    ): Response {
+        $user = $this->getUser();
+        assert($user instanceof User);
+        $trip = $tripRepository->findOneBy(['id' => $tripId]);
+        if (!$trip) {
+            return $this->redirectToRoute('app_home');
+        }
+        return $this->render('booking/success.html.twig', [
+            'trip' => $trip
         ]);
     }
 }
