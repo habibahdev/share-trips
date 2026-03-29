@@ -17,9 +17,16 @@
                             <i class="bi bi-geo-fill me-1" style="color:#1e3a5f;font-size:1.1rem;"></i>{{ trip.destination }}
                         </h1>
                     </div>
-                    <span class="status-badge {% if trip.status.value == 'open' %}status-open{% elseif trip.status.value == 'full' %}status-full{% elseif trip.status.value == 'cancelled' %}status-cancelled{% else %}status-completed{% endif %}">
-                        {% if trip.status.value == 'open' %}Disponible{% elseif trip.status.value == 'full' %}Complet{% elseif trip.status.value == 'cancelled' %}Annulé{% else %}Terminé{% endif %}
-                    </span>
+                    {#<span class="status-badge">
+                        {% if trip.status.value == 'full' %}
+                            Complet
+                        {% elseif trip.status.value == '' %}
+                            {{ trip.availableSeats }} (presque complet)
+                        {% else %}
+                            disponible
+                        {% endif %}
+                        
+                    </span>#}
                 </div>
 
                 <div class="row g-4">
@@ -114,7 +121,6 @@
                                     <i class="bi bi-pencil"></i> Modifier le trajet
                                 </a>
                                 <form method="post" action="{{ path('app_profile_trip_cancel', { trip: trip.id }) }}" onsubmit="return confirm('Annuler ce trajet ?')" style="display:contents;">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('cancel_trip_' ~ trip.id) }}">
                                     <button type="submit" class="btn-cancel-trip"><i class="bi bi-x-lg"></i> Annuler le trajet</button>
                                 </form>
                             </div>

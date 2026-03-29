@@ -29,10 +29,7 @@ final class PasswordController extends AbstractController
                 $newPassword = $form->get('newPassword')->getData();
                 $user->setPassword($hasher->hashPassword($user, $newPassword));
                 $entityManager->flush();
-                $this->addFlash(
-                    'success',
-                    'Mot de passe modifié.'
-                );
+                $this->addFlash('success', 'Mot de passe modifié.');
                 return $this->redirectToRoute('app_profile');
             }
         }

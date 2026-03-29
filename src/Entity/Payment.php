@@ -43,7 +43,7 @@ class Payment
     public function __toString(): string
     {
         $methodLabel = $this->method?->label() ?? 'N/A';
-        return 'Paiement #' . $this->id . ' - ' . $methodLabel;
+        return 'Paiement : ' . $methodLabel;
     }
 
     #[ORM\PrePersist]

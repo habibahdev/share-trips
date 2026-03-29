@@ -23,10 +23,7 @@ final class ReportController extends AbstractController
         $user = $this->getUser();
         assert($user instanceof User);
         if ($booking->getTrip()->getDepartureAt() > new \DateTimeImmutable()) {
-            $this->addFlash(
-                'danger',
-                'Vous ne pouvez signaler qu\'après le trajet.'
-            );
+            $this->addFlash('danger', 'Vous ne pouvez signaler qu\'après le trajet.');
             return $this->redirectToRoute('app_profile_booking');
         }
         if ($booking->getPassenger()->getId() === $user->getId()) {
@@ -41,10 +38,7 @@ final class ReportController extends AbstractController
             'booking' => $booking
         ]);
         if ($existing) {
-            $this->addFlash(
-                'warning',
-                'Vous avez déjà signalé cette personne pour ce trajet.'
-            );
+            $this->addFlash('warning', 'Vous avez déjà signalé cette personne pour ce trajet.');
             return $this->redirectToRoute('app_profile_booking');
         }
         $report = new Report();
@@ -56,10 +50,7 @@ final class ReportController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($report);
             $entityManager->flush();
-            $this->addFlash(
-                'success',
-                'Signalement envoyé. Notre équipe va examiner votre demande.'
-            );
+            $this->addFlash('success', 'Signalement envoyé. Notre équipe va examiner votre demande.');
             return $this->redirectToRoute('app_profile_booking');
         }
         return $this->render('report/index.html.twig', [

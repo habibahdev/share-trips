@@ -5,6 +5,7 @@ namespace App\Controller\Profile;
 use App\Entity\Booking;
 use App\Entity\User;
 use App\Enum\BookingStatus;
+use App\Enum\TripStatus;
 use App\Repository\BookingRepository;
 use App\Repository\TripRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -66,40 +67,46 @@ final class BookingController extends AbstractController
         if ($booking->getPassenger()->getId() !== $user->getId()) {
             return $this->redirectToRoute('app_profile_booking');
         }
+        if ($booking->getStatus() === BookingStatus::Confirmed) {
+            $trip = $booking->getTrip();
+            $newAvailable = $trip->getAvailableSeats() + $booking->getSeatsBooked();
+            $trip->setAvailableSeats(min($trip->getVehicle()->getSeats(), $newAvailable));
+            if ($trip->getStatus() === TripStatus::Full) {
+                $trip->setStatus(TripStatus::Open);
+            }
+        }
         $booking->setStatus(BookingStatus::Cancelled);
         $entityManager->flush();
-        $this->addFlash(
-            'success',
-            'Réservation annulée.'
-        );
+        $this->addFlash('success', 'Réservation annulée.');
         return $this->redirectToRoute('app_profile_booking');
     }
 
     #[Route('/profile/trip/booking/{booking}/confirm', name: 'app_profile_trip_booking_confirm', methods: ['POST'])]
-    public function confirm(Request $request, Booking $booking, EntityManagerInterface $em): Response
-    {
+    public function confirm(
+        Request $request,
+        Booking $booking,
+        EntityManagerInterface $entityManager
+    ): Response {
         $user = $this->getUser();
         assert($user instanceof User);
         $trip = $booking->getTrip();
         if ($trip->getDriver()->getId() !== $user->getId()) {
             throw $this->createAccessDeniedException('Accès refusé.');
         }
+        $booking->setStatus(BookingStatus::Confirmed);
+        $newAvailable = $trip->getVehicle()->getSeats() - $booking->getSeatsBooked();
+        $trip->setAvailableSeats($newAvailable);
+        $entityManager->flush();
+        if ($trip->getAvailableSeats() <= 0) {
+            $trip->setStatus(TripStatus::Full);
+        }
         $submittedToken = (string) $request->request->get('_token');
         if (!$this->isCsrfTokenValid('confirm_' . $booking->getId(), $submittedToken)) {
             $this->addFlash('error', 'Token invalide.');
             return $this->redirectToRoute('app_profile_trip_show', ['id' => $booking->getTrip()->getId()]);
         }
-        if ($booking->getStatus() === BookingStatus::Confirmed) {
-            $this->addFlash('info', 'Cette réservation est déjà confirmée.');
-            return $this->redirectToRoute('app_profile_trip_show', ['id' => $booking->getTrip()->getId()]);
-        }
-        $booking->setStatus(BookingStatus::Confirmed);
-
-        $em->persist($booking);
-        $em->flush();
-
+        $entityManager->flush();
         $this->addFlash('success', 'Réservation confirmée avec succès.');
-
         return $this->redirectToRoute('app_profile_trip_show', ['id' => $booking->getTrip()->getId()]);
     }
 }

@@ -72,7 +72,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $reportsReceived;
 
     #[ORM\Column(length: 20)]
-    private ?string $status = 'active';
+    private ?string $status = 'active'; //active, banned, suspended
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $suspendedUntil = null;

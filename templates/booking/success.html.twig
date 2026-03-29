@@ -1,7 +1,74 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Confirmation - Share Trips{% endblock %}
+{% block title %}Réservation confirmée - Share Trips{% endblock %}
 
 {% block body %}
-    <h1>À+</h1>
+<div style="font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;min-height:calc(100vh - 70px);padding:2.5rem 0;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div style="background:#fff;border-radius:20px;border:1.5px solid #f1f5f9;box-shadow:0 8px 24px rgba(30,58,95,.06);padding:2rem;text-align:center;">
+
+                    <div style="width:72px;height:72px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:1.8rem;">
+                        <i class="bi bi-check2-circle" style="color:#166534;"></i>
+                    </div>
+
+                    <h1 style="font-size:1.4rem;font-weight:800;color:#1e3a5f;margin-bottom:.5rem;">
+                        Réservation confirmée !
+                    </h1>
+                    <p style="color:#94a3b8;font-size:.9rem;margin-bottom:2rem;">
+                        Votre demande a bien été enregistrée. Le conducteur va confirmer votre place.
+                    </p>
+
+                    <div style="background:#eff6ff;border-radius:12px;padding:1.25rem;margin-bottom:2rem;text-align:left;">
+
+                        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:.75rem;">
+                            Détails du trajet
+                        </div>
+
+                        <div style="display:flex;justify-content:space-between;font-size:.875rem;margin-bottom:.5rem;">
+                            <span style="color:#94a3b8;">Trajet</span>
+                            <span style="color:#1e3a5f;font-weight:600;">
+                                {{ trip.origin }} → {{ trip.destination }}
+                            </span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:.875rem;margin-bottom:.5rem;">
+                            <span style="color:#94a3b8;">Date</span>
+                            <span style="color:#1e3a5f;font-weight:600;">
+                                {{ trip.departureAt|date('d/m/Y à H:i') }}
+                            </span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:.875rem;margin-bottom:.5rem;">
+                            <span style="color:#94a3b8;">Conducteur</span>
+                            <span style="color:#1e3a5f;font-weight:600;">
+                                {{ trip.driver.firstName }} {{ trip.driver.lastName }}
+                            </span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;font-size:.875rem;border-top:1.5px solid #dbeafe;padding-top:.5rem;margin-top:.5rem;">
+                            <span style="color:#1e3a5f;font-weight:700;">Prix par place</span>
+                            <span style="color:#1e3a5f;font-weight:800;">{{ trip.pricePerSeat }}€</span>
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex flex-column gap-2">
+                        <a href="{{ path('app_profile_booking') }}"
+                           style="display:block;background:#1e3a5f;color:#fff;border-radius:12px;padding:.85rem;font-size:.9rem;font-weight:700;text-decoration:none;transition:background .2s;"
+                           onmouseover="this.style.background='#1d4ed8'"
+                           onmouseout="this.style.background='#1e3a5f'">
+                            <i class="bi bi-ticket-perforated me-2"></i> Voir mes réservations
+                        </a>
+                        <a href="{{ path('app_trips') }}"
+                           style="display:block;background:#f8fafc;color:#475569;border:1.5px solid #f1f5f9;border-radius:12px;padding:.85rem;font-size:.9rem;font-weight:600;text-decoration:none;transition:background .15s;"
+                           onmouseover="this.style.background='#f1f5f9'"
+                           onmouseout="this.style.background='#f8fafc'">
+                            <i class="bi bi-search me-2"></i> Rechercher d'autres trajets
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
