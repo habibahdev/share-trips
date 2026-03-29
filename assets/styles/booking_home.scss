@@ -180,3 +180,47 @@
     justify-content: center;
     flex-shrink: 0;
 }
+
+.section-divider {
+    border:none;
+    border-top:1.5px solid #f1f5f9;
+    margin:1.25rem 0;
+}
+
+.payment-option {
+    flex: 1;
+    cursor: pointer;
+}
+
+.payment-option-inner {
+    border: 2px solid #f1f5f9;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: border-color .2s, background .2s;
+    cursor: pointer;
+    background: #fff;
+}
+
+.payment-option-inner:hover {
+    border-color: #dbeafe;
+    background: #f8fafc;
+}
+
+.payment-option-inner.selected {
+    border-color: #1d4ed8;
+    background: #eff6ff;
+}
+
+.payment-option-inner i {
+    font-size: 1.5rem;
+    color: #1e3a5f;
+    display: block;
+    margin-bottom: .4rem;
+}
+
+.payment-option-inner span {
+    font-size: .8rem;
+    font-weight: 700;
+    color: #1e3a5f;
+}

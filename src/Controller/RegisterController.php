@@ -36,10 +36,7 @@ final class RegisterController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
             $mailer->sendWelcome($user);
-            $this->addFlash(
-                'info',
-                'Inscription prise en compte. Un e-mail de confirmation vous a été evnoyé.'
-            );
+            $this->addFlash('info', 'Inscription prise en compte. Un e-mail de confirmation vous a été evnoyé.');
         }
         return $this->render('register/index.html.twig', [
             'form' => $form,
@@ -61,10 +58,7 @@ final class RegisterController extends AbstractController
         $user->setIsVerified(true);
         $user->setTokenRegister(null);
         $entityManager->flush();
-        $this->addFlash(
-            'success',
-            'Compte activé. Vous pouvez maintenant vous connecter.'
-        );
+        $this->addFlash('success', 'Compte activé. Vous pouvez maintenant vous connecter.');
         return $this->redirectToRoute('app_login');
     }
 
@@ -85,10 +79,7 @@ final class RegisterController extends AbstractController
         $entityManager->persist($user);
         $entityManager->flush();
         $mailer->sendWelcome($user);
-        $this->addFlash(
-            'info',
-            'L\'e-mail de confirmation vous a été renvoyé.'
-        );
+        $this->addFlash('info', 'L\'e-mail de confirmation vous a été renvoyé.');
         return $this->redirectToRoute('app_profile');
     }
 }

@@ -40,10 +40,7 @@ final class VehicleController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($vehicle);
             $entityManager->flush();
-            $this->addFlash(
-                'success',
-                'Informations du véhicule sauvegardée.'
-            );
+            $this->addFlash('success', 'Informations du véhicule sauvegardée.');
             return $this->redirectToRoute('app_profile_vehicle');
         }
         return $this->render('profile/vehicle/form.html.twig', [
@@ -59,10 +56,7 @@ final class VehicleController extends AbstractController
         if ($vehicle->getUsser() === $this->getUser()) {
             $entityManager->remove($vehicle);
             $entityManager->flush();
-            $this->addFlash(
-                'success',
-                'Véhicule supprimé.'
-            );
+            $this->addFlash('success', 'Véhicule supprimé.');
         }
         return $this->redirectToRoute('app_profile_vehicle');
     }

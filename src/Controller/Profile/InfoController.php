@@ -19,10 +19,7 @@ final class InfoController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-            $this->addFlash(
-                'success',
-                'Informations enregistrées.'
-            );
+            $this->addFlash('success', 'Informations enregistrées.');
             return $this->redirectToRoute('app_profile');
         }
         return $this->render('profile/info/index.html.twig', [

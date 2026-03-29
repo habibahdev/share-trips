@@ -31,17 +31,11 @@ final class BookingController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
         if ($trip->getDriver()->getId() === $user->getId()) {
-            $this->addFlash(
-                'danger',
-                'Vous ne pouvez pas réserver vore propre trajet.'
-            );
+            $this->addFlash('danger', 'Vous ne pouvez pas réserver vore propre trajet.');
             return $this->redirectToRoute('app_trip_show', ['id' => $tripId]);
         }
         if ($trip->getAvailableSeats() <= 0 || $trip->getStatus()->value === 'full') {
-            $this->addFlash(
-                'danger',
-                'Ce trajet est complet.'
-            );
+            $this->addFlash('danger', 'Ce trajet est complet.');
             return $this->redirectToRoute('app_trip_show', ['id' => $tripId]);
         }
         $booking = new Booking();
@@ -50,7 +44,6 @@ final class BookingController extends AbstractController
         $form = $this->createForm(BookingType::class, $booking, [
             'available_seats' => $trip->getAvailableSeats()
         ]);
-
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $method = $form->get('payment')->getData();
@@ -65,8 +58,9 @@ final class BookingController extends AbstractController
             $entityManager->flush();
             $mailer->sendBookingConfirmation($booking);
             $mailer->sendNewBookingToDriver($booking);
-            $entityManager->flush();
-            return $this->redirectToRoute('app_booking_add_success');
+            return $this->redirectToRoute('app_booking_add_success', [
+                'tripId' => $trip->getId()
+            ]);
         }
         return $this->render('booking/index.html.twig', [
             'trip' => $trip,
@@ -75,10 +69,8 @@ final class BookingController extends AbstractController
     }
 
     #[Route('/booking/success/{tripId}', name: 'app_booking_add_success')]
-    public function success(
-        int $tripId,
-        TripRepository $tripRepository
-    ): Response {
+    public function success(int $tripId, TripRepository $tripRepository): Response
+    {
         $user = $this->getUser();
         assert($user instanceof User);
         $trip = $tripRepository->findOneBy(['id' => $tripId]);

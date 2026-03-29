@@ -2,54 +2,10 @@
 
 {% block title %}Mes réservations - Share Trips{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        .bookings-page { font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;min-height:calc(100vh - 70px);padding:2.5rem 0; }
-        .booking-row { background:#fff;border-radius:16px;border:1.5px solid #f1f5f9;padding:1.25rem 1.5rem;transition:border-color .2s,box-shadow .2s,transform .15s; }
-        .booking-row:hover { border-color:#dbeafe;box-shadow:0 6px 20px rgba(30,58,95,.07);transform:translateY(-1px); }
-        .empty-card { background:#fff;border-radius:20px;border:1.5px solid #f1f5f9;padding:2rem; }
-        .route-badge { display:inline-flex;align-items:center;gap:5px;background:#eff6ff;color:#1e3a5f;font-size:.8rem;font-weight:700;border-radius:8px;padding:.3rem .75rem; }
-        .trip-meta { font-size:.8rem;color:#94a3b8;display:flex;align-items:center;gap:5px; }
-        .price-tag { font-size:1.1rem;font-weight:800;color:#1e3a5f; }
-        .status-badge { font-size:.72rem;font-weight:700;border-radius:8px;padding:.25rem .7rem;display:inline-block; }
-        .status-confirmed { background:#dcfce7;color:#166534; }
-        .status-pending { background:#fef9c3;color:#854d0e; }
-        .status-cancelled { background:#f1f5f9;color:#475569; }
-        .seats-badge { background:#eff6ff;color:#1d4ed8;font-size:.75rem;font-weight:700;border-radius:8px;padding:.2rem .65rem;display:inline-flex;align-items:center;gap:4px; }
-        .btn-detail { height:34px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;border:1.5px solid #f1f5f9;background:#f8fafc;color:#475569;text-decoration:none;padding:0 .9rem;transition:background .15s,color .15s;font-family:'Plus Jakarta Sans',sans-serif;gap:5px; }
-        .btn-detail:hover { background:#f1f5f9;color:#1e3a5f; }
-        .btn-cancel-booking { height:34px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;border:1.5px solid #fecaca;background:#fff;color:#dc2626;padding:0 .9rem;transition:background .15s;font-family:'Plus Jakarta Sans',sans-serif;gap:5px;cursor:pointer; }
-        .btn-cancel-booking:hover { background:#fee2e2; }
-        .btn-report-link { height:34px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;border:1.5px solid #fecaca;background:#fff;color:#dc2626;padding:0 .9rem;text-decoration:none;gap:5px;transition:background .15s;font-family:'Plus Jakarta Sans',sans-serif; }
-        .btn-report-link:hover { background:#fee2e2; }
-        .btn-new { background:#1e3a5f;color:#fff;border:none;border-radius:12px;padding:.6rem 1.25rem;font-size:.875rem;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background .2s; }
-        .btn-new:hover { background:#1d4ed8;color:#fff; }
-        .back-link { font-size:.82rem;font-weight:600;color:#94a3b8;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:color .15s; }
-        .back-link:hover { color:#1e3a5f; }
-
-        /* Formulaire de recherche */
-        .search-section { background:#fff;border-radius:16px;border:1.5px solid #f1f5f9;padding:1.5rem;margin-bottom:1.5rem; }
-        .search-section-title { font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin-bottom:1rem;display:flex;align-items:center;gap:6px; }
-        .search-input { border:2px solid #f1f5f9;border-radius:12px;padding:.65rem 1rem;font-size:.875rem;font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;transition:border-color .2s,background .2s;width:100%; }
-        .search-input:focus { border-color:#1d4ed8;background:#fff;box-shadow:0 0 0 4px rgba(29,78,216,.08);outline:none; }
-        .search-label { font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin-bottom:.3rem;display:block; }
-        .btn-search { background:#1e3a5f;color:#fff;border:none;border-radius:12px;padding:.65rem 1.25rem;font-size:.875rem;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;transition:background .2s;cursor:pointer;display:inline-flex;align-items:center;gap:6px;width:100%; justify-content:center; }
-        .btn-search:hover { background:#1d4ed8; }
-
-        /* Résultats de recherche */
-        .trip-row { background:#fff;border-radius:16px;border:1.5px solid #f1f5f9;padding:1.25rem 1.5rem;transition:border-color .2s,box-shadow .2s,transform .15s; }
-        .trip-row:hover { border-color:#dbeafe;box-shadow:0 6px 20px rgba(30,58,95,.07);transform:translateY(-1px); }
-        .results-title { font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin-bottom:1rem;display:flex;align-items:center;gap:6px; }
-    </style>
-{% endblock %}
-
 {% block body %}
 <div class="bookings-page">
     <div class="container">
 
-        {# ===== EN-TÊTE ===== #}
         <div class="d-flex justify-content-between align-items-start mb-4">
             <div>
                 <a href="{{ path('app_profile') }}" class="back-link mb-2 d-inline-flex">
@@ -61,8 +17,6 @@
         </div>
 
         {% if bookings is empty %}
-
-            {# ===== ÉTAT VIDE + RECHERCHE ===== #}
             <div class="empty-card mb-4">
                 <div class="text-center py-3 mb-4" style="border-bottom:1.5px solid #f1f5f9;">
                     <i class="bi bi-ticket-perforated d-block mb-2" style="font-size:2.5rem;color:#bfdbfe;"></i>
@@ -124,7 +78,6 @@
                 </form>
             </div>
 
-            {# ===== RÉSULTATS ===== #}
             {% if availableTrips is not null %}
                 {% if availableTrips is empty %}
                     <div style="background:#fff;border-radius:16px;border:1.5px solid #f1f5f9;padding:2rem;text-align:center;">
@@ -187,7 +140,6 @@
 
         {% else %}
 
-            {# ===== LISTE DES RÉSERVATIONS ===== #}
             <div class="d-flex flex-column gap-3">
                 {% for booking in bookings %}
                     <div class="booking-row">

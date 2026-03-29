@@ -46,10 +46,7 @@ final class TripController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($trip);
             $entityManager->flush();
-            $this->addFlash(
-                'success',
-                'Informations trajet sauvegardée.'
-            );
+            $this->addFlash('success', 'Informations trajet sauvegardée.');
             return $this->redirectToRoute('app_profile_trip');
         }
         return $this->render('profile/trip/form.html.twig', [
@@ -69,10 +66,7 @@ final class TripController extends AbstractController
         }
         $trip->setStatus(TripStatus::Cancelled);
         $entityManager->flush();
-        $this->addFlash(
-            'success',
-            'Trajet annulé.'
-        );
+        $this->addFlash('success', 'Trajet annulé.');
         return $this->redirectToRoute('app_profile_trip');
     }
 
@@ -89,11 +83,12 @@ final class TripController extends AbstractController
         if ($trip->getDriver()->getId() !== $user->getId()) {
             throw $this->createAccessDeniedException('Accès refusé.');
         }
-        $submittedToken = (string) $request->request->get('_token');
-        if (!$this->isCsrfTokenValid('confirm_' . $booking->getId(), $submittedToken)) {
-            throw $this->createAccessDeniedException('Un problème est survenu.');
-        }
         $booking->setStatus(BookingStatus::Confirmed);
+        if ($booking->getSeatsBooked() === $trip->getAvailableSeats()) {
+            $trip->setStatus(TripStatus::Full);
+        } elseif ($booking->getSeatsBooked() < $trip->getAvailableSeats()) {
+            $trip->setStatus(TripStatus::Open);
+        }
         $entityManager->flush();
         $mailer->sendBookingApproved($booking);
         $this->addFlash('success', 'Réservation confirmée.');
