@@ -67,10 +67,19 @@ final class BookingController extends AbstractController
     }
 
     #[Route('/profile/booking/{booking}/cancel', name: 'app_profile_booking_cancel', methods: ['POST'])]
-    public function cancel(Booking $booking, EntityManagerInterface $entityManager): Response
+    public function cancel(Booking $booking, Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         assert($user instanceof User);
+        if (
+            !$this->isCsrfTokenValid(
+                'cancel_booking_' . $booking->getId(),
+                (string) $request->request->get('_token')
+            )
+        ) {
+            $this->addFlash('danger', 'Problème inconnu.');
+            return $this->redirectToRoute('app_profile_booking');
+        }
         if ($booking->getPassenger()->getId() !== $user->getId()) {
             return $this->redirectToRoute('app_profile_booking');
         }
@@ -78,7 +87,7 @@ final class BookingController extends AbstractController
             return $this->redirectToRoute('app_profile_booking');
         }
         if ($booking->getTrip()->getDepartureAt() < new \DateTimeImmutable()) {
-            $this->addFlash('danger', 'Impossible d\annuler un trajet déjà effectué.');
+            $this->addFlash('danger', 'Impossible d\'annuler un trajet déjà effectué.');
             return $this->redirectToRoute('app_profile_booking');
         }
         if ($booking->getStatus() === BookingStatus::Confirmed) {

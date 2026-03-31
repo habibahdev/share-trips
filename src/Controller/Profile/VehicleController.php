@@ -49,10 +49,19 @@ final class VehicleController extends AbstractController
     }
 
     #[Route('/profile/vehicle/delete/{vehicle}', name: 'app_profile_vehicle_delete', methods: ['POST'])]
-    public function delete(Vehicle $vehicle, EntityManagerInterface $entityManager): Response
+    public function delete(Vehicle $vehicle, Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         assert($user instanceof User);
+        if (
+            !$this->isCsrfTokenValid(
+                'delete_vehicle_' . $vehicle->getId(),
+                (string) $request->request->get('_token')
+            )
+        ) {
+            $this->addFlash('danger', 'Problème inconnu.');
+            return $this->redirectToRoute('app_profile_vehicle');
+        }
         if ($vehicle->getUsser() !== $user) {
             $this->addFlash('danger', 'Vous ne pouvez pas supprimer ce véhicule.');
             return $this->redirectToRoute('app_profile_vehicle');
