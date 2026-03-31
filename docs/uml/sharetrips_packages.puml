@@ -1,0 +1,55 @@
+@startuml
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #EEF4FF
+  BorderColor #3B6FC2
+  FontColor #1A1A2E
+  ArrowColor #555555
+}
+skinparam actor {
+  BackgroundColor #FAFAFA
+  BorderColor #444444
+}
+
+left to right direction
+
+title Plateforme de covoiturage
+
+actor "Visiteur" as visiteur
+actor "Utilisateur" as user
+actor "Administrateur" as admin
+
+rectangle "Application Covoiturage" {
+  usecase "UC1 — S'inscrire" as uc1
+  usecase "UC2 — Se connecter"  as uc2
+  usecase "UC3 — Se déconnecter" as uc3
+  usecase "UC4 — Créer un trajet\n(conducteur)" as uc4
+  usecase "UC5 — Réserver un trajet\n(passager)" as uc5
+  usecase "UC6 — Modifier son profil" as uc6
+  usecase "UC7 — Ajouter un véhicule" as uc7
+  usecase "UC8 — Modifier son mot\nde passe" as uc8
+  usecase "UC9 — Consulter ses trajets" as uc9
+  usecase "UC10 — Annuler une réservation" as uc10
+  usecase "UC11 — Gestion des\nutilisateurs" as uc11
+
+}
+
+visiteur --> uc1
+visiteur --> uc2
+
+user --> uc3
+user --> uc4
+user --> uc5
+user --> uc6
+user --> uc7
+user --> uc8
+user --> uc9
+user --> uc10
+admin --> uc11
+
+user --|> visiteur
+
+uc2 .> UC3  : <<include>>
+uc4 .> UC7  : <<include>>
+uc5 .> UC10 : <<extend>>
+@enduml

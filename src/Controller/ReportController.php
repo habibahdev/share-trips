@@ -34,7 +34,7 @@ final class ReportController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
         $existing = $entityManager->getRepository(Report::class)->findOneBy([
-            'reporter' => $reported,
+            'reporter' => $user,
             'booking' => $booking
         ]);
         if ($existing) {

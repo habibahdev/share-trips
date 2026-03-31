@@ -105,14 +105,14 @@ class TripTest extends TestCase
 
     public function testOnPrePersistSetsTimestamps(): void
     {
-        $this->trip->onPrePersists();
+        $this->trip->onPrePersist();
         $this->assertInstanceOf(\DateTimeImmutable::class, $this->trip->getCreatedAt());
         $this->assertInstanceOf(\DateTimeImmutable::class, $this->trip->getUpdatedAt());
     }
 
     public function testOnPreUpdateSetsUpdatedAt(): void
     {
-        $this->trip->onPrePersists();
+        $this->trip->onPrePersist();
         $createdAt = $this->trip->getCreatedAt();
         sleep(1);
         $this->trip->onPreUpdate();

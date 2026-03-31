@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Enum\UserStatus;
 use App\Service\MailService;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -36,7 +37,11 @@ class UserCrudController extends AbstractCrudController
             return;
         }
 
-        $originalStatus = $entityManager->getUnitOfWork()->getOriginalEntityData($entityInstance)['status'] ?? null;
+        $originalData = $entityManager->getUnitOfWork()->getOriginalEntityData($entityInstance);
+        $originalRaw = $originalData['status'] ?? null;
+        $originalStatus = $originalRaw instanceof UserStatus
+            ? $originalRaw
+            : ($originalRaw !== null ? UserStatus::from($originalRaw) : null);
         parent::updateEntity($entityManager, $entityInstance);
         if ($originalStatus !== $entityInstance->getStatus()) {
             if ($entityInstance->isBanned()) {
@@ -66,20 +71,22 @@ class UserCrudController extends AbstractCrudController
         $disabled = $pageName === Crud::PAGE_EDIT;
         return [
             IdField::new('id')->onlyOnIndex(),
-            TextField::new('fullName', 'Nom - Prénom')
+            TextField::new('firstName', 'Prénom')
+                ->setFormTypeOption('disabled', $disabled),
+            TextField::new('lastName', 'Nom')
                 ->setFormTypeOption('disabled', $disabled),
             EmailField::new('email', 'Adresse e-mail')
                 ->setFormTypeOption('disabled', $disabled),
             ChoiceField::new('status', 'Statut')
                 ->setChoices([
-                    'Actif' => 'active',
-                    'Suspendu' => 'suspended',
-                    'Banni' => 'banned'
+                    'Actif' => UserStatus::Active,
+                    'Suspendu' => UserStatus::Suspended,
+                    'Banni' => UserStatus::Banned
                 ])
                 ->renderAsBadges([
-                    'active' => 'success',
-                    'suspended' => 'warning',
-                    'banned' => 'danger'
+                    UserStatus::Active->value => 'success',
+                    UserStatus::Suspended->value => 'warning',
+                    UserStatus::Banned->value => 'danger'
                 ]),
             DateField::new('suspendedUntil', 'Suspendu jusqu\'au')->hideOnIndex(),
             TextareaField::new('adminNote', 'Note admin')->hideOnIndex(),
@@ -102,9 +109,9 @@ class UserCrudController extends AbstractCrudController
         return $filters
             ->add(TextFilter::new('email'))
             ->add(ChoiceFilter::new('status')->setChoices([
-                'Actif' => 'active',
-                'Suspendu' => 'suspended',
-                'Banni' => 'banned'
+                'Actif' => UserStatus::Active,
+                'Suspendu' => UserStatus::Suspended,
+                'Banni' => UserStatus::Banned
             ]))
         ;
     }

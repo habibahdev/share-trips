@@ -45,19 +45,36 @@
                             </div>
                             <div class="col-md-2 text-md-center">
                                 <div class="price-tag mb-1">{{ trip.pricePerSeat }}€</div>
-                                <span class="status-badge {% if trip.status.value == 'open' %}status-open{% elseif trip.status.value == 'full' %}status-full{% elseif trip.status.value == 'cancelled' %}status-cancelled{% else %}status-completed{% endif %}">
-                                    {% if trip.status.value == 'open' %}Disponible{% elseif trip.status.value == 'full' %}Complet{% elseif trip.status.value == 'cancelled' %}Annulé{% else %}Terminé{% endif %}
+                                <span class="status-badge
+                                    {% if trip.status == constant('App\\Enum\\TripStatus::Open') %}status-open
+                                    {% elseif trip.status == constant('App\\Enum\\TripStatus::Full') %}status-full
+                                    {% elseif trip.status == constant('App\\Enum\\TripStatus::Cancelled') %}status-cancelled
+                                    {% else %}status-completed{% endif %}">
+                                    {% if trip.status == constant('App\\Enum\\TripStatus::Open') %}Disponible
+                                    {% elseif trip.status == constant('App\\Enum\\TripStatus::Full') %}Complet
+                                    {% elseif trip.status == constant('App\\Enum\\TripStatus::Cancelled') %}Annulé
+                                    {% else %}Terminé{% endif %}
                                 </span>
                             </div>
                             <div class="col-md-3 d-flex gap-2 justify-content-md-end">
                                 <a href="{{ path('app_profile_trip_show', { trip: trip.id }) }}" class="btn-action btn-action-show" title="Voir"><i class="bi bi-eye"></i></a>
-                                {% if trip.status.value == 'open' or trip.status.value == 'full' %}
-                                    <a href="{{ path('app_profile_trip_form', { trip: trip.id }) }}" class="btn-action btn-action-edit" title="Modifier"><i class="bi bi-pencil"></i></a>
+                                {% if trip.status == constant('App\\Enum\\TripStatus::Open') %}
+                                    <a href="{{ path('app_profile_trip_form', { trip: trip.id }) }}"
+                                       class="btn-action btn-action-edit" title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
                                 {% endif %}
-                                {% if trip.status.value != 'cancelled' and trip.status.value != 'completed' %}
-                                    <form method="post" action="{{ path('app_profile_trip_cancel', { trip: trip.id }) }}" onsubmit="return confirm('Annuler ce trajet ?')" style="display:contents;">
+                                {% if trip.status != constant('App\\Enum\\TripStatus::Cancelled')
+                                    and trip.status != constant('App\\Enum\\TripStatus::Completed')
+                                    and trip.departureAt > date() %}
+                                    <form method="post"
+                                          action="{{ path('app_profile_trip_cancel', { trip: trip.id }) }}"
+                                          onsubmit="return confirm('Annuler ce trajet ?')"
+                                          style="display:contents;">
                                         <input type="hidden" name="_token" value="{{ csrf_token('cancel_trip_' ~ trip.id) }}">
-                                        <button type="submit" class="btn-action btn-action-cancel" title="Annuler"><i class="bi bi-x-lg"></i></button>
+                                        <button type="submit" class="btn-action btn-action-cancel" title="Annuler">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
                                     </form>
                                 {% endif %}
                             </div>

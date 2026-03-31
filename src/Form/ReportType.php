@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Report;
+use App\Enum\ReportReason;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -17,13 +18,9 @@ class ReportType extends AbstractType
         $builder
             ->add('reason', ChoiceType::class, [
                 'label' => 'Motif du signalement',
-                'choices' => [
-                    'Comportement inapproprié' => 'Comportement inapproprié',
-                    'Non-présentation au trajet' => 'Non-présentation au trajet',
-                    'Arnaque / fraude' => 'Arnaque / fraude',
-                    'Harcèlement' => 'Harcèlement',
-                    'Autre' => 'Autre'
-                ],
+                'choices' => ReportReason::cases(),
+                'choice_label' => fn(ReportReason $r) => $r->label(),
+                'choice_value' => fn(ReportReason $r) => $r->label(),
                 'constraints' => [
                     new NotBlank(message: 'Veuillez choisir un motif.')
                 ]

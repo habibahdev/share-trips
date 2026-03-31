@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\UserStatus;
 use App\Repository\UserRepository;
 use DateInterval;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -71,8 +72,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'reported', targetEntity: Report::class)]
     private Collection $reportsReceived;
 
-    #[ORM\Column(length: 20)]
-    private ?string $status = 'active'; //active, banned, suspended
+    #[ORM\Column(enumType: UserStatus::class)]
+    private UserStatus $status = UserStatus::Active;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $suspendedUntil = null;
@@ -87,7 +88,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $tokenRegister = null;
 
     #[ORM\Column]
-    private ?\DateTime $tokenRegisterLifetime = null;
+    private ?\DateTimeImmutable $tokenRegisterLifetime = null;
 
     public function __construct()
     {
@@ -97,12 +98,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->reportsMade = new ArrayCollection();
         $this->reportsReceived = new ArrayCollection();
         $this->isVerified = false;
-        $this->tokenRegisterLifetime = (new \DateTime('now'))->add(new DateInterval('P1D'));
+        $this->tokenRegisterLifetime = (new \DateTimeImmutable('now'))->add(new DateInterval('P1D'));
     }
 
     public function __toString()
     {
-        return $this->firstName . ' ' . $this->lastName . ' (' . $this->email . ')';
+        return $this->firstName . ' ' . $this->lastName;
     }
 
     #[ORM\PrePersist]
@@ -226,7 +227,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getFullName(): string
     {
-        return $this->firstName . ' ' . $this->lastName;
+        return trim(($this->firstName ?? '') . ' ' . ($this->lastName ?? ''));
     }
 
     public function getPhone(): ?string
@@ -234,7 +235,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->phone;
     }
 
-    public function setPhone(string $phone): static
+    public function setPhone(?string $phone): static
     {
         $this->phone = $phone;
         return $this;
@@ -248,12 +249,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
     }
 
     /** @return Collection<int, Vehicle> */
@@ -324,12 +319,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->reportsReceived;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): ?UserStatus
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(UserStatus $status): static
     {
         $this->status = $status;
 
@@ -350,17 +345,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function isActive(): bool
     {
-        return $this->status === 'active';
+        return $this->status === UserStatus::Active;
     }
 
     public function isBanned(): bool
     {
-        return $this->status === 'banned';
+        return $this->status === UserStatus::Banned;
     }
 
     public function isSuspended(): bool
     {
-        return $this->status === 'suspended'
+        return $this->status === UserStatus::Suspended
             && $this->suspendedUntil !== null
             && $this->suspendedUntil > new \DateTimeImmutable()
         ;
@@ -407,12 +402,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getTokenRegisterLifetime(): ?\DateTime
+    public function getTokenRegisterLifetime(): ?\DateTimeImmutable
     {
         return $this->tokenRegisterLifetime;
     }
 
-    public function setTokenRegisterLifetime(\DateTime $tokenRegisterLifetime): static
+    public function setTokenRegisterLifetime(\DateTimeImmutable $tokenRegisterLifetime): static
     {
         $this->tokenRegisterLifetime = $tokenRegisterLifetime;
 

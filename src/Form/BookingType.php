@@ -17,6 +17,7 @@ class BookingType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $availableSeats = $options['available_seats'];
+
         $builder
             ->add('seatsBooked', IntegerType::class, [
                 'label' => 'Nombre de places',
@@ -28,13 +29,14 @@ class BookingType extends AbstractType
                     new Range(
                         min: 1,
                         max: $availableSeats,
-                        notInRangeMessage: "Vous pouvez réserver au plus {{ max }} place(s)."
-                    )
-                ]
+                        notInRangeMessage: 'Vous pouvez réserver au plus {{ max }} place(s).'
+                    ),
+                ],
             ])
             ->add('payment', ChoiceType::class, [
                 'choices' => PaymentMethod::cases(),
                 'choice_label' => fn(PaymentMethod $choice) => $choice->label(),
+                'choice_value' => fn(?PaymentMethod $choice) => $choice?->value,
                 'mapped' => false,
                 'label' => false,
                 'expanded' => true,
@@ -48,6 +50,7 @@ class BookingType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Booking::class,
         ]);
+
         $resolver->setRequired('available_seats');
         $resolver->setAllowedTypes('available_seats', 'int');
     }

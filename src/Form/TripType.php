@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -52,7 +53,7 @@ class TripType extends AbstractType
                 ]
             ])
             ->add('availableSeats', IntegerType::class, [
-                'label' => 'Nombre de plases disponibles',
+                'label' => 'Nombre de places disponibles',
                 'constraints' => [
                     new NotBlank(message: 'Le nombre de places est obligatoire.'),
                     new Range(
@@ -80,8 +81,9 @@ class TripType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Trip::class,
-            'vehicles' => null
+            'data_class' => Trip::class
         ]);
+        $resolver->setRequired('vehicles');
+        $resolver->setAllowedTypes('vehicles', Collection::class);
     }
 }

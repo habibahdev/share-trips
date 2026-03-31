@@ -10,6 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class InfoType extends AbstractType
 {
@@ -38,7 +39,11 @@ class InfoType extends AbstractType
                 'label' => 'Téléphone',
                 'constraints' => [
                     new NotBlank(message: 'Vous devez renseigner votre numéro de téléphone.'),
-                    new Length(max: 20)
+                    new Length(max: 20),
+                    new Regex(
+                        pattern: '/^(\+?\d[\s\-.]?){7,14}\d$/',
+                        message: 'Numéro de téléhone invalide'
+                    )
                 ]
             ])
         ;

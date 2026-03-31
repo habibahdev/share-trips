@@ -23,7 +23,7 @@ final class VehicleController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/vehicle/add/{vehicle}', name: 'app_profile_vehicle_form', defaults: ['vehicle' => null])]
+    #[Route('/profile/vehicle/form/{vehicle}', name: 'app_profile_vehicle_form', defaults: ['vehicle' => null])]
     public function form(?Vehicle $vehicle, Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
@@ -40,7 +40,7 @@ final class VehicleController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($vehicle);
             $entityManager->flush();
-            $this->addFlash('success', 'Informations du véhicule sauvegardée.');
+            $this->addFlash('success', 'Véhicule sauvegardé.');
             return $this->redirectToRoute('app_profile_vehicle');
         }
         return $this->render('profile/vehicle/form.html.twig', [
@@ -48,16 +48,24 @@ final class VehicleController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/vehicle/delete/{vehicle}', name: 'app_profile_vehicle_delete')]
+    #[Route('/profile/vehicle/delete/{vehicle}', name: 'app_profile_vehicle_delete', methods: ['POST'])]
     public function delete(Vehicle $vehicle, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         assert($user instanceof User);
-        if ($vehicle->getUsser() === $this->getUser()) {
-            $entityManager->remove($vehicle);
-            $entityManager->flush();
-            $this->addFlash('success', 'Véhicule supprimé.');
+        if ($vehicle->getUsser() !== $user) {
+            $this->addFlash('danger', 'Vous ne pouvez pas supprimer ce véhicule.');
+            return $this->redirectToRoute('app_profile_vehicle');
         }
+        foreach ($vehicle->getTrips() as $trip) {
+            if ($trip->getDepartureAt() > new \DateTimeImmutable()) {
+                $this->addFlash('danger', 'Impossible de supprimer un véhicule associé à un trajet à venir.');
+                return $this->redirectToRoute('app_profile_vehicle');
+            }
+        }
+        $entityManager->remove($vehicle);
+        $entityManager->flush();
+        $this->addFlash('success', 'Véhicule supprimé.');
         return $this->redirectToRoute('app_profile_vehicle');
     }
 }
