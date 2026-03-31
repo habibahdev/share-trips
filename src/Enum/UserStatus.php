@@ -10,8 +10,7 @@ enum UserStatus: string
 
     public function label(): string
     {
-        return match ($this)
-        {
+        return match ($this) {
             self::Active => 'Actif',
             self::Banned => 'Banni',
             self::Suspended => 'Suspendu'
@@ -20,8 +19,7 @@ enum UserStatus: string
 
     public function isBlocked(): bool
     {
-        return match ($this)
-        {
+        return match ($this) {
             self::Banned, self::Suspended => true,
             default => false
         };

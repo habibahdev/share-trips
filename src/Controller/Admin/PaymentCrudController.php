@@ -43,7 +43,11 @@ class PaymentCrudController extends AbstractCrudController
             ChoiceField::new('method', 'Méthode de paiement')
                 ->setChoices(
                     array_combine(
-                        array_map(fn(PaymentMethod $m) => $m->label(), PaymentMethod::cases()), PaymentMethod::cases()
+                        array_map(
+                            fn(PaymentMethod $m) => $m->label(),
+                            PaymentMethod::cases()
+                        ),
+                        PaymentMethod::cases()
                     )
                 )
                 ->setFormTypeOption('disabled', $disabled)

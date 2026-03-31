@@ -12,8 +12,7 @@ enum ReportReason: string
 
     public function label(): string
     {
-        return match ($this)
-        {
+        return match ($this) {
             self::InappropriatedBehavior => 'Comportement inapproprié',
             self::NoShow => 'Non-présetation au trajet',
             self::Fraud => 'Arnaque / fraude',

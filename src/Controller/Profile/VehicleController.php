@@ -53,7 +53,7 @@ final class VehicleController extends AbstractController
     {
         $user = $this->getUser();
         assert($user instanceof User);
-        if (!$vehicle->getUsser() !== $user) {
+        if ($vehicle->getUsser() !== $user) {
             $this->addFlash('danger', 'Vous ne pouvez pas supprimer ce véhicule.');
             return $this->redirectToRoute('app_profile_vehicle');
         }

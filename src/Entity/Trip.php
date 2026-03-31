@@ -47,7 +47,8 @@ class Trip
     #[Assert\Range(
         min: 1,
         max: 8,
-        notInRangeMessage: 'Le nombre de places doit être compris entre {{ min }} et {{ max }}')]
+        notInRangeMessage: 'Le nombre de places doit être compris entre {{ min }} et {{ max }}'
+    )]
     private ?int $availableSeats = null;
 
     #[ORM\Column(type: 'float')]

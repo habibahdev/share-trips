@@ -37,6 +37,7 @@ final class RegisterController extends AbstractController
             $entityManager->flush();
             $mailer->sendWelcome($user);
             $this->addFlash('info', 'Inscription prise en compte. Un e-mail de confirmation vous a été envoyé.');
+            return $this->redirectToRoute('app_login');
         }
         return $this->render('register/index.html.twig', [
             'form' => $form,
@@ -53,7 +54,7 @@ final class RegisterController extends AbstractController
             $this->addFlash('info', 'Ce compte est déjà activé.');
             return $this->redirectToRoute('app_login');
         }
-        if ($user->getTokenRegister() !== $token || $user->getTokenRegister() === null) {
+        if ($user->getTokenRegister() === null || $user->getTokenRegister() !== $token) {
             $this->addFlash('danger', 'Lien de confirmation invalide.');
             return $this->redirectToRoute('app_register');
         }

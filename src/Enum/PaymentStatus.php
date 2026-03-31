@@ -11,8 +11,7 @@ enum PaymentStatus: string
 
     public function label(): string
     {
-        return match ($this)
-        {
+        return match ($this) {
             self::Pending => 'En attente',
             self::Completed => 'Payé',
             self::Failed => 'Échoué',
