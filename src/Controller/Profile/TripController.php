@@ -62,10 +62,14 @@ final class TripController extends AbstractController
     }
 
     #[Route('/profile/trip/cancel/{trip}', name: 'app_profile_trip_cancel', methods: ['POST'])]
-    public function cancel(Trip $trip, EntityManagerInterface $entityManager): Response
+    public function cancel(Trip $trip, Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         assert($user instanceof User);
+        if (!$this->isCsrfTokenValid('cancel_trip_' . $trip->getId(), (string) $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Problème inconnu.');
+            return $this->redirectToRoute('app_profile_trip');
+        }
         if ($trip->getDriver()->getId() !== $user->getId()) {
             return $this->redirectToRoute('app_profile_trip');
         }
@@ -82,7 +86,7 @@ final class TripController extends AbstractController
         return $this->redirectToRoute('app_profile_trip');
     }
 
-    #[Route('/profile/trip/bookings/{booking}/confirm', name: 'app_profile_trip_booking_confirm')]
+    #[Route('/profile/trip/bookings/{booking}/confirm', name: 'app_profile_trip_booking_confirm', methods: ['POST'])]
     public function confirmBooking(
         Booking $booking,
         EntityManagerInterface $entityManager,
@@ -94,6 +98,15 @@ final class TripController extends AbstractController
         $trip = $booking->getTrip();
         if ($trip->getDriver()->getId() !== $user->getId()) {
             throw $this->createAccessDeniedException('Accès refusé.');
+        }
+        if (
+            !$this->isCsrfTokenValid(
+                'confirm_booking' . $booking->getId(),
+                (string) $request->request->get('_token')
+            )
+        ) {
+            $this->addFlash('danger', 'Problème inconnu.');
+            return $this->redirectToRoute('app_profile_trip_show', ['trip' => $trip->getId()]);
         }
         if ($booking->getStatus() === BookingStatus::Confirmed) {
             $this->addFlash('warning', 'Cette réservation est déjà confirmée.');

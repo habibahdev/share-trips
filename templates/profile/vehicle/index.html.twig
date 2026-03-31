@@ -64,10 +64,15 @@
                                    class="btn-action btn-action-edit">
                                     <i class="bi bi-pencil"></i> Modifier
                                 </a>
-                                <a href="{{ path('app_profile_vehicle_delete', { vehicle: vehicle }) }}"
-                                   class="btn-action btn-action-delete">
-                                    <i class="bi bi-trash2"></i> Supprimer
-                                </a>
+                                <form method="post"
+                                      action="{{ path('app_profile_vehicle_delete', { vehicle: vehicle.id }) }}"
+                                      onsubmit="return confirm('Supprimer ce véhicule ?')"
+                                      style="display:contents;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_vehicle_' ~ vehicle.id) }}">
+                                    <button type="submit" class="btn-action btn-action-delete">
+                                        <i class="bi bi-trash2"></i> Supprimer
+                                    </button>
+                                </form>
                             </div>
 
                         </div>

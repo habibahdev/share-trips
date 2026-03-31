@@ -29,7 +29,7 @@
                         {% else %}status-completed{% endif %}">
                         {% if booking.trip.status == constant('App\\Enum\\TripStatus::Open') %}Disponible
                         {% elseif booking.trip.status == constant('App\\Enum\\TripStatus::Full') %}Complet
-                        {% elseif booking.trip.status.value == constant('App\\Enum\\TripStatus::Cancelled') %}Annulé
+                        {% elseif booking.trip.status == constant('App\\Enum\\TripStatus::Cancelled') %}Annulé
                         {% else %}Terminé{% endif %}
                     </span>
                 </div>
