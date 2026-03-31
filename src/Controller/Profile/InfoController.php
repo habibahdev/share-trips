@@ -2,6 +2,7 @@
 
 namespace App\Controller\Profile;
 
+use App\Entity\User;
 use App\Form\InfoType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,6 +16,7 @@ final class InfoController extends AbstractController
     public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
+        assert($user instanceof User);
         $form = $this->createForm(InfoType::class, $user);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

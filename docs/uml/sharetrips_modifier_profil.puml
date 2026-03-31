@@ -1,0 +1,22 @@
+@startuml
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #EEF4FF
+  BorderColor #3B6FC2
+  FontColor #1A1A2E
+}
+
+left to right direction
+actor Utilisateur
+
+rectangle "ShareTrips" {
+  usecase "Modifier son profil" as UC1
+  usecase "Vérifier les données du profil" as UC2
+  usecase "Gérer les erreurs" as UC3
+}
+
+Utilisateur --> UC1
+UC1 --> UC2 : <<include>>
+UC3 ..> UC1 : <<extend>>
+
+@enduml

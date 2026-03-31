@@ -27,7 +27,14 @@ final class BookingController extends AbstractController
         $origin = $request->query->get('origin');
         $destination = $request->query->get('destination');
         $dateString = $request->query->get('date');
-        $date = $dateString ? new \DateTimeImmutable($dateString) : null;
+        $date = null;
+        if ($dateString) {
+            try {
+                $date = new \DateTimeImmutable($dateString);
+            } catch (\Exception) {
+                $date = null;
+            }
+        }
         $availableTrips = null;
         if ($origin || $destination || $date) {
             $availableTrips = $tripRepository->findAvailableTrips(
@@ -59,12 +66,19 @@ final class BookingController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/booking/{booking}/cancel', name: 'app_profile_booking_cancel')]
+    #[Route('/profile/booking/{booking}/cancel', name: 'app_profile_booking_cancel', methods: ['POST'])]
     public function cancel(Booking $booking, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         assert($user instanceof User);
         if ($booking->getPassenger()->getId() !== $user->getId()) {
+            return $this->redirectToRoute('app_profile_booking');
+        }
+        if ($booking->getStatus() === BookingStatus::Cancelled) {
+            return $this->redirectToRoute('app_profile_booking');
+        }
+        if ($booking->getTrip()->getDepartureAt() < new \DateTimeImmutable()) {
+            $this->addFlash('danger', 'Impossible d\annuler un trajet déjà effectué.');
             return $this->redirectToRoute('app_profile_booking');
         }
         if ($booking->getStatus() === BookingStatus::Confirmed) {
@@ -79,34 +93,5 @@ final class BookingController extends AbstractController
         $entityManager->flush();
         $this->addFlash('success', 'Réservation annulée.');
         return $this->redirectToRoute('app_profile_booking');
-    }
-
-    #[Route('/profile/trip/booking/{booking}/confirm', name: 'app_profile_trip_booking_confirm', methods: ['POST'])]
-    public function confirm(
-        Request $request,
-        Booking $booking,
-        EntityManagerInterface $entityManager
-    ): Response {
-        $user = $this->getUser();
-        assert($user instanceof User);
-        $trip = $booking->getTrip();
-        if ($trip->getDriver()->getId() !== $user->getId()) {
-            throw $this->createAccessDeniedException('Accès refusé.');
-        }
-        $booking->setStatus(BookingStatus::Confirmed);
-        $newAvailable = $trip->getVehicle()->getSeats() - $booking->getSeatsBooked();
-        $trip->setAvailableSeats($newAvailable);
-        $entityManager->flush();
-        if ($trip->getAvailableSeats() <= 0) {
-            $trip->setStatus(TripStatus::Full);
-        }
-        $submittedToken = (string) $request->request->get('_token');
-        if (!$this->isCsrfTokenValid('confirm_' . $booking->getId(), $submittedToken)) {
-            $this->addFlash('error', 'Token invalide.');
-            return $this->redirectToRoute('app_profile_trip_show', ['id' => $booking->getTrip()->getId()]);
-        }
-        $entityManager->flush();
-        $this->addFlash('success', 'Réservation confirmée avec succès.');
-        return $this->redirectToRoute('app_profile_trip_show', ['id' => $booking->getTrip()->getId()]);
     }
 }

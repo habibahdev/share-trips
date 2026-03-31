@@ -2,11 +2,13 @@
 
 namespace App\Entity;
 
+use App\Enum\BookingStatus;
 use App\Enum\TripStatus;
 use App\Repository\TripRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TripRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -26,27 +28,40 @@ class Trip
     private ?Vehicle $vehicle = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: 'La ville de départ est obligatoire.')]
+    #[Assert\Length(max: 100)]
     private ?string $origin = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: 'La ville d\'arrivée est obligatoire.')]
+    #[Assert\Length(max: 100)]
     private ?string $destination = null;
 
-     #[ORM\Column]
+    #[ORM\Column]
+    #[Assert\NotNull(message: 'La date de départ est obligatoire.')]
+    #[Assert\GreaterThan(value: 'now', message: 'La date de départ doit être dans le futur.')]
     private ?\DateTimeImmutable $departureAt = null;
 
-     #[ORM\Column]
+    #[ORM\Column]
+    #[Assert\NotNull(message: 'Le nombre de places est obligatoire.')]
+    #[Assert\Range(
+        min: 1,
+        max: 8,
+        notInRangeMessage: 'Le nombre de places doit être compris entre {{ min }} et {{ max }}')]
     private ?int $availableSeats = null;
 
     #[ORM\Column(type: 'float')]
+    #[Assert\NotNull(message: 'Le prix est obligatoire.')]
+    #[Assert\PositiveOrZero(message: 'Le prix doit être positif ou nul.')]
     private ?float $pricePerSeat = null;
 
-     #[ORM\Column(enumType: TripStatus::class)]
+    #[ORM\Column(enumType: TripStatus::class)]
     private TripStatus $status = TripStatus::Open;
 
-     #[ORM\Column]
+    #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-     #[ORM\Column]
+    #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
     /** @var Collection<int, Booking> */
@@ -59,7 +74,7 @@ class Trip
     }
 
     #[ORM\PrePersist]
-    public function onPrePersists(): void
+    public function onPrePersist(): void
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
@@ -182,6 +197,27 @@ class Trip
     public function isOpen(): bool
     {
         return $this->status === TripStatus::Open;
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === TripStatus::Cancelled;
+    }
+
+    public function isPast(): bool
+    {
+        return $this->departureAt !== null && $this->departureAt < new \DateTimeImmutable();
+    }
+
+    public function getRemainingSeats(): int
+    {
+        $confirmedSeats = 0;
+        foreach ($this->bookings as $booking) {
+            if ($booking->getStatus() === BookingStatus::Confirmed) {
+                $confirmedSeats += $booking->getSeatsBooked();
+            }
+        }
+        return max(0, ($this->availableSeats ?? 0) - $confirmedSeats);
     }
 
     /** @return Collection<int, Booking> */

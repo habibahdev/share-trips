@@ -16,7 +16,14 @@ final class HomeController extends AbstractController
         $origin = $request->query->get('origin');
         $destination = $request->query->get('destination');
         $dateString = $request->query->get('date');
-        $date = $dateString ? new \DateTimeImmutable($dateString) : null;
+        $date = null;
+        if ($dateString) {
+            try {
+                $date = new \DateTimeImmutable($dateString);
+            } catch (\Exception) {
+                $date = null;
+            }
+        }
         $nextTrips = $tripRepository->findAvailableTrips($origin, $destination, $date);
         return $this->render('home/index.html.twig', [
             'nextTrips' => $nextTrips,

@@ -51,7 +51,7 @@ class VehicleType extends AbstractType
                 ]
             ])
             ->add('seats', IntegerType::class, [
-                'label' => 'Nombre de place',
+                'label' => 'Nombre de places',
                 'constraints' => [
                     new NotBlank(message: 'Le nombre de places disponibles est obligatoire.'),
                     new Range(

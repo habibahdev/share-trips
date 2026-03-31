@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Payment;
 use App\Enum\PaymentMethod;
+use App\Enum\PaymentStatus;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -40,22 +41,25 @@ class PaymentCrudController extends AbstractCrudController
             AssociationField::new('booking', 'Réservation')
                 ->setFormTypeOption('disabled', $disabled),
             ChoiceField::new('method', 'Méthode de paiement')
-                ->setChoices([
-                    'Espèces' => PaymentMethod::Cash,
-                    'Paypal' => PaymentMethod::Paypal,
-                ])
+                ->setChoices(
+                    array_combine(
+                        array_map(fn(PaymentMethod $m) => $m->label(), PaymentMethod::cases()), PaymentMethod::cases()
+                    )
+                )
                 ->setFormTypeOption('disabled', $disabled)
                 ->hideOnIndex(),
             ChoiceField::new('status', 'Statut')
                 ->setChoices([
-                    'En attente' => 'pending',
-                    'Complété' => 'completed',
-                    'Échoué' => 'failed'
+                    'En attente' => PaymentStatus::Pending,
+                    'Complété' => PaymentStatus::Completed,
+                    'Échoué' => PaymentStatus::Failed,
+                    'Remboursé' => PaymentStatus::Refunded
                 ])
                 ->renderAsBadges([
-                    'pending' => 'warning',
-                    'completed' => 'success',
-                    'failed' => 'danger'
+                    PaymentStatus::Pending->value => 'warning',
+                    PaymentStatus::Completed->value => 'success',
+                    PaymentStatus::Failed->value => 'danger',
+                    PaymentStatus::Refunded->value => 'info'
                 ]),
             DateTimeField::new('createdAt', 'Payé le')->hideOnForm(),
         ];

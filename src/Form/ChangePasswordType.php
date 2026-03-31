@@ -10,6 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class ChangePasswordType extends AbstractType
 {
@@ -27,7 +28,11 @@ class ChangePasswordType extends AbstractType
                 'mapped' => false,
                 'constraints' => [
                     new Length(min: 6, minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères.'),
-                    new NotBlank(message: 'Le mot de passe est obligatoire.')
+                    new NotBlank(message: 'Le mot de passe est obligatoire.'),
+                    new Regex(
+                        pattern: '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
+                        message: 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.'
+                    )
                 ]
             ])
         ;

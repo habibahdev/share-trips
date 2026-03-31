@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Report;
+use App\Enum\ReportStatus;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -53,14 +54,16 @@ class ReportCrudController extends AbstractCrudController
                 ->setFormTypeOption('disabled', $disabled),
             ChoiceField::new('status', 'Statut')
                 ->setChoices([
-                    'En attente' => 'pending',
-                    'Traité' => 'reviewed',
-                    'Rejeté' => 'dismissed'
+                    'En attente' => ReportStatus::Pending,
+                    'Traité' => ReportStatus::Reviewed,
+                    'Rejeté' => ReportStatus::Rejected,
+                    'Résolu' => ReportStatus::Resolved
                 ])
                 ->renderAsBadges([
-                    'pending' => 'warning',
-                    'reviewed' => 'success',
-                    'dismissed' => 'secondary'
+                    ReportStatus::Pending->value => 'warning',
+                    ReportStatus::Reviewed->value => 'info',
+                    ReportStatus::Rejected->value => 'success',
+                    ReportStatus::Resolved->value => 'secondary'
                 ]),
             TextareaField::new('adminNote', 'Note admin')->hideOnIndex(),
             DateTimeField::new('createdAt', 'Date')

@@ -22,9 +22,8 @@ final class TripController extends AbstractController
     {
         $user = $this->getUser();
         assert($user instanceof User);
-        $trips = $user->getTripsAsDriver();
         return $this->render('profile/trip/index.html.twig', [
-            'trips' => $trips,
+            'trips' => $user->getTripsAsDriver()
         ]);
     }
 
@@ -36,8 +35,14 @@ final class TripController extends AbstractController
         if (!$trip) {
             $trip = new Trip();
             $trip->setDriver($user);
-        } elseif ($trip->getDriver()->getId() !== $user->getId()) {
-            return $this->redirectToRoute('app_profile_trip');
+        } else {
+            if ($trip->getDriver()->getId() !== $user->getId()) {
+                return $this->redirectToRoute('app_profile_trip');
+            }
+            if ($trip->getStatus() === TripStatus::Cancelled || $trip->getStatus() === TripStatus::Full) {
+                $this->addFlash('danger', 'Impossible de modifier un trajet annulé ou complet.');
+                return $this->redirectToRoute('app_profile_trip');
+            }
         }
         $form = $this->createForm(TripType::class, $trip, [
             'vehicles' => $user->getVehicles()
@@ -46,7 +51,7 @@ final class TripController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($trip);
             $entityManager->flush();
-            $this->addFlash('success', 'Informations trajet sauvegardée.');
+            $this->addFlash('success', 'Trajet sauvegardé.');
             return $this->redirectToRoute('app_profile_trip');
         }
         return $this->render('profile/trip/form.html.twig', [
@@ -56,12 +61,19 @@ final class TripController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/trip/cancel/{trip}', name: 'app_profile_trip_cancel')]
+    #[Route('/profile/trip/cancel/{trip}', name: 'app_profile_trip_cancel', methods: ['POST'])]
     public function cancel(Trip $trip, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
         assert($user instanceof User);
         if ($trip->getDriver()->getId() !== $user->getId()) {
+            return $this->redirectToRoute('app_profile_trip');
+        }
+        if ($trip->getStatus() === TripStatus::Cancelled) {
+            return $this->redirectToRoute('app_profile_trip');
+        }
+        if ($trip->getDepartureAt() < new \DateTimeImmutable()) {
+            $this->addFlash('danger', 'Impossible d\'annuler un trajet déjà effectué.');
             return $this->redirectToRoute('app_profile_trip');
         }
         $trip->setStatus(TripStatus::Cancelled);
@@ -83,18 +95,24 @@ final class TripController extends AbstractController
         if ($trip->getDriver()->getId() !== $user->getId()) {
             throw $this->createAccessDeniedException('Accès refusé.');
         }
-        $booking->setStatus(BookingStatus::Confirmed);
-        if ($booking->getSeatsBooked() === $trip->getAvailableSeats()) {
-            $trip->setStatus(TripStatus::Full);
-        } elseif ($booking->getSeatsBooked() < $trip->getAvailableSeats()) {
-            $trip->setStatus(TripStatus::Open);
+        if ($booking->getStatus() === BookingStatus::Confirmed) {
+            $this->addFlash('warning', 'Cette réservation est déjà confirmée.');
+            return $this->redirectToRoute('app_profile_trip_show', ['trip' => $trip->getId()]);
         }
+        $booking->setStatus(BookingStatus::Confirmed);
+        $confirmedSeats = 0;
+        foreach ($trip->getBookings() as $b) {
+            if ($b->getStatus() === BookingStatus::Confirmed) {
+                $confirmedSeats += $b->getSeatsBooked();
+            }
+        }
+        $remaining = $trip->getVehicle()->getSeats() - $confirmedSeats;
+        $trip->setAvailableSeats(max(0, $remaining));
+        $trip->setStatus($remaining <= 0 ? TripStatus::Full : TripStatus::Open);
         $entityManager->flush();
         $mailer->sendBookingApproved($booking);
         $this->addFlash('success', 'Réservation confirmée.');
-        return $this->redirectToRoute('app_profile_trip_show', [
-            'trip' => $trip->getId()
-        ]);
+        return $this->redirectToRoute('app_profile_trip_show', ['trip' => $trip->getId()]);
     }
 
     #[Route('/profile/trip/{trip}', name: 'app_profile_trip_show')]

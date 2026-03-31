@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class BookingController extends AbstractController
 {
     #[Route('/booking/add/{tripId}', name: 'app_booking_add')]
-    public function index(
+    public function add(
         int $tripId,
         TripRepository $tripRepository,
         Request $request,
@@ -26,15 +26,15 @@ final class BookingController extends AbstractController
     ): Response {
         $user = $this->getUser();
         assert($user instanceof User);
-        $trip = $tripRepository->findOneBy(['id' => $tripId]);
+        $trip = $tripRepository->find($tripId);
         if (!$trip) {
             return $this->redirectToRoute('app_home');
         }
         if ($trip->getDriver()->getId() === $user->getId()) {
-            $this->addFlash('danger', 'Vous ne pouvez pas réserver vore propre trajet.');
+            $this->addFlash('danger', 'Vous ne pouvez pas réserver votre propre trajet.');
             return $this->redirectToRoute('app_trip_show', ['id' => $tripId]);
         }
-        if ($trip->getAvailableSeats() <= 0 || $trip->getStatus()->value === 'full') {
+        if ($trip->isFull() || $trip->getAvailableSeats() <= 0) {
             $this->addFlash('danger', 'Ce trajet est complet.');
             return $this->redirectToRoute('app_trip_show', ['id' => $tripId]);
         }
@@ -73,8 +73,18 @@ final class BookingController extends AbstractController
     {
         $user = $this->getUser();
         assert($user instanceof User);
-        $trip = $tripRepository->findOneBy(['id' => $tripId]);
+        $trip = $tripRepository->find($tripId);
         if (!$trip) {
+            return $this->redirectToRoute('app_home');
+        }
+        $hasBooking = false;
+        foreach ($trip->getBookings() as $booking) {
+            if ($booking->getPassenger()->getId() === $user->getId()) {
+                $hasBooking = true;
+                break;
+            }
+        }
+        if (!$hasBooking) {
             return $this->redirectToRoute('app_home');
         }
         return $this->render('booking/success.html.twig', [

@@ -38,6 +38,9 @@ class Vehicle
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $updatedAt = null;
+
     /** @var Collection<int, Trip> */
     #[ORM\OneToMany(mappedBy: 'vehicle', targetEntity: Trip::class)]
     private Collection $trips;
@@ -56,6 +59,12 @@ class Vehicle
     public function onPrePersist(): void
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -101,7 +110,7 @@ class Vehicle
         return $this->color;
     }
 
-    public function setColor(string $color): static
+    public function setColor(?string $color): static
     {
         $this->color = $color;
         return $this;
@@ -132,6 +141,11 @@ class Vehicle
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
     }
 
     public function getLabel(): string

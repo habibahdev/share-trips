@@ -1,0 +1,27 @@
+@startuml
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #EEF4FF
+  BorderColor #3B6FC2
+  FontColor #1A1A2E
+}
+
+left to right direction
+actor Administrateur
+
+rectangle "ShareTrips" {
+  usecase "Gérer les utilisateurs" as UC1
+  usecase "Consulter les utilisateurs" as UC2
+  usecase "Supprimer un utilisateur" as UC3
+  usecase "Bloquer un utilisateur" as UC4
+  usecase "Bannir un utilisateur" as UC5
+ usecase "Suspendre un utilisateur" as UC6
+}
+
+Administrateur --> UC1
+UC1 --> UC2 : <<include>>
+UC1 --> UC3 : <<include>>
+UC1 --> UC4 : <<include>>
+UC1 --> UC5 : <<include>>
+UC1 --> UC6 : <<include>>
+@enduml

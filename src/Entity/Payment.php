@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Enum\PaymentMethod;
+use App\Enum\PaymentStatus;
 use App\Repository\PaymentRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -18,11 +19,14 @@ class Payment
     #[ORM\Column]
     private ?float $amount = null;
 
-    #[ORM\Column(length: 20)]
-    private ?string $status = 'pending'; // pending, completed, failed
+    #[ORM\Column(enumType: PaymentStatus::class)]
+    private PaymentStatus $status;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(enumType: PaymentMethod::class)]
     private ?PaymentMethod $method = null;
@@ -37,7 +41,7 @@ class Payment
 
     public function __construct()
     {
-        $this->status = 'pending';
+        $this->status = PaymentStatus::Pending;
     }
 
     public function __toString(): string
@@ -50,6 +54,13 @@ class Payment
     public function onPrePersist(): void
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -69,16 +80,36 @@ class Payment
         return $this;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): PaymentStatus
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(PaymentStatus $status): static
     {
         $this->status = $status;
 
         return $this;
+    }
+
+    public function markAsCompleted(): void
+    {
+        $this->status = PaymentStatus::Completed;
+    }
+
+    public function markAsFailed(): void
+    {
+        $this->status = PaymentStatus::Failed;
+    }
+
+    public function refund(): void
+    {
+        $this->status = PaymentStatus::Refunded;
+    }
+
+    public function isSuccessful(): bool
+    {
+        return $this->status->isSuccessful();
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable
@@ -86,11 +117,9 @@ class Payment
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function getUpdatedAt(): ?\DateTimeImmutable
     {
-        $this->createdAt = $createdAt;
-
-        return $this;
+        return $this->updatedAt;
     }
 
     public function getMethod(): ?PaymentMethod

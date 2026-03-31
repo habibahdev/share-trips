@@ -1,0 +1,20 @@
+@startuml
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #EEF4FF
+  BorderColor #3B6FC2
+  FontColor #1A1A2E
+}
+
+left to right direction
+
+actor Visiteur
+database Database
+
+rectangle Inscription {
+  Visiteur -- (S'inscrire)
+  (S'inscrire) .> (Envoi email) : include
+  (S'inscrire) -- Database
+}
+
+@enduml

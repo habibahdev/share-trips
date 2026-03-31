@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Enum\BookingStatus;
+use App\Enum\PaymentStatus;
 use App\Repository\BookingRepository;
 use App\Validator\AvailableSeats;
 use App\Validator\NotTripDriver;
@@ -144,7 +145,7 @@ class Booking
 
     public function getTotalPrice(): float
     {
-        return $this->trip->getPricePerSeat() * $this->seatsBooked;
+        return ($this->trip->getPricePerSeat() ?? 0) * $this->seatsBooked;
     }
 
     /** @return Collection<int, Report> */
@@ -172,7 +173,7 @@ class Booking
         return $this;
     }
 
-    public function hasBeeanReportedBy(User $user): bool
+    public function hasBeenReportedBy(User $user): bool
     {
         foreach ($this->reports as $report) {
             if ($report->getReporter()->getId() === $user->getId()) {
@@ -195,6 +196,6 @@ class Booking
 
     public function isPaid(): bool
     {
-        return $this->payment?->getStatus() === 'completed';
+        return $this->payment?->getStatus() === PaymentStatus::Completed;
     }
 }

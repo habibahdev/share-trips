@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\ReportStatus;
 use App\Repository\ReportRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -33,8 +34,8 @@ class Report
     #[ORM\Column(nullable: true, type: 'text')]
     private ?string $details = null;
 
-    #[ORM\Column(length: 20)]
-    private ?string $status = null;
+    #[ORM\Column(enumType: ReportStatus::class)]
+    private ReportStatus $status = ReportStatus::Pending;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -44,14 +45,13 @@ class Report
 
     public function __toString(): string
     {
-        return 'Signalement #' . $this->id;
+        return 'Signalement : ' . $this->id;
     }
 
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
         $this->createdAt = new \DateTimeImmutable();
-        $this->status = 'pending';
     }
 
     public function getId(): ?int
@@ -95,12 +95,12 @@ class Report
         return $this;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): ?ReportStatus
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(ReportStatus $status): static
     {
         $this->status = $status;
 
@@ -110,13 +110,6 @@ class Report
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
     }
 
     public function getAdminNote(): ?string
