@@ -24,7 +24,6 @@
                     <p style="font-size:.875rem;color:#94a3b8;margin:0;">Recherchez un trajet ci-dessous pour commencer.</p>
                 </div>
 
-                {# Formulaire de recherche #}
                 <div class="search-section-title">
                     <i class="bi bi-search"></i> Rechercher un trajet
                 </div>
@@ -189,7 +188,7 @@
                                 <a href="{{ path('app_profile_booking_show', { booking: booking.id }) }}" class="btn-detail">
                                     <i class="bi bi-eye"></i> Détail
                                 </a>
-                                {% if booking.status != constant('App\\Enum\\BookingStatus::Cancelled') %}
+                                {% if booking.status != constant('App\\Enum\\BookingStatus::Cancelled') and booking.trip.departureAt > date() %}
                                     <form method="post" action="{{ path('app_profile_booking_cancel', { booking: booking.id }) }}"
                                           onsubmit="return confirm('Annuler cette réservation ?')"
                                           style="display:contents;">
@@ -199,9 +198,19 @@
                                         </button>
                                     </form>
                                 {% endif %}
+                                {% if booking.status == constant('App\\Enum\\BookingStatus::Confirmed')
+                                    and booking.trip.departureAt < date() %}
+                                    <a href="{{ path('app_review_add', { id: booking.id }) }}"
+                                       class="btn-detail"
+                                       style="background:#fef9c3;color:#854d0e;border-color:#fde68a;">
+                                        <i class="bi bi-star"></i> Noter
+                                    </a>
+                                {% endif %}
                                 {% if booking.status == constant('App\\Enum\\BookingStatus::Confirmed') and booking.trip.departureAt < date() %}
-                                    <a href="{{ path('app_report_add', { id: booking.id }) }}" class="btn-report-link">
-                                        <i class="bi bi-flag"></i> Signaler
+                                    <a href="{{ path('app_report_add', { id: booking.id }) }}"
+                                        class="btn-detail"
+                                        style="background:#fee2e2;color:#b91c1c;border-color:#fca5a5;">
+                                        <i class="bi bi-flag"></i>
                                     </a>
                                 {% endif %}
                             </div>

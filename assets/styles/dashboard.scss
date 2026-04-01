@@ -1,0 +1,28 @@
+.admin-dashboard .profile-card {
+    font-family:'Plus Jakarta Sans',sans-serif;
+    box-shadow: 0 8px 24px rgba(30,58,95,.06);
+    border-radius: 20px;
+    border:1.5px solid #f1f5f9;
+    transition: transform .15s;
+}
+
+.admin-dashboard .profile-card:hover {
+    transform: translateY(-2px);
+}
+
+.admin-dashboard table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.admin-dashboard .section-title {
+    font-size:.7rem;
+    font-weight:700;
+    text-transform:uppercase;
+    color:#94a3b8;
+    margin-bottom:1rem;
+}
+
+.admin-dashboard .info-value.empty {
+    font-style:italic;
+    color:#cbd5e1;
+}

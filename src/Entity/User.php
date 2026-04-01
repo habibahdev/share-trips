@@ -96,6 +96,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $tokenForgotPasswordExpiredAt = null;
 
+    /** @var Collection<int, Review> */
+    #[ORM\OneToMany(mappedBy: 'reviewer', targetEntity: Review::class, orphanRemoval: true)]
+    private Collection $reviewsMade;
+
+    /** @var Collection<int, Review> */
+    #[ORM\OneToMany(mappedBy: 'reviewed', targetEntity: Review::class, orphanRemoval: true)]
+    private Collection $reviewsReceived;
+
     public function __construct()
     {
         $this->vehicles = new ArrayCollection();
@@ -105,6 +113,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->reportsReceived = new ArrayCollection();
         $this->isVerified = false;
         $this->tokenRegisterLifetime = (new \DateTimeImmutable('now'))->add(new DateInterval('PT10M'));
+        $this->reviewsMade = new ArrayCollection();
+        $this->reviewsReceived = new ArrayCollection();
     }
 
     public function __toString()
@@ -448,5 +458,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             && $this->tokenForgotPasswordExpiredAt !== null
             && $this->tokenForgotPasswordExpiredAt > new \DateTimeImmutable()
         ;
+    }
+
+    /** @return Collection<int, Review> */
+    public function getReviewsMade(): Collection
+    {
+        return $this->reviewsMade;
+    }
+
+    /** @return Collection<int, Review> */
+    public function getReviewsReceived(): Collection
+    {
+        return $this->reviewsReceived;
+    }
+
+    public function addReviewMade(Review $review): static
+    {
+        if (!$this->reviewsMade->contains($review)) {
+            $this->reviewsMade->add($review);
+            $review->setReviewer($this);
+        }
+        return $this;
+    }
+
+    public function addReviewReceived(Review $review): static
+    {
+        if (!$this->reviewsReceived->contains($review)) {
+            $this->reviewsReceived->add($review);
+            $review->setReviewed($this);
+        }
+        return $this;
     }
 }
