@@ -126,6 +126,21 @@ class MailService
         $this->send($email);
     }
 
+    public function sendForgotPassword(User $user): void
+    {
+        $email = (new TemplatedEmail())
+            ->to(new Address($user->getEmail(), $user->getFullName()))
+            ->subject('Réinitialisation de votre mot de passe - ShareTrips')
+            ->htmlTemplate('emails/forgot_password.html.twig')
+            ->context([
+                'user' => $user,
+                'token' => $user->getTokenForgotPassword(),
+                'expiredAt' => $user->getTokenForgotPasswordExpiredAt()->format('d/m/Y à H:i')
+            ])
+        ;
+        $this->send($email);
+    }
+
     private function send(TemplatedEmail $email): void
     {
         $email->from(new Address($this->fromEmail, $this->fromName));

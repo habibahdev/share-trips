@@ -90,6 +90,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?\DateTimeImmutable $tokenRegisterLifetime = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $tokenForgotPassword = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $tokenForgotPasswordExpiredAt = null;
+
     public function __construct()
     {
         $this->vehicles = new ArrayCollection();
@@ -412,5 +418,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->tokenRegisterLifetime = $tokenRegisterLifetime;
 
         return $this;
+    }
+    public function getTokenForgotPassword(): ?string
+    {
+        return $this->tokenForgotPassword;
+    }
+
+    public function setTokenForgotPassword(?string $tokenForgotPassword): static
+    {
+        $this->tokenForgotPassword = $tokenForgotPassword;
+
+        return $this;
+    }
+
+    public function getTokenForgotPasswordExpiredAt(): ?\DateTimeImmutable
+    {
+        return $this->tokenForgotPasswordExpiredAt;
+    }
+
+    public function setTokenForgotPasswordExpiredAt(?\DateTimeImmutable $tokenForgotPasswordExpiredAt): static
+    {
+        $this->tokenForgotPasswordExpiredAt = $tokenForgotPasswordExpiredAt;
+
+        return $this;
+    }
+    public function isForgotPasswordTokenValid(): bool
+    {
+        return $this->tokenForgotPassword != null
+            && $this->tokenForgotPasswordExpiredAt !== null
+            && $this->tokenForgotPasswordExpiredAt > new \DateTimeImmutable()
+        ;
     }
 }

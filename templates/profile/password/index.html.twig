@@ -35,13 +35,11 @@
                                     'placeholder': '••••••••'
                                 }
                             }) }}
-                            {% if form.actualPassword.vars.errors|length %}
-                                {% for error in form.actualPassword.vars.errors %}
-                                    <div class="invalid-feedback-st">
-                                        <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
+                            {% for error in form.actualPassword.vars.errors %}
+                                <div class="invalid-feedback-st">
+                                    <i class="bi bi-exclamation-circle-fill"></i> {{ error.message }}
+                                </div>
+                            {% endfor %}
                         </div>
 
                         <hr class="pw-divider">
@@ -52,12 +50,18 @@
                             </label>
                             {{ form_widget(form.newPassword.first, {
                                 'attr': {
-                                    'class': 'pw-input' ~ (form.newPassword.vars.errors|length ? ' is-invalid' : ''),
+                                    'class': 'pw-input' ~ (form.newPassword.first.vars.errors|length ? ' is-invalid' : ''),
+                                    'id': 'profile_new_password',
                                     'placeholder': '••••••••'
                                 }
                             }) }}
+                            {% for error in form.newPassword.first.vars.errors %}
+                                <div class="invalid-feedback-st">
+                                    <i class="bi bi-exclamation-circle-fill"></i> {{ error.message }}
+                                </div>
+                            {% endfor %}
                             <div class="pw-hint">
-                                <i class="bi bi-info-circle"></i> 8 caractères minimum
+                                <i class="bi bi-info-circle"></i> 8 caractères minimum, majuscule, chiffre
                             </div>
                         </div>
 
@@ -67,17 +71,25 @@
                             </label>
                             {{ form_widget(form.newPassword.second, {
                                 'attr': {
-                                    'class': 'pw-input' ~ (form.newPassword.vars.errors|length ? ' is-invalid' : ''),
+                                    'class': 'pw-input' ~ (form.newPassword.second.vars.errors|length ? ' is-invalid' : ''),
                                     'placeholder': '••••••••'
                                 }
                             }) }}
-                            {% if form.newPassword.vars.errors|length %}
-                                {% for error in form.newPassword.vars.errors %}
-                                    <div class="invalid-feedback-st">
-                                        <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
+                            {% for error in form.newPassword.second.vars.errors %}
+                                <div class="invalid-feedback-st">
+                                    <i class="bi bi-exclamation-circle-fill"></i> {{ error.message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div id="profile_password_strength" class="mb-4" style="display:none;">
+                            <div style="display:flex;gap:4px;margin-bottom:.35rem;">
+                                <div class="s-bar" id="p_s1"></div>
+                                <div class="s-bar" id="p_s2"></div>
+                                <div class="s-bar" id="p_s3"></div>
+                                <div class="s-bar" id="p_s4"></div>
+                            </div>
+                            <div id="p_s_label" style="font-size:.75rem;color:#94a3b8;"></div>
                         </div>
 
                         <div class="d-flex gap-2">
@@ -97,4 +109,42 @@
         </div>
     </div>
 </div>
+
+<style>
+.s-bar { flex:1; height:4px; border-radius:2px; background:#e2e8f0; transition:background .2s; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('change_password_newPassword_first');
+    const wrap  = document.getElementById('profile_password_strength');
+    const lbl   = document.getElementById('p_s_label');
+    const bars  = ['p_s1','p_s2','p_s3','p_s4'].map(id => document.getElementById(id));
+
+    const lvl   = [
+        {c:'#ef4444', t:'Très faible'},
+        {c:'#f97316', t:'Faible'},
+        {c:'#eab308', t:'Moyen'},
+        {c:'#22c55e', t:'Fort'},
+    ];
+
+    if (!input) return;
+
+    input.addEventListener('input', () => {
+        const v = input.value;
+        if (!v) { wrap.style.display = 'none'; return; }
+
+        let s = 0;
+        if (v.length >= 8) s++;
+        if (/[A-Z]/.test(v)) s++;
+        if (/[0-9]/.test(v)) s++;
+        if (/[^A-Za-z0-9]/.test(v)) s++;
+
+        wrap.style.display = 'block';
+        bars.forEach((b, i) => { b.style.background = i < s ? lvl[s-1].c : '#e2e8f0'; });
+        lbl.textContent = lvl[s-1]?.t ?? '';
+        lbl.style.color = lvl[s-1]?.c ?? '#94a3b8';
+    });
+});
+</script>
 {% endblock %}
