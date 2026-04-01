@@ -34,13 +34,11 @@
                                     'class': 'register-input' ~ (form.email.vars.errors|length ? ' is-invalid' : '')
                                 }
                             }) }}
-                            {% if form.email.vars.errors|length %}
-                                {% for error in form.email.vars.errors %}
-                                    <div class="invalid-feedback-st">
-                                        <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
+                            {% for error in form.email.vars.errors %}
+                                <div class="invalid-feedback-st">
+                                    <i class="bi bi-exclamation-circle-fill"></i> {{ error.message }}
+                                </div>
+                            {% endfor %}
                         </div>
 
                         <div class="mb-3">
@@ -49,12 +47,18 @@
                             </label>
                             {{ form_widget(form.plainPassword.first, {
                                 'attr': {
-                                    'class': 'register-input' ~ (form.plainPassword.vars.errors|length ? ' is-invalid' : ''),
+                                    'class': 'register-input' ~ (form.plainPassword.first.vars.errors|length ? ' is-invalid' : ''),
+                                    'id': 'register_password',
                                     'placeholder': '••••••••'
                                 }
                             }) }}
+                            {% for error in form.plainPassword.first.vars.errors %}
+                                <div class="invalid-feedback-st">
+                                    <i class="bi bi-exclamation-circle-fill"></i> {{ error.message }}
+                                </div>
+                            {% endfor %}
                             <div class="password-hint">
-                                <i class="bi bi-info-circle"></i> 8 caractères minimum
+                                <i class="bi bi-info-circle"></i> 8 caractères minimum, majuscule, chiffre
                             </div>
                         </div>
 
@@ -64,20 +68,28 @@
                             </label>
                             {{ form_widget(form.plainPassword.second, {
                                 'attr': {
-                                    'class': 'register-input' ~ (form.plainPassword.vars.errors|length ? ' is-invalid' : ''),
+                                    'class': 'register-input' ~ (form.plainPassword.second.vars.errors|length ? ' is-invalid' : ''),
                                     'placeholder': '••••••••'
                                 }
                             }) }}
-                            {% if form.plainPassword.vars.errors|length %}
-                                {% for error in form.plainPassword.vars.errors %}
-                                    <div class="invalid-feedback-st">
-                                        <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
+                            {% for error in form.plainPassword.second.vars.errors %}
+                                <div class="invalid-feedback-st">
+                                    <i class="bi bi-exclamation-circle-fill"></i> {{ error.message }}
+                                </div>
+                            {% endfor %}
                         </div>
 
-                        <button type="submit" class="btn-register">
+                        <div id="register_password_strength" class="mb-4" style="display:none;">
+                            <div style="display:flex;gap:4px;margin-bottom:.35rem;">
+                                <div class="s-bar" id="r_s1"></div>
+                                <div class="s-bar" id="r_s2"></div>
+                                <div class="s-bar" id="r_s3"></div>
+                                <div class="s-bar" id="r_s4"></div>
+                            </div>
+                            <div id="r_s_label" style="font-size:.75rem;color:#94a3b8;"></div>
+                        </div>
+
+                        <button type="submit" class="btn-register w-100">
                             Créer mon compte
                         </button>
 
@@ -103,4 +115,39 @@
         </div>
     </div>
 </div>
+
+<style>
+.s-bar { flex:1; height:4px; border-radius:2px; background:#e2e8f0; transition:background .2s; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('register_plainPassword_first');
+    const wrap  = document.getElementById('register_password_strength');
+    const lbl   = document.getElementById('r_s_label');
+    const bars  = ['r_s1','r_s2','r_s3','r_s4'].map(id => document.getElementById(id));
+    const lvl   = [
+        {c:'#ef4444', t:'Très faible'},
+        {c:'#f97316', t:'Faible'},
+        {c:'#eab308', t:'Moyen'},
+        {c:'#22c55e', t:'Fort'},
+    ];
+
+    if (!input) return;
+
+    input.addEventListener('input', () => {
+        const v = input.value;
+        if (!v) { wrap.style.display = 'none'; return; }
+        let s = 0;
+        if (v.length >= 8) s++;
+        if (/[A-Z]/.test(v)) s++;
+        if (/[0-9]/.test(v)) s++;
+        if (/[^A-Za-z0-9]/.test(v)) s++;
+        wrap.style.display = 'block';
+        bars.forEach((b, i) => { b.style.background = i < s ? lvl[s-1].c : '#e2e8f0'; });
+        lbl.textContent = lvl[s-1]?.t ?? '';
+        lbl.style.color = lvl[s-1]?.c ?? '#94a3b8';
+    });
+});
+</script>
 {% endblock %}

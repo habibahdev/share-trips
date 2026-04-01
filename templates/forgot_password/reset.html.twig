@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau mot de passe - Share Trips{% endblock %}
+
+{% block body %}
+<div class="container" style="max-width:480px;margin:3rem auto;">
+
+    <div class="text-center mb-4">
+        <i class="bi bi-shield-lock-fill d-block mb-3" style="font-size:2.5rem;color:#1d4ed8;"></i>
+        <h1 style="font-size:1.5rem;font-weight:800;color:#1e3a5f;margin:0 0 .5rem;">
+            Nouveau mot de passe
+        </h1>
+        <p style="font-size:.9rem;color:#94a3b8;margin:0;">
+            Choisissez un mot de passe sécurisé d'au moins 8 caractères.
+        </p>
+    </div>
+
+    <div class="edit-card">
+        {{ form_start(form, {
+            'action': path('app_reset_password', { token: token }),
+            'attr': {'novalidate': 'novalidate'}
+        }) }}
+
+            <div class="mb-3">
+                <label class="edit-label">
+                    <i class="bi bi-lock me-1"></i>Nouveau mot de passe
+                </label>
+                {{ form_widget(form.plainPassword.first, {
+                    'attr': {
+                        'class': 'edit-input' ~ (form.plainPassword.first.vars.errors|length ? ' is-invalid' : ''),
+                        'id': 'new_password'
+                    }
+                }) }}
+                {% for error in form.plainPassword.first.vars.errors %}
+                    <div class="invalid-feedback-st mb-3">
+                        <i class="bi bi-exclamation-circle-fill"></i> {{ error.message }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="mb-3">
+                <label class="edit-label">
+                    <i class="bi bi-lock-fill me-1"></i>Confirmez le mot de passe
+                </label>
+                {{ form_widget(form.plainPassword.second, {
+                    'attr': {
+                        'class': 'edit-input' ~ (form.plainPassword.second.vars.errors|length ? ' is-invalid' : '')
+                    }
+                }) }}
+                {% for error in form.plainPassword.second.vars.errors %}
+                    <div class="invalid-feedback-st mb-3">
+                        <i class="bi bi-exclamation-circle-fill"></i> {{ error.message }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div id="password-strength" class="mb-4" style="display:none;">
+                <div style="display:flex;gap:4px;margin-bottom:.35rem;">
+                    <div class="s-bar" id="s1"></div>
+                    <div class="s-bar" id="s2"></div>
+                    <div class="s-bar" id="s3"></div>
+                    <div class="s-bar" id="s4"></div>
+                </div>
+                <div id="s-label" style="font-size:.75rem;color:#94a3b8;"></div>
+            </div>
+
+            <button type="submit" class="btn-save w-100">
+                <i class="bi bi-check2-circle me-2"></i>Réinitialiser le mot de passe
+            </button>
+
+        {{ form_end(form) }}
+    </div>
+
+</div>
+
+<style>
+.s-bar { flex:1; height:4px; border-radius:2px; background:#e2e8f0; transition:background .2s; }
+</style>
+
+<script>
+const input = document.getElementById('reset_password_plainPassword_first');
+const wrap  = document.getElementById('password-strength');
+const lbl   = document.getElementById('s-label');
+const bars  = ['s1','s2','s3','s4'].map(id => document.getElementById(id));
+const lvl   = [
+    {c:'#ef4444', t:'Très faible'},
+    {c:'#f97316', t:'Faible'},
+    {c:'#eab308', t:'Moyen'},
+    {c:'#22c55e', t:'Fort'},
+];
+if (input) {
+    input.addEventListener('input', () => {
+        const v = input.value;
+        if (!v) { wrap.style.display = 'none'; return; }
+        let s = 0;
+        if (v.length >= 8) s++;
+        if (/[A-Z]/.test(v)) s++;
+        if (/[0-9]/.test(v)) s++;
+        if (/[^A-Za-z0-9]/.test(v)) s++;
+        wrap.style.display = 'block';
+        bars.forEach((b, i) => { b.style.background = i < s ? lvl[s-1].c : '#e2e8f0'; });
+        lbl.textContent = lvl[s-1]?.t ?? '';
+        lbl.style.color = lvl[s-1]?.c ?? '#94a3b8';
+    });
+}
+</script>
+{% endblock %}

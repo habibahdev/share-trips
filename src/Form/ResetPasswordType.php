@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -13,17 +12,14 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
 
-class RegisterType extends AbstractType
+class ResetPasswordType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email', EmailType::class, [
-                'label' => 'Adresse email'
-            ])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
-                'first_options'  => ['label' => 'Mot de passe', 'hash_property_path' => 'password'],
+                'first_options'  => ['label' => 'Nouveau mot de passe', 'hash_property_path' => 'password'],
                 'second_options' => ['label' => 'Confirmez le mot de passe'],
                 'mapped' => false,
                 'constraints' => [
@@ -31,7 +27,7 @@ class RegisterType extends AbstractType
                     new NotBlank(message: 'Le mot de passe est obligatoire.'),
                     new Regex(
                         pattern: '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
-                        message: 'Le mot de passe doit contenir au moins un majuscule, une minuscule et un chiffre.'
+                        message: 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.'
                     )
                 ]
             ])
@@ -41,7 +37,7 @@ class RegisterType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => User::class,
+            'data_class' => User::class
         ]);
     }
 }
