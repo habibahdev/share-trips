@@ -30,6 +30,12 @@ final class BookingController extends AbstractController
         if (!$trip) {
             return $this->redirectToRoute('app_home');
         }
+        if (!$user->isVerified()) {
+            $this->addFlash(
+                'warning',
+                'Vous devez vérifier votre adresse e-mail avant de pouvoir réserver un trajet.'
+            );
+        }
         if ($trip->getDriver()->getId() === $user->getId()) {
             $this->addFlash('danger', 'Vous ne pouvez pas réserver votre propre trajet.');
             return $this->redirectToRoute('app_trip_show', ['id' => $tripId]);
