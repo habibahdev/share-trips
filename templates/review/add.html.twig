@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Noter {{ driver.firstName }} {{ driver.lastName }} - Share Trips{% endblock %}
+
+{% block body %}
+<div class="container" style="max-width:580px;margin:2rem auto;">
+
+    <a href="{{ path('app_profile_booking') }}" class="back-link mb-3 d-inline-flex">
+        <i class="bi bi-arrow-left"></i> Mes réservations
+    </a>
+
+    <div class="show-card">
+
+        <div class="card-section-title mb-4">
+            <i class="bi bi-star"></i> Laisser un avis
+        </div>
+
+        <div style="background:#f8fafc;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;">
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <div class="driver-avatar">
+                    {{ driver.firstName ? driver.firstName|first|upper : '?' }}
+                </div>
+                <div>
+                    <div style="font-weight:700;color:#1e3a5f;">
+                        {{ driver.firstName ?? '' }} {{ driver.lastName ?? '' }}
+                    </div>
+                    <div style="font-size:.8rem;color:#94a3b8;">Conducteur</div>
+                </div>
+            </div>
+            <div style="font-size:.85rem;color:#64748b;">
+                <i class="bi bi-geo-alt-fill me-1" style="color:#1d4ed8;"></i>
+                {{ booking.trip.origin }}
+                <i class="bi bi-arrow-right mx-1"></i>
+                {{ booking.trip.destination }}
+            </div>
+            <div style="font-size:.85rem;color:#64748b;margin-top:.25rem;">
+                <i class="bi bi-calendar3 me-1"></i>
+                {{ booking.trip.departureAt|date('d/m/Y à H:i') }}
+            </div>
+        </div>
+
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+            {# Note en étoiles #}
+            <div class="mb-4">
+                <div class="info-label mb-2">Votre note</div>
+                <div class="star-rating-group">
+                    {% for child in form.rating %}
+                        <label class="star-label" for="{{ child.vars.id }}">
+                            {{ form_widget(child, {'attr': {'class': 'star-input'}}) }}
+                            <span class="star-display">
+                                ★ {{ child.vars.value }}
+                            </span>
+                        </label>
+                    {% endfor %}
+                </div>
+                {% if form.rating.vars.errors|length %}
+                    {% for error in form.rating.vars.errors %}
+                        <div class="invalid-feedback-st mt-1">
+                            <i class="bi bi-exclamation-circle-fill"></i> {{ error.message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            {# Commentaire #}
+            <div class="mb-4">
+                <label class="info-label mb-1" for="{{ form.comment.vars.id }}">
+                    Commentaire <span style="color:#94a3b8;font-weight:400;">(optionnel)</span>
+                </label>
+                {{ form_widget(form.comment, {
+                    'attr': {
+                        'class': 'edit-input' ~ (form.comment.vars.errors|length ? ' is-invalid' : ''),
+                        'id': form.comment.vars.id
+                    }
+                }) }}
+                <div style="text-align:right;font-size:.75rem;color:#94a3b8;margin-top:.25rem;">
+                    <span id="char-count">0</span>/500 caractères
+                </div>
+                {% if form.comment.vars.errors|length %}
+                    {% for error in form.comment.vars.errors %}
+                        <div class="invalid-feedback-st">
+                            <i class="bi bi-exclamation-circle-fill"></i> {{ error.message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn-save">
+                    <i class="bi bi-check2"></i> Publier l'avis
+                </button>
+                <a href="{{ path('app_profile_booking') }}" class="btn-cancel">Annuler</a>
+            </div>
+
+        {{ form_end(form) }}
+
+    </div>
+</div>
+
+<style>
+.star-rating-group {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+.star-label {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    cursor: pointer;
+}
+.star-input {
+    accent-color: #1d4ed8;
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+}
+.star-display {
+    font-size: .9rem;
+    color: #475569;
+    font-weight: 500;
+}
+.star-label:has(.star-input:checked) .star-display {
+    color: #f59e0b;
+    font-weight: 700;
+}
+</style>
+
+<script>
+const textarea = document.querySelector('textarea[name$="[comment]"]');
+const counter  = document.getElementById('char-count');
+if (textarea && counter) {
+    counter.textContent = textarea.value.length;
+    textarea.addEventListener('input', () => {
+        counter.textContent = textarea.value.length;
+    });
+}
+</script>
+{% endblock %}

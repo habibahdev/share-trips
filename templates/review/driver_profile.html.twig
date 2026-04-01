@@ -1,0 +1,155 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ driver.firstName }} {{ driver.lastName }} - Profil conducteur - Share Trips{% endblock %}
+
+{% block body %}
+<div class="container" style="max-width:720px;margin:2rem auto;">
+
+    {# ── En-tête du profil ─────────────────────────────────────────────────── #}
+    <div class="show-card mb-4">
+        <div class="d-flex align-items-center gap-4 flex-wrap">
+
+            <div class="driver-avatar" style="width:64px;height:64px;font-size:1.5rem;flex-shrink:0;">
+                {{ driver.firstName ? driver.firstName|first|upper : '?' }}
+            </div>
+
+            <div style="flex:1;min-width:0;">
+                <h1 style="font-size:1.4rem;font-weight:800;color:#1e3a5f;margin:0 0 .25rem;">
+                    {{ driver.firstName ?? '' }} {{ driver.lastName ?? '' }}
+                </h1>
+                <div style="font-size:.85rem;color:#94a3b8;">
+                    <i class="bi bi-calendar3 me-1"></i>
+                    Membre depuis {{ driver.createdAt ? driver.createdAt|date('MMMM Y')|capitalize : 'N/A' }}
+                </div>
+            </div>
+
+            {# Note globale #}
+            <div class="text-center" style="min-width:120px;">
+                {% if averageRating %}
+                    <div style="font-size:2.5rem;font-weight:800;color:#1e3a5f;line-height:1;">
+                        {{ averageRating|number_format(1) }}
+                    </div>
+                    <div style="color:#f59e0b;font-size:1.1rem;margin:.2rem 0;">
+                        {% for i in 1..5 %}
+                            {% if i <= averageRating|round %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                    </div>
+                    <div style="font-size:.75rem;color:#94a3b8;">
+                        {{ totalReviews }} avis
+                    </div>
+                {% else %}
+                    <div style="font-size:.875rem;color:#94a3b8;">
+                        <i class="bi bi-star d-block mb-1" style="font-size:1.5rem;"></i>
+                        Aucun avis
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+        {# Véhicules du conducteur #}
+        {% if driver.vehicles is not empty %}
+            <hr style="margin:1.25rem 0;border-color:#f1f5f9;">
+            <div class="card-section-title mb-2">
+                <i class="bi bi-car-front"></i> Véhicules
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                {% for vehicle in driver.vehicles %}
+                    <span style="background:#f1f5f9;border-radius:8px;padding:.3rem .75rem;
+                                 font-size:.8rem;font-weight:600;color:#475569;">
+                        {{ vehicle.brand }} {{ vehicle.model }}
+                        {% if vehicle.color %} · {{ vehicle.color }}{% endif %}
+                    </span>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    {# ── Répartition des notes ─────────────────────────────────────────────── #}
+    {% if reviews is not empty %}
+        <div class="show-card mb-4">
+            <div class="card-section-title mb-3">
+                <i class="bi bi-bar-chart"></i> Répartition des notes
+            </div>
+            {% for star in 5..1 %}
+                {% set count = reviews|filter(r => r.rating == star)|length %}
+                {% set percent = totalReviews > 0 ? (count / totalReviews * 100)|round : 0 %}
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <span style="font-size:.8rem;font-weight:600;color:#475569;min-width:40px;">
+                        {{ star }} ★
+                    </span>
+                    <div style="flex:1;background:#f1f5f9;border-radius:99px;height:8px;overflow:hidden;">
+                        <div style="width:{{ percent }}%;background:#f59e0b;height:100%;border-radius:99px;
+                                    transition:width .4s ease;"></div>
+                    </div>
+                    <span style="font-size:.8rem;color:#94a3b8;min-width:30px;text-align:right;">
+                        {{ count }}
+                    </span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {# ── Liste des avis ────────────────────────────────────────────────────── #}
+    <div class="show-card">
+        <div class="card-section-title mb-3">
+            <i class="bi bi-chat-quote"></i> Avis
+            <span style="background:#f1f5f9;color:#475569;font-size:.7rem;font-weight:700;
+                         border-radius:20px;padding:.15rem .6rem;">
+                {{ totalReviews }}
+            </span>
+        </div>
+
+        {% if reviews is empty %}
+            <div class="text-center py-4">
+                <i class="bi bi-star d-block mb-2" style="font-size:2rem;color:#bfdbfe;"></i>
+                <p style="font-size:.875rem;color:#94a3b8;margin:0;">
+                    Aucun avis pour le moment.
+                </p>
+            </div>
+        {% else %}
+            <div class="d-flex flex-column gap-0">
+                {% for review in reviews %}
+                    <div class="py-3 {% if not loop.last %}border-bottom{% endif %}"
+                         style="border-color:#f1f5f9 !important;">
+
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="passenger-avatar" style="width:32px;height:32px;font-size:.8rem;">
+                                    {{ review.reviewer.firstName ? review.reviewer.firstName|first|upper : '?' }}
+                                </div>
+                                <div>
+                                    <div style="font-weight:600;font-size:.875rem;color:#1e3a5f;">
+                                        {{ review.reviewer.firstName ?? 'Utilisateur' }}
+                                    </div>
+                                    <div style="font-size:.75rem;color:#94a3b8;">
+                                        {{ review.createdAt|date('d/m/Y') }}
+                                        · {{ review.booking.trip.origin }} → {{ review.booking.trip.destination }}
+                                    </div>
+                                </div>
+                            </div>
+                            {# Étoiles #}
+                            <div style="color:#f59e0b;font-size:.9rem;white-space:nowrap;">
+                                {% for i in 1..5 %}
+                                    {% if i <= review.rating %}★{% else %}
+                                        <span style="color:#e2e8f0;">★</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        {% if review.comment %}
+                            <p style="font-size:.875rem;color:#475569;margin:.5rem 0 0;
+                                      line-height:1.6;padding-left:2.5rem;">
+                                {{ review.comment }}
+                            </p>
+                        {% endif %}
+
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

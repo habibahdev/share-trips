@@ -45,14 +45,15 @@ symfony serve -d
 Lors du lancement du conteneur, la base de données est créée directement. Il suffit ensuite de jouer les migrations.
 
 ```
-docker compose -f docker-compose.dev.yaml exec app php bin/console make:migration
-docker compose -f docker-compose.dev.yaml exec app php bin/console d:m:m -n
+symfony console make:migration
+symfony console d:m:m -n
 ```
 
 ### 2. Fixtures
 ```
-docker compose -f docker-compose.dev.yaml exec app php bin/console doctrine:fixtures:load -n
+symfony console doctrine:fixtures:load -n
 ```
+> Insère dans la base un compte administrateur.
 
 ### 3. Assets
 ```
@@ -72,6 +73,12 @@ npm run maildev
 ```
 * MailDev : http://localhost:1080
 
+#### 4.2. Base de données
+```
+http://localhost:8081
+```
+> Les données de connexions sont définies dans le fichier `.env.local`
+
 ### 5. Arrêt des services
 ```
 symfony server:stop
@@ -81,9 +88,11 @@ docker compose -f docker-compose.dev.yaml stop
 ## Mise à jour de l'environnement Docker
 Si en faisant un `git pull` vous voyer que le fichier `docker-compose.dev.yaml` est modifié :
 ```
-docker compose -f docker-compose.dev.yaml down
+docker compose -f docker-compose.dev.yaml down -v
 docker compose -f docker-compose.dev.yaml up -d
-docker compose -f docker-compose.dev.yaml exec app php bin/console d:m:m -n
-docker compose -f docker-compose.dev.yaml exec app php bin/console doctrine:fixtures:load -n
+rm -f migrations/*.php
+symfony console make:migration
+symfony console d:m:m -n
+symfony console doctrine:fixtures:load -n
 ```
 > Permet d'appliquer correctement les modifications et de synchroniser la base de données.

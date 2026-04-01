@@ -58,9 +58,14 @@ class Booking
     #[ORM\OneToOne(mappedBy: 'booking', targetEntity: Payment::class, cascade: ['persist', 'remove'])]
     private ?Payment $payment = null;
 
+    /** @var Collection<int, Review> */
+    #[ORM\OneToMany(mappedBy: 'booking', targetEntity: Review::class, orphanRemoval: true)]
+    private Collection $reviews;
+
     public function __construct()
     {
         $this->reports = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
     }
 
     public function __toString()
@@ -197,5 +202,30 @@ class Booking
     public function isPaid(): bool
     {
         return $this->payment?->getStatus() === PaymentStatus::Completed;
+    }
+
+    /** @return Collection<int, Review> */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
+
+    public function addReview(Review $review): static
+    {
+        if (!$this->reviews->contains($review)) {
+            $this->reviews->add($review);
+            $review->setBooking($this);
+        }
+        return $this;
+    }
+
+    public function removeReview(Review $review): static
+    {
+        if ($this->reviews->removeElement($review)) {
+            if ($review->getBooking() === $this) {
+                $review->setBooking(null);
+            }
+        }
+        return $this;
     }
 }

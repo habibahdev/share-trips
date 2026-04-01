@@ -85,49 +85,61 @@
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-6 col-md-3">
-                            <a href="{{ path('app_profile_vehicle') }}" class="quick-link">
-                                <div class="quick-link-icon" style="background:#eff6ff;">
-                                    <i class="bi bi-car-front" style="color:#1d4ed8;"></i>
-                                </div>
-                                <div class="quick-link-label">Mes véhicules</div>
-                                <div class="quick-link-sub">
-                                    {{ user.vehicles|length }} véhicule{{ user.vehicles|length > 1 ? 's' : '' }}
-                                </div>
-                            </a>
-                        </div>
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <div class="col-6 col-md-3">
+                                <a href="{{ path('admin') }}" class="quick-link">
+                                    <div class="quick-link-icon" style="background:#eff6ff;">
+                                        <i class="bi bi-shield-lock" style="color:#1d4ed8;"></i>
+                                    </div>
+                                    <div class="quick-link-label">Administration</div>
+                                    <div class="quick-link-sub">Gérer le site</div>
+                                </a>
+                            </div>
+                        {% else %}
+                            <div class="col-6 col-md-3">
+                                <a href="{{ path('app_profile_vehicle') }}" class="quick-link">
+                                    <div class="quick-link-icon" style="background:#eff6ff;">
+                                        <i class="bi bi-car-front" style="color:#1d4ed8;"></i>
+                                    </div>
+                                    <div class="quick-link-label">Mes véhicules</div>
+                                    <div class="quick-link-sub">
+                                        {{ user.vehicles|length }} véhicule{{ user.vehicles|length > 1 ? 's' : '' }}
+                                    </div>
+                                </a>
+                            </div>
 
-                        <div class="col-6 col-md-3">
-                            <a href="{{ path('app_profile_booking') }}" class="quick-link">
-                                <div class="quick-link-icon" style="background:#eff6ff;">
-                                    <i class="bi bi-ticket-perforated" style="color:#1d4ed8;"></i>
-                                </div>
-                                <div class="quick-link-label">Mes réservations</div>
-                                <div class="quick-link-sub">
-                                    {{ user.bookings|length }} réservation{{ user.bookings|length > 1 ? 's' : '' }}
-                                </div>
-                            </a>
-                        </div>
+                            <div class="col-6 col-md-3">
+                                <a href="{{ path('app_profile_booking') }}" class="quick-link">
+                                    <div class="quick-link-icon" style="background:#eff6ff;">
+                                        <i class="bi bi-ticket-perforated" style="color:#1d4ed8;"></i>
+                                    </div>
+                                    <div class="quick-link-label">Mes réservations</div>
+                                    <div class="quick-link-sub">
+                                        {{ user.bookings|length }} réservation{{ user.bookings|length > 1 ? 's' : '' }}
+                                    </div>
+                                </a>
+                            </div>
 
-                        <div class="col-6 col-md-3">
-                            <a href="{{ path('app_profile_trip') }}" class="quick-link">
-                                <div class="quick-link-icon" style="background:#eff6ff;">
-                                    <i class="bi bi-map" style="color:#1d4ed8;"></i>
-                                </div>
-                                <div class="quick-link-label">Mes trajets</div>
-                                <div class="quick-link-sub">Gérer mes trajets</div>
-                            </a>
-                        </div>
+                            <div class="col-6 col-md-3">
+                                <a href="{{ path('app_profile_trip') }}" class="quick-link">
+                                    <div class="quick-link-icon" style="background:#eff6ff;">
+                                        <i class="bi bi-map" style="color:#1d4ed8;"></i>
+                                    </div>
+                                    <div class="quick-link-label">Mes trajets</div>
+                                    <div class="quick-link-sub">Gérer mes trajets</div>
+                                </a>
+                            </div>
 
-                        <div class="col-6 col-md-3">
-                            <a href="{{ path('app_profile_password') }}" class="quick-link">
-                                <div class="quick-link-icon" style="background:#eff6ff;">
-                                    <i class="bi bi-lock" style="color:#1d4ed8;"></i>
-                                </div>
-                                <div class="quick-link-label">Mot de passe</div>
-                                <div class="quick-link-sub">Modifier</div>
-                            </a>
-                        </div>
+                            <div class="col-6 col-md-3">
+                                <a href="{{ path('app_profile_password') }}" class="quick-link">
+                                    <div class="quick-link-icon" style="background:#eff6ff;">
+                                        <i class="bi bi-lock" style="color:#1d4ed8;"></i>
+                                    </div>
+                                    <div class="quick-link-label">Mot de passe</div>
+                                    <div class="quick-link-sub">Modifier</div>
+                                </a>
+                            </div>
+                        {% endif %}
                     </div>
 
                 </div>

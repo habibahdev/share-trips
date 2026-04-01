@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Repository\BookingRepository;
 use App\Repository\ReportRepository;
+use App\Repository\ReviewRepository;
 use App\Repository\TripRepository;
 use App\Repository\UserRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
@@ -19,7 +20,8 @@ class DashboardController extends AbstractDashboardController
         private UserRepository $userRepository,
         private TripRepository $tripRepository,
         private BookingRepository $bookingRepository,
-        private ReportRepository $reportRepository
+        private ReportRepository $reportRepository,
+        private ReviewRepository $reviewRepository
     ) {
     }
 
@@ -32,7 +34,8 @@ class DashboardController extends AbstractDashboardController
             'pendingReports' => $this->reportRepository->count(['status' => 'pending']),
             'recentReports' => $this->reportRepository->findBy(['status' => 'pending'], ['createdAt' => 'desc'], 5),
             'bannedUsers' => $this->userRepository->count(['status' => 'banned']),
-            'suspendedUsers' => $this->userRepository->count(['status' => 'suspended'])
+            'suspendedUsers' => $this->userRepository->count(['status' => 'suspended']),
+            'totalReviews' => $this->reviewRepository->count([])
         ]);
     }
 
@@ -49,5 +52,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkTo(UserCrudController::class, 'Utilisateurs', 'fa fa-users');
         yield MenuItem::linkTo(ReportCrudController::class, 'Signalements', 'fa fa-flag');
         yield MenuItem::linkTo(PaymentCrudController::class, 'Paiements', 'fa fa-coins');
+        yield MenuItem::linkTo(ReviewCrudController::class, 'Avis', 'fa fa-comments');
     }
 }
