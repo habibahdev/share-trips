@@ -98,7 +98,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->reportsMade = new ArrayCollection();
         $this->reportsReceived = new ArrayCollection();
         $this->isVerified = false;
-        $this->tokenRegisterLifetime = (new \DateTimeImmutable('now'))->add(new DateInterval('P1D'));
+        $this->tokenRegisterLifetime = (new \DateTimeImmutable('now'))->add(new DateInterval('PT10M'));
     }
 
     public function __toString()

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;padding:2rem;">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:20px;border:1.5px solid #f1f5f9;padding:2rem;">
+
+    <div style="text-align:center;margin-bottom:2rem;">
+        <h1 style="color:#1e3a5f;font-size:1.5rem;font-weight:800;">
+            Share<span style="color:#1d4ed8;">Trips</span>
+        </h1>
+    </div>
+
+    <div style="text-align:center;margin-bottom:1.5rem;">
+        <div style="width:64px;height:64px;border-radius:50%;background:#dcfce7;display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;">
+            €
+        </div>
+    </div>
+
+    <h2 style="color:#1e3a5f;font-weight:700;text-align:center;">
+        Remboursement en cours
+    </h2>
+
+    <p style="color:#475569;text-align:center;">
+        Bonjour <strong>{{ booking.passenger.firstName }}</strong>, suite à l'annulation du trajet 
+        <strong>{{ booking.trip.origin }} → {{ booking.trip.destination }}</strong>, votre remboursement est en cours.
+    </p>
+
+    <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:12px;padding:1.25rem;text-align:center;margin:1.5rem 0;">
+        <div style="font-size:2rem;font-weight:800;color:#166534;">
+            {{ booking.totalPrice|number_format(2, ',', ' ') }}€
+        </div>
+        <div style="font-size:.85rem;color:#22c55e;margin-top:.25rem;">
+            Montant remboursé
+        </div>
+    </div>
+
+    <div style="background:#f1f5f9;border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
+            <span style="color:#94a3b8;font-size:.875rem;">Trajet</span>
+            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">
+                {{ booking.trip.origin }} → {{ booking.trip.destination }}
+            </span>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
+            <span style="color:#94a3b8;font-size:.875rem;">Date du trajet</span>
+            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">
+                {{ booking.trip.departureAt|date('d/m/Y à H:i') }}
+            </span>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
+            <span style="color:#94a3b8;font-size:.875rem;">Places réservées</span>
+            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">
+                {{ booking.seatsBooked }} place{{ booking.seatsBooked > 1 ? 's' : '' }}
+            </span>
+        </div>
+
+        {% if booking.payment %}
+        <div style="display:flex;justify-content:space-between;">
+            <span style="color:#94a3b8;font-size:.875rem;">Méthode de paiement</span>
+            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">
+                {{ booking.payment.method ? booking.payment.method.label() : 'N/A' }}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+
+    <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;color:#166534;font-size:.875rem;text-align:center;">
+        Le remboursement sera effectué sous 5 à 10 jours ouvrés selon votre banque.
+    </div>
+
+    <p style="color:#64748b;font-size:.85rem;text-align:center;">
+        Si vous n'avez rien reçu après ce délai, contactez notre support.
+    </p>
+
+    <p style="color:#94a3b8;font-size:.8rem;text-align:center;margin-top:2rem;">
+        © {{ "now"|date("Y") }} ShareTrips - Tous droits réservés
+    </p>
+
+</div>
+</body>
+</html>

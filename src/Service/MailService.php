@@ -90,6 +90,42 @@ class MailService
         $this->send($email);
     }
 
+    public function sendBookingCancellationToDriver(Booking $booking): void
+    {
+        $driver = $booking->getTrip()->getDriver();
+        $email = (new TemplatedEmail())
+            ->to(new Address($driver->getEmail(), $driver->getFullName()))
+            ->subject('Annulation de réservation - ShareTrips')
+            ->htmlTemplate('emails/booking_cancellation_driver.html.twig')
+            ->context(['booking' => $booking])
+        ;
+        $this->send($email);
+    }
+
+    public function sendTripCancellationToPassanger(Booking $booking): void
+    {
+        $passenger = $booking->getPassenger();
+        $email = (new TemplatedEmail())
+            ->to(new Address($passenger->getEmail(), $passenger->getFullName()))
+            ->subject('Trajet annulé - ShareTrips')
+            ->htmlTemplate('emails/trip_cancellation_passenger.html.twig')
+            ->context(['booking' => $booking])
+        ;
+        $this->send($email);
+    }
+
+    public function sendRefund(Booking $booking): void
+    {
+        $passenger = $booking->getPassenger();
+        $email = (new TemplatedEmail())
+            ->to(new Address($passenger->getEmail(), $passenger->getFullName()))
+            ->subject('Remboursement en cours - ShareTrips')
+            ->htmlTemplate('emails/refund.html.twig')
+            ->context(['booking' => $booking])
+        ;
+        $this->send($email);
+    }
+
     private function send(TemplatedEmail $email): void
     {
         $email->from(new Address($this->fromEmail, $this->fromName));

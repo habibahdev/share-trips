@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;padding:2rem;">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:20px;border:1.5px solid #f1f5f9;padding:2rem;">
+
+    <div style="text-align:center;margin-bottom:2rem;">
+        <h1 style="color:#1e3a5f;font-size:1.5rem;font-weight:800;">
+            Share<span style="color:#1d4ed8;">Trips</span>
+        </h1>
+    </div>
+
+    <div style="text-align:center;margin-bottom:1.5rem;">
+        <div style="width:64px;height:64px;border-radius:50%;background:#fee2e2;display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;">
+            ✕
+        </div>
+    </div>
+
+    <h2 style="color:#1e3a5f;font-weight:700;text-align:center;">
+        Réservation annulée
+    </h2>
+
+    <p style="color:#475569;text-align:center;">
+        Bonjour <strong>{{ booking.trip.driver.firstName }}</strong>, le passager 
+        <strong>{{ booking.passenger.fullName }}</strong> a annulé sa réservation.
+    </p>
+
+    <div style="background:#f1f5f9;border-radius:12px;padding:1.25rem;margin:1.5rem 0;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
+            <span style="color:#94a3b8;font-size:.875rem;">Trajet</span>
+            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">
+                {{ booking.trip.origin }} → {{ booking.trip.destination }}
+            </span>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
+            <span style="color:#94a3b8;font-size:.875rem;">Date</span>
+            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">
+                {{ booking.trip.departureAt|date('d/m/Y à H:i') }}
+            </span>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;">
+            <span style="color:#94a3b8;font-size:.875rem;">Places libérées</span>
+            <span style="color:#1e3a5f;font-weight:700;font-size:.875rem;">
+                {{ booking.seatsBooked }} place{{ booking.seatsBooked > 1 ? 's' : '' }}
+            </span>
+        </div>
+    </div>
+
+    <div style="background:#fef9c3;border:1.5px solid #fde68a;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;color:#854d0e;font-size:.875rem;text-align:center;">
+        Des places sont à nouveau disponibles sur votre trajet. De nouveaux passagers peuvent réserver.
+    </div>
+
+    <p style="color:#64748b;font-size:.85rem;text-align:center;">
+        Si vous avez des questions, n'hésitez pas à nous contacter.
+    </p>
+
+    <p style="color:#94a3b8;font-size:.8rem;text-align:center;margin-top:2rem;">
+        © {{ "now"|date("Y") }} ShareTrips - Tous droits réservés
+    </p>
+
+</div>
+</body>
+</html>

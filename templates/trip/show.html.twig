@@ -19,8 +19,15 @@
                     {{ trip.destination }}
                 </h1>
             </div>
-            <span class="status-badge {% if trip.status.value == 'open' %}status-open{% elseif trip.status.value == 'full' %}status-full{% elseif trip.status.value == 'cancelled' %}status-cancelled{% else %}status-completed{% endif %}">
-                {% if trip.status.value == 'open' %}Disponible{% elseif trip.status.value == 'full' %}Complet{% elseif trip.status.value == 'cancelled' %}Annulé{% else %}Terminé{% endif %}
+            <span class="status-badge
+                {% if trip.status == constant('App\\Enum\\TripStatus::Open') %}status-open
+                {% elseif trip.status == constant('App\\Enum\\TripStatus::Full') %}status-full
+                {% elseif trip.status == constant('App\\Enum\\TripStatus::Cancelled') %}status-cancelled
+                {% else %}status-completed{% endif %}">
+                {% if trip.status == constant('App\\Enum\\TripStatus::Open') %}Disponible
+                {% elseif trip.status == constant('App\\Enum\\TripStatus::Full') %}Complet
+                {% elseif trip.status == constant('App\\Enum\\TripStatus::Cancelled') %}Annulé
+                {% else %}Terminé{% endif %}
             </span>
         </div>
 
@@ -106,7 +113,7 @@
                         <span class="price-hero">{{ trip.pricePerSeat }}€</span>
                     </div>
 
-                    {% if trip.status.value == 'open' and trip.availableSeats > 0 %}
+                    {% if trip.status == constant('App\\Enum\\TripStatus::Open') and trip.availableSeats > 0 %}
                         {% if not app.user %}
                             <div class="alert-info-st mb-3">
                                 <i class="bi bi-info-circle-fill" style="color:#1d4ed8;flex-shrink:0;"></i>
@@ -120,6 +127,27 @@
                                 <i class="bi bi-info-circle-fill" style="color:#1d4ed8;flex-shrink:0;"></i>
                                 Vous êtes le conducteur de ce trajet.
                             </div>
+                        {% elseif not app.user.verified %}
+                            <div class="alert d-flex align-items-start gap-3 mb-3"
+                                 style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px;padding:1rem 1.25rem;">
+                                <i class="bi bi-envelope-exclamation-fill"
+                                   style="color:#d97706;font-size:1.25rem;flex-shrink:0;margin-top:.1rem;"></i>
+                                <div>
+                                    <div style="font-weight:700;color:#92400e;margin-bottom:.25rem;">
+                                        Compte non vérifié
+                                    </div>
+                                    <div style="font-size:.875rem;color:#92400e;">
+                                        Confirmez votre adresse e-mail pour pouvoir réserver.
+                                        <a href="{{ path('app_resend') }}"
+                                           style="color:#d97706;font-weight:600;text-decoration:underline;">
+                                            Renvoyer l'e-mail
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn-book" disabled style="opacity:.6;cursor:not-allowed;">
+                                <i class="bi bi-lock"></i> Réservation indisponible
+                            </button>
                         {% else %}
                             <div style="background:#f8fafc;border-radius:12px;padding:1rem;margin-bottom:1.25rem;">
                                 <div style="display:flex;justify-content:space-between;font-size:.85rem;color:#94a3b8;margin-bottom:.5rem;">

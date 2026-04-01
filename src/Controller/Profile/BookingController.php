@@ -8,6 +8,7 @@ use App\Enum\BookingStatus;
 use App\Enum\TripStatus;
 use App\Repository\BookingRepository;
 use App\Repository\TripRepository;
+use App\Service\MailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -67,8 +68,12 @@ final class BookingController extends AbstractController
     }
 
     #[Route('/profile/booking/{booking}/cancel', name: 'app_profile_booking_cancel', methods: ['POST'])]
-    public function cancel(Booking $booking, Request $request, EntityManagerInterface $entityManager): Response
-    {
+    public function cancel(
+        Booking $booking,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        MailService $mailer
+    ): Response {
         $user = $this->getUser();
         assert($user instanceof User);
         if (
@@ -90,7 +95,8 @@ final class BookingController extends AbstractController
             $this->addFlash('danger', 'Impossible d\'annuler un trajet déjà effectué.');
             return $this->redirectToRoute('app_profile_booking');
         }
-        if ($booking->getStatus() === BookingStatus::Confirmed) {
+        $confirmed = $booking->getStatus() === BookingStatus::Confirmed;
+        if ($confirmed) {
             $trip = $booking->getTrip();
             $newAvailable = $trip->getAvailableSeats() + $booking->getSeatsBooked();
             $trip->setAvailableSeats(min($trip->getVehicle()->getSeats(), $newAvailable));
@@ -100,6 +106,9 @@ final class BookingController extends AbstractController
         }
         $booking->setStatus(BookingStatus::Cancelled);
         $entityManager->flush();
+        if ($confirmed) {
+            $mailer->sendBookingCancellationToDriver($booking);
+        }
         $this->addFlash('success', 'Réservation annulée.');
         return $this->redirectToRoute('app_profile_booking');
     }

@@ -62,11 +62,20 @@ final class TripController extends AbstractController
     }
 
     #[Route('/profile/trip/cancel/{trip}', name: 'app_profile_trip_cancel', methods: ['POST'])]
-    public function cancel(Trip $trip, Request $request, EntityManagerInterface $entityManager): Response
-    {
+    public function cancel(
+        Trip $trip,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        MailService $mailer
+    ): Response {
         $user = $this->getUser();
         assert($user instanceof User);
-        if (!$this->isCsrfTokenValid('cancel_trip_' . $trip->getId(), (string) $request->request->get('_token'))) {
+        if (
+            !$this->isCsrfTokenValid(
+                'cancel_trip_' . $trip->getId(),
+                (string) $request->request->get('_token')
+            )
+        ) {
             $this->addFlash('danger', 'Problème inconnu.');
             return $this->redirectToRoute('app_profile_trip');
         }
@@ -82,7 +91,16 @@ final class TripController extends AbstractController
         }
         $trip->setStatus(TripStatus::Cancelled);
         $entityManager->flush();
-        $this->addFlash('success', 'Trajet annulé.');
+        foreach ($trip->getBookings() as $booking) {
+            if ($booking->getStatus() !== BookingStatus::Cancelled) {
+                $mailer->sendTripCancellationToPassanger($booking);
+                if ($booking->getStatus() === BookingStatus::Confirmed) {
+                    $mailer->sendRefund($booking);
+                }
+                $booking->setStatus(BookingStatus::Cancelled);
+            }
+        }
+        $this->addFlash('success', 'Trajet annulé. Les passagers ont été notifiés.');
         return $this->redirectToRoute('app_profile_trip');
     }
 
