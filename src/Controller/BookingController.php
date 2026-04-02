@@ -35,6 +35,7 @@ final class BookingController extends AbstractController
                 'warning',
                 'Vous devez vérifier votre adresse e-mail avant de pouvoir réserver un trajet.'
             );
+            return $this->redirectToRoute('app_trip_show', ['id' => $tripId]);
         }
         if ($trip->getDriver()->getId() === $user->getId()) {
             $this->addFlash('danger', 'Vous ne pouvez pas réserver votre propre trajet.');
@@ -96,5 +97,73 @@ final class BookingController extends AbstractController
         return $this->render('booking/success.html.twig', [
             'trip' => $trip
         ]);
+    }
+
+    #[Route('/booking/{booking}/payment/confirm', name: 'app_booking_payment_confirm', methods: ['POST'])]
+    public function confirmPayment(
+        Booking $booking,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        MailService $mailer
+    ): Response {
+        $user = $this->getUser();
+        assert($user instanceof User);
+        if (
+            !$this->isCsrfTokenValid(
+                'confirm_payment_' . $booking->getId(),
+                (string) $request->request->get('_token')
+            )
+        ) {
+            $this->addFlash('danger', 'Problème inconnu.');
+            return $this->redirectToRoute('app_profile_booking_show', ['booking' => $booking->getId()]);
+        }
+        if ($booking->getPassenger()->getId() !== $user->getId()) {
+            return $this->redirectToRoute('app_profile_booking');
+        }
+        $payment = $booking->getPayment();
+        if (!$payment) {
+            $this->addFlash('danger', 'Aucun paiement associé à cette réservation.');
+            return $this->redirectToRoute('app_profile_booking_show', ['booking' => $booking->getId()]);
+        }
+        if ($payment->getStatus()->isFinal()) {
+            $this->addFlash('warning', 'Ce paiement a déjà été traité.');
+            return $this->redirectToRoute('app_profile_booking_show', ['booking' => $booking->getId()]);
+        }
+        $payment->markAsCompleted();
+        $entityManager->flush();
+        $mailer->sendPaymentConfirmation($booking);
+        $this->addFlash('success', 'Paiement confirmé.');
+        return $this->redirectToRoute('app_profile_booking_show', ['booking' => $booking->getId()]);
+    }
+
+    #[Route('/booking/{booking}/payment/fail', name: 'app_booking_payment_fail', methods: ['POST'])]
+    public function failPayment(
+        Booking $booking,
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $user = $this->getUser();
+        assert($user instanceof User);
+        if (
+            !$this->isCsrfTokenValid(
+                'fail_payment_' . $booking->getId(),
+                (string) $request->request->get('_token')
+            )
+        ) {
+            $this->addFlash('danger', 'Problème inconnu.');
+            return $this->redirectToRoute('app_profile_booking_show', ['booking' => $booking->getId()]);
+        }
+        if ($booking->getPassenger()->getId() !== $user->getId()) {
+            return $this->redirectToRoute('app_profile_booking');
+        }
+        $payment = $booking->getPayment();
+        if (!$payment || $payment->getStatus()->isFinal()) {
+            $this->addFlash('warning', 'Ce paiement a déjà été traité.');
+            return $this->redirectToRoute('app_profile_booking_show', ['booking' => $booking->getId()]);
+        }
+        $payment->markAsFailed();
+        $entityManager->flush();
+        $this->addFlash('success', 'Paiement échoué.');
+        return $this->redirectToRoute('app_profile_booking_show', ['booking' => $booking->getId()]);
     }
 }

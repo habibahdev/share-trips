@@ -103,6 +103,11 @@ final class BookingController extends AbstractController
             if ($trip->getStatus() === TripStatus::Full) {
                 $trip->setStatus(TripStatus::Open);
             }
+            // remboursement
+            if ($booking->getPayment()?->isSuccessful()) {
+                $booking->getPayment()->refund();
+                $mailer->sendRefund($booking);
+            }
         }
         $booking->setStatus(BookingStatus::Cancelled);
         $entityManager->flush();

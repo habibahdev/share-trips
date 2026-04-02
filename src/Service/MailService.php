@@ -141,6 +141,18 @@ class MailService
         $this->send($email);
     }
 
+    public function sendPaymentConfirmation(Booking $booking): void
+    {
+        $passenger = $booking->getPassenger();
+        $email = (new TemplatedEmail())
+            ->to(new Address($passenger->getEmail(), $passenger->getFullName()))
+            ->subject('Paiement confirmé - ShareTrips')
+            ->htmlTemplate('emails/payment_confirmed.html.twig')
+            ->context(['booking' => $booking])
+        ;
+        $this->send($email);
+    }
+
     private function send(TemplatedEmail $email): void
     {
         $email->from(new Address($this->fromEmail, $this->fromName));
