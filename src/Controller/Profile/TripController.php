@@ -119,7 +119,7 @@ final class TripController extends AbstractController
         }
         if (
             !$this->isCsrfTokenValid(
-                'confirm_booking' . $booking->getId(),
+                'confirm_booking_' . $booking->getId(),
                 (string) $request->request->get('_token')
             )
         ) {

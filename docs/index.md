@@ -53,7 +53,7 @@ symfony console d:m:m -n
 ```
 symfony console doctrine:fixtures:load -n
 ```
-> Insère dans la base un compte administrateur.
+> Insère dans la base un compte administrateur et 5 utilisateurs.
 
 ### 3. Assets
 ```

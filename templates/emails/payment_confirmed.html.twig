@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family:'Plus Jakarta Sans','Segoe UI',Arial,sans-serif;
+            background:#f8fafc;
+            margin:0;
+            padding:2rem 0;
+            color:#1e3a5f;
+        }
+        .wrapper {
+            max-width:560px;
+            margin:0 auto;
+        }
+        .card {
+            background:#fff;
+            border-radius:20px;
+            border:1.5px solid #f1f5f9;
+            overflow:hidden;
+        }
+        .header {
+            text-align:center;
+            padding:2rem 2rem 1rem;
+        }
+        .header h1 {
+            margin:0;
+            font-size:1.5rem;
+            font-weight:800;
+            color:#1e3a5f;
+        }
+        .header span {
+            color:#1d4ed8;
+        }
+        .body {
+            padding:2rem;
+        }
+        .title {
+            font-size:1.2rem;
+            font-weight:700;
+            margin-bottom:.5rem;
+        }
+        .text {
+            color:#475569;
+            font-size:.95rem;
+        }
+        .info-block {
+            background:#eff6ff;
+            border-radius:12px;
+            padding:1.25rem;
+            margin:1.5rem 0;
+        }
+        .info-row {
+            display:flex;
+            justify-content:space-between;
+            margin-bottom:.5rem;
+            font-size:.875rem;
+        }
+        .info-row:last-child {
+            margin-bottom:0;
+        }
+        .label {
+            color:#94a3b8;
+        }
+        .value {
+            color:#1e3a5f;
+            font-weight:600;
+        }
+        .divider {
+            border-top:1.5px solid #dbeafe;
+            margin-top:.5rem;
+            padding-top:.5rem;
+        }
+        .strong {
+            font-weight:800;
+        }
+        .footer {
+            text-align:center;
+            padding:1.5rem;
+            font-size:.8rem;
+            color:#94a3b8;
+        }
+    </style>
+</head>
+
+<body>
+<div class="wrapper">
+    <div class="card">
+
+        <div class="header">
+            <h1>Share<span>Trips</span></h1>
+        </div>
+
+        <div class="body">
+            <div class="title">Paiement enregistré !</div>
+            <p class="text">
+                Bonjour <strong>{{ booking.passenger.firstName }}</strong>, votre paiement a été confirmé.
+            </p>
+
+            <div class="info-block">
+                <div class="info-row">
+                    <span class="label">Trajet</span>
+                    <span class="value">{{ booking.trip.origin }} → {{ booking.trip.destination }}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Date</span>
+                    <span class="value">{{ booking.trip.departureAt|date('d/m/Y à H:i') }}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Places</span>
+                    <span class="value">
+                        {{ booking.seatsBooked }} place{{ booking.seatsBooked > 1 ? 's' : '' }}
+                    </span>
+                </div>
+
+                <div class="info-row divider">
+                    <span class="value">Total</span>
+                    <span class="value strong">
+                        {{ booking.totalPrice|number_format(2, ',', ' ') }}€
+                    </span>
+                </div>
+
+                {% if booking.payment.method %}
+                <div class="info-row divider">
+                    <span class="value">Méthode de paiement</span>
+                    <span class="value strong">
+                        {{ booking.payment.method.label() }}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="footer">
+            © {{ "now"|date("Y") }} ShareTrips - Tous droits réservés
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
