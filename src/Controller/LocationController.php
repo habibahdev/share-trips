@@ -8,8 +8,18 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * API responsable de la localisation
+ */
 class LocationController extends AbstractController
 {
+    /**
+     * Recherche des villes/adresses via une requête texte.
+     *
+     * @param Request $request Requête HTTP contenant le paramètre 'q'
+     * @param OpenStreetMapService $streetMap Service de recherche géographique
+     * @return JsonResponse
+     */
     #[Route('/api/cities/search', name: 'api_cities_search', methods: ['GET'])]
     public function search(Request $request, OpenStreetMapService $streetMap): JsonResponse
     {

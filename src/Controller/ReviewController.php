@@ -14,8 +14,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Contrôleur responsable des avis utilisateurs.
+ */
 final class ReviewController extends AbstractController
 {
+    /**
+     * Laisser un avis sur un conducteur.
+     *
+     * @param Booking $booking Réservation concernée
+     * @param Request $request Requête HTTP
+     * @param EntityManagerInterface $entityManager Doctrine
+     * @param ReviewRepository $reviewRepository Repository des avis
+     * @return Response
+     */
     #[Route('/review/add/{id}', name: 'app_review_add')]
     public function index(
         Booking $booking,
@@ -34,7 +46,7 @@ final class ReviewController extends AbstractController
             || $booking->getTrip()->getDepartureAt() > new \DateTimeImmutable()
         ) {
             $this->addFlash('warning', 'Vous ne pouvez pas noter ce conducteur pour l\'instant.');
-            $this->redirectToRoute('app_profile_booking');
+            return $this->redirectToRoute('app_profile_booking');
         }
         if ($reviewRepository->findByBookingAndReviewer($booking, $user)) {
             $this->addFlash('warning', 'Vous avez déjà noté ce conducteur pour ce trajet.');
@@ -60,6 +72,13 @@ final class ReviewController extends AbstractController
         ]);
     }
 
+    /**
+     * Affiche le profil public d'un conducteur avec ses avis.
+     *
+     * @param User $driver Conducteur concerné
+     * @param ReviewRepository $reviewRepository Repository des avis
+     * @return Response
+     */
     #[Route('/review/driver/{id}', name: 'app_review_driver')]
     public function driverProfile(User $driver, ReviewRepository $reviewRepository): Response
     {

@@ -12,8 +12,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Contrôleur responsable du signalement entre utilisateurs.
+ */
 final class ReportController extends AbstractController
 {
+    /**
+     * Création d'un signalement par rapport à un trajet
+     *
+     * @param Booking $booking Réservation concernée
+     * @param Request $request Requête HTTP
+     * @param EntityManagerInterface $entityManager Doctrine
+     * @return Response
+     */
     #[Route('/report/{id}', name: 'app_report_add')]
     public function add(
         Booking $booking,

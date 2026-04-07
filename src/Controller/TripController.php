@@ -9,8 +9,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Contrôleur responsable de l'affichage et de la recherche de trajets.
+ */
 final class TripController extends AbstractController
 {
+    /**
+     * Affiche la liste des trajets disponibles avec filtres.
+     *
+     * @param TripRepository $tripRepository Repository des trajets
+     * @param Request $request Requête HTTP
+     * @return Response
+     */
     #[Route('/trip', name: 'app_trips')]
     public function index(TripRepository $tripRepository, Request $request): Response
     {
@@ -34,6 +44,12 @@ final class TripController extends AbstractController
         ]);
     }
 
+    /**
+     * Affiche le détail d'un trajet.
+     *
+     * @param Trip $trip Trajet à effectuer
+     * @return Response
+     */
     #[Route('/trip/{id}', name: 'app_trip_show')]
     public function show(Trip $trip): Response
     {
