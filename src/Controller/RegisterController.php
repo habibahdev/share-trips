@@ -13,8 +13,21 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
+/**
+ * Contrôleur responsable de l'inscription des utilisateurs.
+ */
 final class RegisterController extends AbstractController
 {
+    /**
+     * Gère l'inscription.
+     *
+     * @param Request $request Requête HTTP
+     * @param UserPasswordHasherInterface $hasher Service de hachage du mot de passe
+     * @param EntityManagerInterface $entityManager Doctrine
+     * @param MailService $mailer Service d'envoi e'mails
+     * @param TokenGeneratorInterface $tokenGenerator Générateur de token sécurisé
+     * @return Response
+     */
     #[Route('/register', name: 'app_register')]
     public function register(
         Request $request,
@@ -44,6 +57,14 @@ final class RegisterController extends AbstractController
         ]);
     }
 
+    /**
+     * Confirmation de l'adresse l'e-mail d'un utilisateur via un token.
+     *
+     * @param string $token Token de validation
+     * @param User $user Utilisateur
+     * @param EntityManagerInterface $entityManager Doctrine
+     * @return Response
+     */
     #[Route('/verify/{token}/{id<\d+>}', name: 'app_confirm_email')]
     public function confirmEmail(
         string $token,
@@ -70,6 +91,14 @@ final class RegisterController extends AbstractController
         return $this->redirectToRoute('app_login');
     }
 
+    /**
+     * Renvoie un email de confirmation à l'utilisateur connecté.
+     *
+     * @param EntityManagerInterface $entityManager Doctrine
+     * @param MailService $mailer Service d'envoi d'email
+     * @param TokenGeneratorInterface $tokenGenerator Générateur de token sécurisé
+     * @return Response
+     */
     #[Route('/resend', name: 'app_resend')]
     public function resend(
         EntityManagerInterface $entityManager,

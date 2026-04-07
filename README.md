@@ -4,6 +4,8 @@
 ![Symfony](https://img.shields.io/badge/Symfony-7.4.7-000000?logo=symfony&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-24.14.0-339933?logo=node.js\&logoColor=white)
+![npm](https://img.shields.io/badge/npm-11.9.0-CB3837?logo=npm\&logoColor=white)
 ![CI](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 

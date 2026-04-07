@@ -13,8 +13,20 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Contrôleur responsable du processus de mot de passe oublié.
+ */
 final class ForgotPasswordController extends AbstractController
 {
+    /**
+     * Affichage et traitement de la demande de réinitialisation.
+     *
+     * @param Request $request Requête HTTP
+     * @param UserRepository $userRepository Repository des utilisateurs
+     * @param EntityManagerInterface $entityManager Doctrine
+     * @param MailService $mailer Service d'envoi d'emails
+     * @return Response
+     */
     #[Route('/forgot-password', name: 'app_forgot_password')]
     public function request(
         Request $request,
@@ -46,12 +58,27 @@ final class ForgotPasswordController extends AbstractController
         ]);
     }
 
+    /**
+     * Information pour l'utilisateur.
+     *
+     * @return Response
+     */
     #[Route('/forgot-password/check', name: 'app_forgot_password_check')]
     public function check(): Response
     {
         return $this->render('forgot_password/check.html.twig');
     }
 
+    /**
+     * Réinitialisation du mot de passe.
+     *
+     * @param string $token Token de réinitialisation
+     * @param Request $request Requête HTTP
+     * @param UserRepository $userRepository Repository des utilisateurs
+     * @param UserPasswordHasherInterface $hasher Service du hachage du mot de passe
+     * @param EntityManagerInterface $entityManager Doctrine
+     * @return Response
+     */
     #[Route('/reset-password/{token}', name: 'app_reset_password')]
     public function reset(
         string $token,

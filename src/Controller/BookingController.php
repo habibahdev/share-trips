@@ -14,8 +14,21 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Contrôleur responsable de la gestion des réservations.
+ */
 final class BookingController extends AbstractController
 {
+    /**
+     * Réserver un trajet.
+     *
+     * @param integer $tripId Identifiant du trajet à réserver
+     * @param TripRepository $tripRepository Repository des trajets
+     * @param Request $request Requête HTTP
+     * @param EntityManagerInterface $entityManager Doctrine
+     * @param MailService $mailer Service d'envoi d'emails
+     * @return Response
+     */
     #[Route('/booking/add/{tripId}', name: 'app_booking_add')]
     public function add(
         int $tripId,
@@ -75,6 +88,13 @@ final class BookingController extends AbstractController
         ]);
     }
 
+    /**
+     * Page de confirmation de la réservation.
+     *
+     * @param integer $tripId Identifiant du trajet
+     * @param TripRepository $tripRepository Repository des trajets.
+     * @return Response
+     */
     #[Route('/booking/success/{tripId}', name: 'app_booking_add_success')]
     public function success(int $tripId, TripRepository $tripRepository): Response
     {
@@ -99,6 +119,15 @@ final class BookingController extends AbstractController
         ]);
     }
 
+    /**
+     * COnfirmation du paiement d'une réservation.
+     *
+     * @param Booking $booking Réservation concernée
+     * @param Request $request Requête HTTP
+     * @param EntityManagerInterface $entityManager Doctrine
+     * @param MailService $mailer Service d'envoi d'emails
+     * @return Response
+     */
     #[Route('/booking/{booking}/payment/confirm', name: 'app_booking_payment_confirm', methods: ['POST'])]
     public function confirmPayment(
         Booking $booking,
@@ -136,6 +165,14 @@ final class BookingController extends AbstractController
         return $this->redirectToRoute('app_profile_booking_show', ['booking' => $booking->getId()]);
     }
 
+    /**
+     * Marque un paiement comme échoué.
+     *
+     * @param Booking $booking Réservation concernée
+     * @param Request $request Requête HTTP
+     * @param EntityManagerInterface $entityManager Doctrine
+     * @return Response
+     */
     #[Route('/booking/{booking}/payment/fail', name: 'app_booking_payment_fail', methods: ['POST'])]
     public function failPayment(
         Booking $booking,
