@@ -18,6 +18,7 @@
 
                 <div class="booking-card">
 
+                    {# Résumé du trajet #}
                     <div class="trip-summary">
                         <div class="trip-summary-route">
                             <span>{{ trip.origin }}</span>
@@ -34,6 +35,7 @@
                         </div>
                     </div>
 
+                    {# Conducteur #}
                     <div style="border-bottom:1.5px solid #f1f5f9;margin-bottom:1.25rem;padding-bottom:1.25rem;">
                         <div class="booking-label">Conducteur</div>
                         <div class="d-flex align-items-center gap-2">
@@ -53,6 +55,7 @@
 
                     {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'booking-form'}}) }}
 
+                        {# Nombre de places #}
                         <div class="mb-3">
                             <label class="booking-label">
                                 <i class="bi bi-person-check me-1"></i>Nombre de places
@@ -74,51 +77,55 @@
                             {% endif %}
                         </div>
 
+                        {# Récapitulatif prix #}
                         <div class="price-breakdown">
-                            <div class="price-row"><span>Prix par place</span><span>{{ trip.pricePerSeat }}€</span></div>
-                            <div class="price-row"><span>Nombre de places</span><span id="seats-count">1</span></div>
-                            <div class="price-row total"><span>Total</span><span id="total-price">{{ trip.pricePerSeat }}€</span></div>
+                            <div class="price-row">
+                                <span>Prix par place</span>
+                                <span>{{ trip.pricePerSeat }}€</span>
+                            </div>
+                            <div class="price-row">
+                                <span>Nombre de places</span>
+                                <span id="seats-count">1</span>
+                            </div>
+                            <div class="price-row total">
+                                <span>Total</span>
+                                <span id="total-price">{{ trip.pricePerSeat }}€</span>
+                            </div>
                         </div>
 
                         <hr class="section-divider">
 
-                        <div class="mb-4">
-                            <label class="booking-label">
-                                <i class="bi bi-credit-card me-1"></i>Mode de paiement
-                            </label>
-                            {% if form.payment is defined %}
-                                <div class="d-flex gap-3 mt-2">
-                                    {% for choice in form.payment %}
-                                        <label class="payment-option">
-                                            <div class="payment-option-inner" id="payment-option-{{ choice.vars.value }}">
-                                                {{ form_widget(choice, {
-                                                    'attr': {
-                                                        'class': 'd-none',
-                                                        'onchange': 'updatePaymentStyle()'
-                                                    }
-                                                }) }}
-                                                <i class="bi {{ choice.vars.value == 'cash' ? 'bi-cash-stack' : 'bi-paypal' }}"></i>
-                                                <span>{{ choice.vars.label }}</span>
-                                            </div>
-                                        </label>
-                                    {% endfor %}
-                                </div>
-                                {% if form.payment.vars.errors|length %}
-                                    {% for error in form.payment.vars.errors %}
-                                        <div class="invalid-feedback-st mt-2">
-                                            <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
-                            {% endif %}
+                        {# Bandeau paiement sécurisé Stripe #}
+                        <div style="background:#f8faff;border:1.5px solid #e0e7ff;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.85rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="42" height="18" viewBox="0 0 60 25" aria-label="Stripe">
+                                <path fill="#635BFF" d="M59.64 14.28c0-4.66-2.26-8.34-6.58-8.34-4.34 0-6.97 3.68-6.97 8.3 0 5.48 3.1 8.25 7.55 8.25 2.17 0 3.81-.49 5.05-1.19v-3.64c-1.24.62-2.66.97-4.47.97-1.77 0-3.33-.62-3.53-2.77h8.91c0-.24.04-.99.04-1.58zm-9-.9c0-2.06 1.26-2.91 2.41-2.91 1.12 0 2.3.85 2.3 2.91h-4.71zM40.7 5.94c-1.78 0-2.92.84-3.56 1.42l-.24-1.13h-4v21.31l4.54-.96.01-5.17c.66.48 1.63 1.16 3.24 1.16 3.27 0 6.25-2.63 6.25-8.43-.01-5.3-3.02-8.2-6.24-8.2zm-1.1 12.62c-1.08 0-1.71-.38-2.15-.85l-.02-6.72c.47-.53 1.12-.88 2.17-.88 1.66 0 2.81 1.86 2.81 4.22 0 2.41-1.13 4.23-2.81 4.23zM28.24 4.98l4.56-.97V0l-4.56.97zM28.24 6.23h4.56v15.86h-4.56zM23.1 7.53l-.29-1.3h-3.91v15.86h4.54v-10.7c1.07-1.4 2.89-1.14 3.46-.96V6.23c-.58-.21-2.7-.6-3.8 1.3zM14.1 2.86L9.67 3.8l-.02 14.86c0 2.75 2.06 4.77 4.81 4.77 1.52 0 2.63-.28 3.24-.61v-3.67c-.59.24-3.5 1.08-3.5-1.63V9.99h3.5V6.23h-3.5l-.1-3.37zM4.07 10.96c0-.71.58-1 1.54-1 1.38 0 3.12.42 4.5 1.16V6.9C8.67 6.29 7.28 6 5.61 6 2.23 6 0 7.77 0 11.1c0 5.14 7.08 4.32 7.08 6.54 0 .84-.73 1.11-1.75 1.11-1.51 0-3.45-.62-4.98-1.46v4.29C1.82 22.22 3.36 22.5 4.9 22.5c3.47 0 5.84-1.72 5.84-5.09-.01-5.55-7.07-4.56-7.07-6.45z"/>
+                            </svg>
+                            <div>
+                                <div style="font-size:.82rem;font-weight:700;color:#1e3a5f;">Paiement 100% sécurisé</div>
+                                <div style="font-size:.75rem;color:#94a3b8;">Vous serez redirigé vers Stripe pour finaliser</div>
+                            </div>
+                            <i class="bi bi-shield-lock-fill ms-auto" style="color:#635BFF;font-size:1.1rem;"></i>
                         </div>
-                        <button type="submit" class="btn-book">
-                            <i class="bi bi-check2-circle"></i> Confirmer la réservation
+
+                        {# Bouton Stripe #}
+                        <button type="submit" class="btn-book" style="background:#635BFF;display:flex;align-items:center;justify-content:center;gap:.6rem;">
+                            <i class="bi bi-lock-fill"></i>
+                            Payer <span id="btn-total">{{ trip.pricePerSeat }}€</span> avec Stripe
                         </button>
 
                     {{ form_end(form) }}
 
                     <a href="{{ path('app_trip_show', { id: trip.id }) }}" class="btn-cancel">Annuler</a>
+
+                    {# Réassurance #}
+                    <div style="display:flex;justify-content:center;gap:1.5rem;margin-top:1.25rem;">
+                        <div style="font-size:.72rem;color:#94a3b8;display:flex;align-items:center;gap:.3rem;">
+                            <i class="bi bi-arrow-counterclockwise"></i> Remboursement si annulation
+                        </div>
+                        <div style="font-size:.72rem;color:#94a3b8;display:flex;align-items:center;gap:.3rem;">
+                            <i class="bi bi-credit-card"></i> CB, Apple Pay, Google Pay
+                        </div>
+                    </div>
 
                 </div>
             </div>
@@ -128,33 +135,24 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const seatsInput = document.getElementById('seats-input');
-    const totalPrice = document.getElementById('total-price');
-    const seatsCount = document.getElementById('seats-count');
-    if (seatsInput) {
-        const pricePerSeat = {{ trip.pricePerSeat }};
-        seatsInput.addEventListener('input', function () {
-            const seats = parseInt(this.value) || 1;
-            if (seatsCount) seatsCount.textContent = seats;
-            if (totalPrice) totalPrice.textContent = (seats * pricePerSeat).toFixed(2) + '€';
-        });
+    const seatsInput  = document.getElementById('seats-input');
+    const seatsCount  = document.getElementById('seats-count');
+    const totalPrice  = document.getElementById('total-price');
+    const btnTotal    = document.getElementById('btn-total');
+    const pricePerSeat = {{ trip.pricePerSeat }};
+
+    function updatePrice() {
+        const seats = parseInt(seatsInput.value) || 1;
+        const total = (seats * pricePerSeat).toFixed(2);
+        if (seatsCount) seatsCount.textContent = seats;
+        if (totalPrice) totalPrice.textContent  = total + '€';
+        if (btnTotal)   btnTotal.textContent    = total + '€';
     }
-    const firstRadio = document.querySelector('input[type="radio"]');
-    if (firstRadio) {
-        firstRadio.checked = true;
-        updatePaymentStyle();
+
+    if (seatsInput) {
+        seatsInput.addEventListener('input', updatePrice);
+        updatePrice();
     }
 });
-
-function updatePaymentStyle() {
-    document.querySelectorAll('[id^="payment-option-"]').forEach(el => {
-        el.classList.remove('selected');
-    });
-    const checked = document.querySelector('input[type="radio"]:checked');
-    if (checked) {
-        const optionEl = document.getElementById('payment-option-' + checked.value);
-        if (optionEl) optionEl.classList.add('selected');
-    }
-}
 </script>
 {% endblock %}

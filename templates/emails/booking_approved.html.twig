@@ -1,47 +1,39 @@
-<!DOCTYPE html>
-<html>
-<body style="font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;padding:2rem;">
-<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:20px;border:1.5px solid #f1f5f9;padding:2rem;">
+{% extends 'emails/_layout.html.twig' %}
 
-    <div style="text-align:center;margin-bottom:2rem;">
-        <h1 style="color:#1e3a5f;font-size:1.5rem;font-weight:800;">
-            Share<span style="color:#1d4ed8;">Trips</span>
-        </h1>
-    </div>
+{% set icon     = '✓' %}
+{% set icon_bg  = '#dcfce7' %}
+{% set title    = 'Réservation confirmée !' %}
+{% set subtitle %}
+    Bonjour <strong>{{ booking.passenger.firstName }}</strong>,
+    votre place a été confirmée par le conducteur.
+{% endset %}
 
-    <div style="text-align:center;margin-bottom:1.5rem;">
-        <div style="width:64px;height:64px;border-radius:50%;background:#dcfce7;display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;">✓</div>
-    </div>
+{% block content %}
 
-    <h2 style="color:#1e3a5f;font-weight:700;text-align:center;">Réservation confirmée !</h2>
-    <p style="color:#475569;text-align:center;">Bonjour {{ booking.passenger.firstName }}, votre réservation a été confirmée par le conducteur.</p>
+    {{ include('emails/_trip_details.html.twig', { booking: booking, show_payment: true }) }}
 
-    <div style="background:#eff6ff;border-radius:12px;padding:1.25rem;margin:1.5rem 0;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
-            <span style="color:#94a3b8;font-size:.875rem;">Trajet</span>
-            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">{{ booking.trip.origin }} → {{ booking.trip.destination }}</span>
+    <div style="background:#f8fafc;border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:.75rem;">
+            Votre conducteur
         </div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
-            <span style="color:#94a3b8;font-size:.875rem;">Date</span>
-            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">{{ booking.trip.departureAt|date('d/m/Y à H:i') }}</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
-            <span style="color:#94a3b8;font-size:.875rem;">Conducteur</span>
-            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">{{ booking.trip.driver.fullName }}</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;">
-            <span style="color:#94a3b8;font-size:.875rem;">Total payé</span>
-            <span style="color:#1e3a5f;font-weight:800;">{{ booking.totalPrice }}€</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;">
-            <span style="color:#94a3b8;font-size:.875rem;">Méthode de paiement</span>
-            <span style="color:#1e3a5f;font-weight:800;">{{ booking.payment }}</span>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+            <div style="width:40px;height:40px;border-radius:50%;background:#dbeafe;display:inline-flex;align-items:center;justify-content:center;font-weight:800;color:#1d4ed8;">
+                {{ booking.trip.driver.firstName|first|upper }}
+            </div>
+            <div>
+                <div style="font-weight:600;color:#1e3a5f;font-size:.9rem;">
+                    {{ booking.trip.driver.fullName }}
+                </div>
+                <div style="font-size:.78rem;color:#94a3b8;">
+                    {{ booking.trip.vehicle.brand }} {{ booking.trip.vehicle.model }}
+                </div>
+            </div>
         </div>
     </div>
 
-    <p style="color:#94a3b8;font-size:.8rem;text-align:center;">
-        © {{ "now"|date("Y") }} ShareTrips - Tous droits réservés
-    </p>
-</div>
-</body>
-</html>
+    <div style="background:#dcfce7;border-radius:12px;padding:1rem 1.25rem;color:#166534;font-size:.875rem;text-align:center;">
+        ✅ <strong>Tout est prêt !</strong> Rendez-vous au point de départ
+        le {{ booking.trip.departureAt|date('d/m/Y à H:i') }}.
+    </div>
+
+{% endblock %}

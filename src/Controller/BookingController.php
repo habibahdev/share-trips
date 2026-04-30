@@ -5,9 +5,10 @@ namespace App\Controller;
 use App\Entity\Booking;
 use App\Entity\Payment;
 use App\Entity\User;
+use App\Enum\BookingStatus;
 use App\Form\BookingType;
 use App\Repository\TripRepository;
-use App\Service\MailService;
+use App\Service\StripeService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +27,6 @@ final class BookingController extends AbstractController
      * @param TripRepository $tripRepository Repository des trajets
      * @param Request $request Requête HTTP
      * @param EntityManagerInterface $entityManager Doctrine
-     * @param MailService $mailer Service d'envoi d'emails
      * @return Response
      */
     #[Route('/booking/add/{tripId}', name: 'app_booking_add')]
@@ -35,7 +35,7 @@ final class BookingController extends AbstractController
         TripRepository $tripRepository,
         Request $request,
         EntityManagerInterface $entityManager,
-        MailService $mailer
+        StripeService $stripe
     ): Response {
         $user = $this->getUser();
         assert($user instanceof User);
@@ -66,21 +66,18 @@ final class BookingController extends AbstractController
         ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $method = $form->get('payment')->getData();
             $payment = new Payment();
             $payment->setPayer($user);
             $payment->setAmount($booking->getTotalPrice());
-            $payment->setMethod($method);
             $payment->setBooking($booking);
             $booking->setPayment($payment);
             $entityManager->persist($booking);
             $entityManager->persist($payment);
             $entityManager->flush();
-            $mailer->sendBookingConfirmation($booking);
-            $mailer->sendNewBookingToDriver($booking);
-            return $this->redirectToRoute('app_booking_add_success', [
-                'tripId' => $trip->getId()
-            ]);
+            $session = $stripe->createCheckoutSession($booking, $payment);
+            $payment->setStripeSessionId($session->id);
+            $entityManager->flush();
+            return $this->redirect($session->url);
         }
         return $this->render('booking/index.html.twig', [
             'trip' => $trip,
@@ -89,118 +86,62 @@ final class BookingController extends AbstractController
     }
 
     /**
-     * Page de confirmation de la réservation.
+     * Undocumented function
      *
-     * @param integer $tripId Identifiant du trajet
-     * @param TripRepository $tripRepository Repository des trajets.
+     * @param Booking $booking
      * @return Response
      */
-    #[Route('/booking/success/{tripId}', name: 'app_booking_add_success')]
-    public function success(int $tripId, TripRepository $tripRepository): Response
+    #[Route('/booking/{booking}/stripe/success', name: 'app_booking_stripe_success')]
+    public function stripeSuccess(Booking $booking): Response
     {
         $user = $this->getUser();
         assert($user instanceof User);
-        $trip = $tripRepository->find($tripId);
-        if (!$trip) {
-            return $this->redirectToRoute('app_home');
-        }
-        $hasBooking = false;
-        foreach ($trip->getBookings() as $booking) {
-            if ($booking->getPassenger()->getId() === $user->getId()) {
-                $hasBooking = true;
-                break;
-            }
-        }
-        if (!$hasBooking) {
+        if ($booking->getPassenger()->getId() !== $user->getId()) {
             return $this->redirectToRoute('app_home');
         }
         return $this->render('booking/success.html.twig', [
-            'trip' => $trip
+            'booking' => $booking
         ]);
     }
 
     /**
-     * COnfirmation du paiement d'une réservation.
+     * Undocumented function
      *
-     * @param Booking $booking Réservation concernée
-     * @param Request $request Requête HTTP
-     * @param EntityManagerInterface $entityManager Doctrine
-     * @param MailService $mailer Service d'envoi d'emails
+     * @param Booking $booking
+     * @param EntityManagerInterface $entityManager
      * @return Response
      */
-    #[Route('/booking/{booking}/payment/confirm', name: 'app_booking_payment_confirm', methods: ['POST'])]
-    public function confirmPayment(
-        Booking $booking,
-        Request $request,
-        EntityManagerInterface $entityManager,
-        MailService $mailer
-    ): Response {
+    #[Route('/booking/{booking}/stripe/cancel', name: 'app_booking_stripe_cancel')]
+    public function stripeCancel(Booking $booking, EntityManagerInterface $entityManager): Response
+    {
         $user = $this->getUser();
         assert($user instanceof User);
-        if (
-            !$this->isCsrfTokenValid(
-                'confirm_payment_' . $booking->getId(),
-                (string) $request->request->get('_token')
-            )
-        ) {
-            $this->addFlash('danger', 'Problème inconnu.');
-            return $this->redirectToRoute('app_profile_booking_show', ['booking' => $booking->getId()]);
-        }
         if ($booking->getPassenger()->getId() !== $user->getId()) {
-            return $this->redirectToRoute('app_profile_booking');
+            return $this->redirectToRoute('app_home');
         }
         $payment = $booking->getPayment();
-        if (!$payment) {
-            $this->addFlash('danger', 'Aucun paiement associé à cette réservation.');
-            return $this->redirectToRoute('app_profile_booking_show', ['booking' => $booking->getId()]);
+        if ($payment && !$payment->getStatus()->isFinal()) {
+            $payment->markAsFailed();
+            $booking->setStatus(BookingStatus::Cancelled);
+            $entityManager->flush();
         }
-        if ($payment->getStatus()->isFinal()) {
-            $this->addFlash('warning', 'Ce paiement a déjà été traité.');
-            return $this->redirectToRoute('app_profile_booking_show', ['booking' => $booking->getId()]);
-        }
-        $payment->markAsCompleted();
-        $entityManager->flush();
-        $mailer->sendPaymentConfirmation($booking);
-        $this->addFlash('success', 'Paiement confirmé.');
-        return $this->redirectToRoute('app_profile_booking_show', ['booking' => $booking->getId()]);
+        $this->addFlash('warning', 'Paiement annulé. Votre réservation n\'a pas été confirmée.');
+        return $this->redirectToRoute('app_trip_show', [
+            'id' => $booking->getTrip()->getId()
+        ]);
     }
 
-    /**
-     * Marque un paiement comme échoué.
-     *
-     * @param Booking $booking Réservation concernée
-     * @param Request $request Requête HTTP
-     * @param EntityManagerInterface $entityManager Doctrine
-     * @return Response
-     */
-    #[Route('/booking/{booking}/payment/fail', name: 'app_booking_payment_fail', methods: ['POST'])]
-    public function failPayment(
-        Booking $booking,
-        Request $request,
-        EntityManagerInterface $entityManager
-    ): Response {
+    #[Route('/booking/{booking}/success', name: 'app_booking_add_success')]
+    public function success(Booking $booking): Response
+    {
         $user = $this->getUser();
         assert($user instanceof User);
-        if (
-            !$this->isCsrfTokenValid(
-                'fail_payment_' . $booking->getId(),
-                (string) $request->request->get('_token')
-            )
-        ) {
-            $this->addFlash('danger', 'Problème inconnu.');
-            return $this->redirectToRoute('app_profile_booking_show', ['booking' => $booking->getId()]);
-        }
         if ($booking->getPassenger()->getId() !== $user->getId()) {
-            return $this->redirectToRoute('app_profile_booking');
+            return $this->redirectToRoute('app_home');
         }
-        $payment = $booking->getPayment();
-        if (!$payment || $payment->getStatus()->isFinal()) {
-            $this->addFlash('warning', 'Ce paiement a déjà été traité.');
-            return $this->redirectToRoute('app_profile_booking_show', ['booking' => $booking->getId()]);
-        }
-        $payment->markAsFailed();
-        $entityManager->flush();
-        $this->addFlash('success', 'Paiement échoué.');
-        return $this->redirectToRoute('app_profile_booking_show', ['booking' => $booking->getId()]);
+        return $this->render('booking/success.html.twig', [
+            'booking' => $booking,
+            'trip' => $booking->getTrip(),
+        ]);
     }
 }

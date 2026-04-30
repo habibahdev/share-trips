@@ -1,43 +1,26 @@
-<!DOCTYPE html>
-<html>
-<body style="font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;padding:2rem;">
-<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:20px;border:1.5px solid #f1f5f9;padding:2rem;">
+{% extends 'emails/_layout.html.twig' %}
 
-    <div style="text-align:center;margin-bottom:2rem;">
-        <h1 style="color:#1e3a5f;font-size:1.5rem;font-weight:800;">
-            Share<span style="color:#1d4ed8;">Trips</span>
-        </h1>
+{% set icon     = '💳' %}
+{% set icon_bg  = '#eff6ff' %}
+{% set title    = 'Paiement reçu !' %}
+{% set subtitle %}
+    Bonjour <strong>{{ booking.passenger.firstName }}</strong>,
+    votre paiement a bien été encaissé. Le conducteur va confirmer votre place.
+{% endset %}
+
+{% block content %}
+
+    {{ include('emails/_trip_details.html.twig', { booking: booking, show_payment: true }) }}
+
+    <div style="text-align:center;margin-bottom:1.5rem;">
+        <span style="display:inline-flex;align-items:center;gap:.4rem;background:#f5f3ff;border:1px solid #e0e7ff;border-radius:8px;padding:.4rem .9rem;font-size:.78rem;font-weight:700;color:#635BFF;">
+            🔒 Paiement sécurisé par Stripe
+        </span>
     </div>
 
-    <h2 style="color:#1e3a5f;font-weight:700;">Réservation enregistrée !</h2>
-    <p style="color:#475569;">Bonjour {{ booking.passenger.firstName }}, votre réservation est bien enregistrée et en attente de confirmation.</p>
-
-    <div style="background:#eff6ff;border-radius:12px;padding:1.25rem;margin:1.5rem 0;">
-        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
-            <span style="color:#94a3b8;font-size:.875rem;">Trajet</span>
-            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">{{ booking.trip.origin }} → {{ booking.trip.destination }}</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
-            <span style="color:#94a3b8;font-size:.875rem;">Date</span>
-            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">{{ booking.trip.departureAt|date('d/m/Y à H:i') }}</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:.5rem;">
-            <span style="color:#94a3b8;font-size:.875rem;">Places</span>
-            <span style="color:#1e3a5f;font-weight:600;font-size:.875rem;">{{ booking.seatsBooked }}</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;border-top:1.5px solid #dbeafe;padding-top:.5rem;margin-top:.5rem;">
-            <span style="color:#1e3a5f;font-weight:700;">Total</span>
-            <span style="color:#1e3a5f;font-weight:800;">{{ booking.totalPrice }}€</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;border-top:1.5px solid #dbeafe;padding-top:.5rem;margin-top:.5rem;">
-            <span style="color:#1e3a5f;font-weight:700;">Méthode de paiement</span>
-            <span style="color:#1e3a5f;font-weight:800;">{{ booking.payment }}</span>
-        </div>
+    <div style="background:#fefce8;border:1.5px solid #fef08a;border-radius:12px;padding:1rem 1.25rem;color:#854d0e;font-size:.875rem;text-align:center;">
+        ⏳ <strong>En attente de confirmation</strong> — Le conducteur doit valider votre place.
+        Vous recevrez un email dès qu'il aura confirmé.
     </div>
 
-    <p style="color:#94a3b8;font-size:.8rem;text-align:center;">
-        © {{ "now"|date("Y") }} ShareTrips - Tous droits réservés
-    </p>
-</div>
-</body>
-</html>
+{% endblock %}

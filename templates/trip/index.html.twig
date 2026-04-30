@@ -1,51 +1,137 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Tous les trajets - Share Trips{% endblock %}
 
 {% block body %}
-<div class="trips-page container">
-    <h1 style="font-weight:800;color:#1e3a5f;margin-bottom:2rem;">Trajets disponibles</h1>
+<div class="container" style="padding:2.5rem 0;min-height:calc(100vh - 70px);">
 
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <span class="section-tag">Covoiturage</span>
+            <h1 style="font-size:1.6rem;font-weight:800;color:#1e3a5f;margin:0;">Trajets disponibles</h1>
+        </div>
+        {% if trips is not empty %}
+            <span style="color:#94a3b8;font-size:.875rem;font-weight:500;">
+                {{ trips|length }} trajet{{ trips|length > 1 ? 's' : '' }} trouvé{{ trips|length > 1 ? 's' : '' }}
+            </span>
+        {% endif %}
+    </div>
+
+    {# Formulaire de recherche #}
+    <div class="mb-4">
+        {% include "partials/_search_form.html.twig" with {
+            action: path('app_trips'),
+            origin: origin ?? '',
+            destination: destination ?? '',
+            date: date ?? ''
+        } %}
+    </div>
+
+    {# Résultats vides #}
     {% if trips is empty %}
-        <div class="alert alert-info">
+        <div style="background:#fff;border-radius:20px;padding:3rem;text-align:center;border:1.5px solid #f1f5f9;">
+            <i class="bi bi-signpost-2 d-block mb-3" style="font-size:3rem;color:#bfdbfe;"></i>
             {% if origin or destination or date %}
-                Aucun trajet ne correspond à votre recherche.
-                {% if origin %} Départ : <strong>{{ origin }}</strong>. {% endif %}
-                {% if destination %} Arrivée : <strong>{{ destination }}</strong>. {% endif %}
-                {% if date %} Date : <strong>{{ date|date('d/m/Y') }}</strong>. {% endif %}
+                <p style="font-size:1.1rem;color:#1e3a5f;font-weight:700;margin-bottom:.5rem;">
+                    Aucun trajet ne correspond à votre recherche.
+                </p>
+                <p class="text-muted" style="font-size:.9rem;">
+                    {% if origin %}Départ : <strong>{{ origin }}</strong>. {% endif %}
+                    {% if destination %}Arrivée : <strong>{{ destination }}</strong>. {% endif %}
+                    {% if date %}Date : <strong>{{ date|date('d/m/Y') }}</strong>.{% endif %}
+                </p>
             {% else %}
-                <i class="bi bi-info-circle-fill"></i> Aucun trajet disponible pour le moment.
+                <p class="text-muted mb-3" style="font-size:1.1rem;">Aucun trajet disponible pour le moment.</p>
+                {% if app.user %}
+                    <a href="{{ path('app_profile_trip_form') }}" class="btn-reserve px-4 py-2 text-decoration-none d-inline-block">
+                        <i class="bi bi-plus-circle me-2"></i>Proposer le premier trajet
+                    </a>
+                {% endif %}
             {% endif %}
+        </div>
+
+    {# Grille de trajets #}
+    {% else %}
+        <div class="row g-3">
+            {% for trip in trips %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="trip-card-col h-100 d-flex flex-column">
+
+                        {# Header : avatar + conducteur + badge #}
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar">
+                                    {{ trip.driver.firstName ? trip.driver.firstName|first|upper : '?' }}
+                                </div>
+                                <div>
+                                    <div style="font-weight:600;color:#1e3a5f;font-size:.875rem;">
+                                        {{ trip.driver.firstName ?? '' }} {{ trip.driver.lastName ?? '' }}
+                                    </div>
+                                    <div style="font-size:.75rem;color:#94a3b8;">
+                                        <i class="bi bi-car-front me-1"></i>{{ trip.vehicle.brand }} {{ trip.vehicle.model }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if trip.status.value == 'open' %}
+                                <span class="trip-badge trip-badge--open">
+                                    {{ trip.availableSeats }} place{{ trip.availableSeats > 1 ? 's' : '' }}
+                                </span>
+                            {% else %}
+                                <span class="trip-badge trip-badge--full">Complet</span>
+                            {% endif %}
+                        </div>
+
+                        {# Route #}
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <div class="d-flex flex-column align-items-center" style="width:12px;gap:3px;">
+                                <div class="route-dot" style="background:#1d4ed8;"></div>
+                                <div class="route-line" style="height:20px;"></div>
+                                <div class="route-dot" style="background:#1e3a5f;"></div>
+                            </div>
+                            <div style="flex:1;">
+                                <div style="font-weight:700;color:#1e3a5f;font-size:.95rem;
+                                            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                    {{ trip.origin }}
+                                </div>
+                                <div style="font-weight:600;color:#475569;font-size:.875rem;
+                                            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                    {{ trip.destination }}
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Date #}
+                        <div style="font-size:.8rem;color:#94a3b8;margin-bottom:1rem;">
+                            <i class="bi bi-calendar3 me-1"></i>{{ trip.departureAt|date('d/m/Y') }}
+                            <span class="divider-dot mx-2"></span>
+                            <i class="bi bi-clock me-1"></i>{{ trip.departureAt|date('H:i') }}
+                        </div>
+
+                        {# Footer : prix + bouton #}
+                        <div class="d-flex align-items-center justify-content-between mt-auto pt-3"
+                             style="border-top:1.5px solid #f1f5f9;">
+                            <span class="price-pill">
+                                {{ trip.pricePerSeat }}€
+                                <span style="font-size:.7rem;font-weight:500;color:#94a3b8;"> / place</span>
+                            </span>
+                            {% if trip.status.value == 'open' %}
+                                <a href="{{ path('app_trip_show', {id: trip.id}) }}"
+                                   class="btn-reserve text-decoration-none">
+                                    Réserver
+                                </a>
+                            {% else %}
+                                <span class="btn-reserve"
+                                      style="opacity:.4;cursor:not-allowed;pointer-events:none;">
+                                    Complet
+                                </span>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+            {% endfor %}
         </div>
     {% endif %}
 
-    {% for trip in trips %}
-        <div class="trip-card">
-            <div class="trip-info">
-                <div class="trip-route">
-                    {{ trip.origin }} → {{ trip.destination }}
-                </div>
-                <div class="trip-meta">
-                    <span><i class="bi bi-calendar3"></i> {{ trip.departureAt|date('d/m/Y H:i') }}</span>
-                    <span><i class="bi bi-person-check"></i> {{ trip.availableSeats }} place{{ trip.availableSeats > 1 ? 's' : '' }} dispo</span>
-                </div>
-                <div class="trip-meta" style="margin-top:.5rem;">
-                    <span>Conducteur: {{ trip.driver.firstName ?? '' }} {{ trip.driver.lastName ?? '' }}</span>
-                </div>
-            </div>
-
-            <div style="display:flex;align-items:center;gap:.75rem;">
-                <span class="status-badge {% if trip.status.value == 'open' %}status-open{% else %}status-full{% endif %}">
-                    {% if trip.status.value == 'open' %}Disponible{% else %}Complet{% endif %}
-                </span>
-
-                {% if trip.status.value == 'open' %}
-                    <a href="{{ path('app_trip_show', {id: trip.id}) }}" class="btn-book">
-                        <i class="bi bi-check2-circle"></i> Réserver
-                    </a>
-                {% endif %}
-            </div>
-        </div>
-    {% endfor %}
 </div>
 {% endblock %}

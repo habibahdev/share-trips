@@ -9,6 +9,7 @@ use App\Enum\BookingStatus;
 use App\Enum\TripStatus;
 use App\Form\TripType;
 use App\Service\MailService;
+use App\Service\StripeService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -66,7 +67,8 @@ final class TripController extends AbstractController
         Trip $trip,
         Request $request,
         EntityManagerInterface $entityManager,
-        MailService $mailer
+        MailService $mailer,
+        StripeService $stripe
     ): Response {
         $user = $this->getUser();
         assert($user instanceof User);
@@ -90,16 +92,30 @@ final class TripController extends AbstractController
             return $this->redirectToRoute('app_profile_trip');
         }
         $trip->setStatus(TripStatus::Cancelled);
-        $entityManager->flush();
+
         foreach ($trip->getBookings() as $booking) {
-            if ($booking->getStatus() !== BookingStatus::Cancelled) {
-                $mailer->sendTripCancellationToPassanger($booking);
-                if ($booking->getStatus() === BookingStatus::Confirmed) {
-                    $mailer->sendRefund($booking);
-                }
-                $booking->setStatus(BookingStatus::Cancelled);
+            if ($booking->getStatus() === BookingStatus::Cancelled) {
+                continue;
             }
+            $mailer->sendTripCancellationToPassenger($booking);
+
+            $payment = $booking->getPayment();
+
+            if ($payment && $payment->isSuccessful()) {
+                try {
+                    $stripe->refund($payment);
+                    $payment->refund();
+                    $mailer->sendRefund($booking);
+                } catch (\Exception $e) {
+                    $this->addFlash(
+                        'warning',
+                        'Remboursement échoué pour la réservation ' . $booking->getId() . '.'
+                    );
+                }
+            }
+            $booking->setStatus(BookingStatus::Cancelled);
         }
+        $entityManager->flush();
         $this->addFlash('success', 'Trajet annulé. Les passagers ont été notifiés.');
         return $this->redirectToRoute('app_profile_trip');
     }
@@ -130,6 +146,15 @@ final class TripController extends AbstractController
             $this->addFlash('warning', 'Cette réservation est déjà confirmée.');
             return $this->redirectToRoute('app_profile_trip_show', ['trip' => $trip->getId()]);
         }
+        $payment = $booking->getPayment();
+        if (!$payment || !$payment->isSuccessful()) {
+            $this->addFlash(
+                'danger',
+                'Impossible de confirmer une réservation sans paiement validé.'
+            );
+            return $this->redirectToRoute('app_profile_trip_show', ['trip' => $trip->getId()]);
+        }
+
         $booking->setStatus(BookingStatus::Confirmed);
         $confirmedSeats = 0;
         foreach ($trip->getBookings() as $b) {

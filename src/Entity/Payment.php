@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Enum\PaymentMethod;
 use App\Enum\PaymentStatus;
 use App\Repository\PaymentRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -54,14 +53,6 @@ class Payment
     private ?\DateTimeImmutable $updatedAt = null;
 
     /**
-     * Méthode de paiement.
-     *
-     * @var PaymentMethod|null
-     */
-    #[ORM\Column(enumType: PaymentMethod::class)]
-    private ?PaymentMethod $method = null;
-
-    /**
      * Réservation associée au paiement.
      *
      * @var Booking|null
@@ -79,20 +70,17 @@ class Payment
     #[ORM\JoinColumn(nullable: false)]
     private ?User $payer = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $stripeSessionId = null;
+
     public function __construct()
     {
         $this->status = PaymentStatus::Pending;
     }
 
-    /**
-     * Représentation textuelle du paiement.
-     *
-     * @return string
-     */
     public function __toString(): string
     {
-        $methodLabel = $this->method?->label() ?? 'N/A';
-        return 'Paiement : ' . $methodLabel;
+        return 'Paiement Stripe #' . ($this->stripeSessionId ?? 'N/A');
     }
 
     /**
@@ -221,24 +209,6 @@ class Payment
     }
 
     /**
-     * @return PaymentMethod|null
-     */
-    public function getMethod(): ?PaymentMethod
-    {
-        return $this->method;
-    }
-
-    /**
-     * @param PaymentMethod|null $method
-     * @return static
-     */
-    public function setMethod(?PaymentMethod $method): static
-    {
-        $this->method = $method;
-        return $this;
-    }
-
-    /**
      * @return Booking|null
      */
     public function getBooking(): ?Booking
@@ -271,6 +241,17 @@ class Payment
     public function setPayer(?User $payer): static
     {
         $this->payer = $payer;
+        return $this;
+    }
+
+    public function getStripeSessionId(): ?string
+    {
+        return $this->stripeSessionId;
+    }
+
+    public function setStripeSessionId(?string $stripeSessionId): static
+    {
+        $this->stripeSessionId = $stripeSessionId;
         return $this;
     }
 }
