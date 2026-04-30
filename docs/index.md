@@ -5,8 +5,6 @@
 * [Installation](#installation)
 * [Lancement du projet](#lancement-du-projet)
 * [Mise à jour de l'environnement Docker](#mise-à-jour-de-lenvironnement-docker)
-* [Cas d'utilisation](usecase.md)
-* [User story](userstory.md)
 
 ## Pré-requis
 * PHP >= 8.3
@@ -21,10 +19,7 @@
 git clone https://github.com/habibahdev/share-trips.git
 cd share-trips
 composer install
-npm install
-rm -f migrations/*.php
 ```
-
 ### 2. Variables d'environnement
 Créer le fichier `.env.local` à la racine du projet et y placer :
 
@@ -33,6 +28,12 @@ DATABASE_URL="postgresql://tripsadmin:tripsadmin@127.0.0.1:5433/sharetrips?serve
 MAILER_DSN=smtp://localhost:1025
 MAILER_FROM=noreply@sharetrips.fr
 MAILER_FROM_NAME=ShareTrips
+```
+
+### 3. Ressources
+```
+npm install
+rm -f migrations/*.php
 ```
 
 ## Lancement du projet
