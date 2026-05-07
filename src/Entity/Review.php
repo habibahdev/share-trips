@@ -27,7 +27,7 @@ class Review
      *
      * @var User|null
      */
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'reviewsMade')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $reviewer = null;
 
@@ -36,7 +36,7 @@ class Review
      *
      * @var User|null
      */
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'reviewsReceived')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $reviewed = null;
 
@@ -45,7 +45,7 @@ class Review
      *
      * @var Booking|null
      */
-    #[ORM\ManyToOne(targetEntity: Booking::class)]
+    #[ORM\ManyToOne(targetEntity: Booking::class, inversedBy: 'reviews')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Booking $booking = null;
 

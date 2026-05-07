@@ -54,7 +54,6 @@ docker compose exec app php bin/console d:m:m -n
 ```
 docker compose exec app php bin/console doctrine:fixtures:load -n
 ```
-> Insère dans la base un compte administrateur et 5 utilisateurs.
 
 ## Assets
 ### Build porduction
@@ -78,7 +77,7 @@ npm run maildev
 ```
 http://localhost:8081
 ```
-> Les données de connexions sont définies dans le fichier `.env.local`
+> Les données de connexions sont définies dans le fichier `.env`
 
 ## Arrêt du projet
 ```

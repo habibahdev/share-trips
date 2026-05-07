@@ -23,6 +23,10 @@ services:
         arguments:
             $fromEmail: '%env(MAILER_FROM)%'
             $fromName: '%env(MAILER_FROM_NAME)%'
+    
+    App\Service\StripeService:
+        arguments:
+            $secretKey: '%env(STRIPE_SECRET_KEY)%'
 
     App\Controller\StripeWebhookController:
         arguments:
