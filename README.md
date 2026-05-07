@@ -1,7 +1,7 @@
 # ShareTrips
 
 ![PHP](https://img.shields.io/badge/PHP-8.3-777BB4?logo=php&logoColor=white)
-![Symfony](https://img.shields.io/badge/Symfony-7-000000?logo=symfony&logoColor=white)
+![Symfony](https://img.shields.io/badge/Symfony-7.4-000000?logo=symfony&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-24.14.0-339933?logo=node.js\&logoColor=white)

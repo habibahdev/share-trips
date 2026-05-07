@@ -27,6 +27,7 @@ final class BookingController extends AbstractController
      * @param TripRepository $tripRepository Repository des trajets
      * @param Request $request Requête HTTP
      * @param EntityManagerInterface $entityManager Doctrine
+     * @param StripeService $stripe
      * @return Response
      */
     #[Route('/booking/add/{tripId}', name: 'app_booking_add')]
@@ -38,7 +39,10 @@ final class BookingController extends AbstractController
         StripeService $stripe
     ): Response {
         $user = $this->getUser();
-        assert($user instanceof User);
+        if (!$user instanceof User) {
+            return $this->redirectToRoute('app_login');
+        }
+
         $trip = $tripRepository->find($tripId);
         if (!$trip) {
             return $this->redirectToRoute('app_home');
@@ -100,7 +104,8 @@ final class BookingController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
         return $this->render('booking/success.html.twig', [
-            'booking' => $booking
+            'booking' => $booking,
+            'trip' => $booking->getTrip()
         ]);
     }
 
@@ -131,6 +136,12 @@ final class BookingController extends AbstractController
         ]);
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param Booking $booking
+     * @return Response
+     */
     #[Route('/booking/{booking}/success', name: 'app_booking_add_success')]
     public function success(Booking $booking): Response
     {

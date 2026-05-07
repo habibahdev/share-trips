@@ -57,7 +57,7 @@ final class StripeService
             ),
 
             'cancel_url' => $this->urlGenerator->generate(
-                'app_booking_cancel',
+                'app_booking_stripe_cancel',
                 ['booking' => $booking->getId()],
                 UrlGeneratorInterface::ABSOLUTE_URL
             ),
