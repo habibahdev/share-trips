@@ -93,6 +93,7 @@ class AppFixtures extends Fixture
             }
         }
 
+        /*
         $trips = [];
         foreach ($users as $driverIndex => $driver) {
             $driverVehicles = $vehicles[$driverIndex];
@@ -137,14 +138,70 @@ class AppFixtures extends Fixture
             $trips[] = ['trip' => $tripPast, 'driver' => $driver, 'type' => 'past'];
         }
         $manager->flush();
+        */
+        $trips = [];
 
+        /**
+         * 3 trajets passés
+         */
+        for ($i = 0; $i < 3; $i++) {
+            $driver = $users[$i];
+            $vehicle = $vehicles[$i][0];
+
+            $tripPast = $this->createTrip(
+                driver: $driver,
+                vehicle: $vehicle,
+                origin: self::CITIES[$i],
+                dest: self::CITIES[$i + 1],
+                departure: new \DateTimeImmutable(sprintf('-%d days', $i + 2)),
+                seats: 3,
+                price: 12.0 + $i,
+                status: TripStatus::Completed
+            );
+
+            $manager->persist($tripPast);
+
+            $trips[] = [
+                'trip' => $tripPast,
+                'driver' => $driver,
+                'type' => 'past'
+            ];
+        }
+
+        /**
+         * 9 trajets futurs NON complets
+         */
+        for ($i = 0; $i < 12; $i++) {
+            $driver = $users[$i % count($users)];
+            $vehicle = $vehicles[$i % count($users)][0];
+
+            $tripOpen = $this->createTrip(
+                driver: $driver,
+                vehicle: $vehicle,
+                origin: self::CITIES[$i % count(self::CITIES)],
+                dest: self::CITIES[($i + 2) % count(self::CITIES)],
+                departure: new \DateTimeImmutable(sprintf('+%d days', $i + 1)),
+                seats: rand(2, 5),
+                price: 10.0 + $i,
+                status: TripStatus::Open
+            );
+
+            $manager->persist($tripOpen);
+
+            $trips[] = [
+                'trip' => $tripOpen,
+                'driver' => $driver,
+                'type' => 'open'
+            ];
+        }
+
+        $manager->flush();
         foreach ($trips as $tripData) {
             /** @var Trip $trip */
             $trip = $tripData['trip'];
             $driver = $tripData['driver'];
             $type = $tripData['type'];
 
-            // On sélectionne des passagers ≠ conducteur
             $passengers = array_filter(
                 $users,
                 fn(User $u) => $u->getId() !== $driver->getId()
@@ -152,11 +209,6 @@ class AppFixtures extends Fixture
             $passengers = array_values($passengers);
 
             match ($type) {
-                'full' => $this->createFullTripBookings(
-                    $manager,
-                    $trip,
-                    $passengers
-                ),
                 'open' => $this->createOpenTripBookings(
                     $manager,
                     $trip,
@@ -172,23 +224,6 @@ class AppFixtures extends Fixture
         }
 
         $manager->flush();
-    }
-
-    /**
-     * @param User[] $passengers
-     */
-    private function createFullTripBookings(
-        ObjectManager $manager,
-        Trip $trip,
-        array $passengers
-    ): void {
-        foreach (array_slice($passengers, 0, 2) as $passenger) {
-            $booking = $this->createBooking($trip, $passenger, 1, BookingStatus::Confirmed);
-            $payment = $this->createPayment($booking, $passenger, PaymentStatus::Completed);
-            $booking->setPayment($payment);
-            $manager->persist($booking);
-            $manager->persist($payment);
-        }
     }
 
     /**

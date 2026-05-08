@@ -4,19 +4,19 @@
 ![Symfony](https://img.shields.io/badge/Symfony-7.4-000000?logo=symfony&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-24.14.0-339933?logo=node.js\&logoColor=white)
-![npm](https://img.shields.io/badge/npm-11.9.0-CB3837?logo=npm\&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-26.1.0-339933?logo=node.js\&logoColor=white)
+![npm](https://img.shields.io/badge/npm-11.13.0-CB3837?logo=npm\&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/bootstrap-5.3-7532f9?logo=bootstrap&logoColor=white)
 ![CI](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-Plateforme de covoiturage développée avec Symfony permettant de proposer et réserver des trajets entre particuliers.
+Plateforme de covoiturage permettant de proposer et réserver des trajets entre particuliers.
 
 ![Homepage](docs/images/homepage.png)
 
 # Sommaire
 * [Objectif](#objectif-du-projet)
-* [Fonctionnalités](#fontionnalité-principales)
+* [Fonctionnalité principales](#fonctionnalité-principales)
 * [Documentation](#documentation)
 
 # Objectif
@@ -35,3 +35,6 @@ ShareTrips a été conçu pour :
 
 # Documentation
 La documentation est disponible [ici](docs/index.md)
+
+# Crédit
+Le projet a été initialement développé par [Umm-Habibah](https://github.com/habibahdev)

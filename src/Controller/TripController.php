@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Trip;
 use App\Repository\TripRepository;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +23,7 @@ final class TripController extends AbstractController
      * @return Response
      */
     #[Route('/trip', name: 'app_trips')]
-    public function index(TripRepository $tripRepository, Request $request): Response
+    public function index(TripRepository $tripRepository, Request $request, PaginatorInterface $paginator): Response
     {
         $origin = $request->query->get('origin');
         $destination = $request->query->get('destination');
@@ -35,7 +36,12 @@ final class TripController extends AbstractController
                 $date = null;
             }
         }
-        $trips = $tripRepository->findAvailableTrips($origin, $destination, $date);
+        $query = $tripRepository->findAvailableTripsQuery($origin, $destination, $date);
+        $trips = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            9
+        );
         return $this->render('trip/index.html.twig', [
             'trips' => $trips,
             'origin' => $origin,
