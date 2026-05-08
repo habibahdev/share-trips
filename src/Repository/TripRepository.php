@@ -45,8 +45,36 @@ class TripRepository extends ServiceEntityRepository
                 ->setParameter('end', $date->setTime(23, 59, 59));
         }
         $query->orderBy('t.departureAt', 'asc')
-            ->setMaxResults(10);
+            ->setMaxResults(6);
         return $query->getQuery()->getResult();
+    }
+
+    /**
+     * @param string|null $origin
+     * @param string|null $destination
+     * @param \DateTimeImmutable|null $date
+     * @return QueryBuilder
+     */
+    public function findAvailableTripsQuery(
+        ?string $origin = null,
+        ?string $destination = null,
+        ?\DateTimeImmutable $date = null
+    ): QueryBuilder {
+        $query = $this->createAvailableTripsQueryBuilder();
+        if ($origin) {
+            $query->andWhere('lower(t.origin) like lower(:origin)')
+                ->setParameter('origin', '%' . $origin . '%');
+        }
+        if ($destination) {
+            $query->andWhere('lower(t.destination) like lower(:destination)')
+                ->setParameter('destination', '%' . $destination . '%');
+        }
+        if ($date) {
+            $query->andWhere('t.departureAt between :start and :end')
+                ->setParameter('start', $date->setTime(0, 0, 0))
+                ->setParameter('end', $date->setTime(23, 59, 59));
+        }
+        return $query->orderBy('t.departureAt', 'asc');
     }
 
     /**

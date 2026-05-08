@@ -18,18 +18,18 @@
 
 ## Installation
 ### Clôner le projet
+Pensez à `fork` le dépôt.
+
 ```
 git clone https://github.com/habibahdev/share-trips.git
 cd share-trips
+composer install
+npm install
 ```
+
 ### Lancement de l'environnement Docker
 ```
 docker compose -f docker-compose.dev.yaml up -d --build
-```
-
-### Installer les dépendances
-```
-docker compose exec app composer install
 ```
 
 ## Lancement du projet
@@ -89,7 +89,6 @@ docker compose -f docker-compose.dev.yaml stop
 ```
 docker compose -f docker-compose.dev.yaml down -v
 docker compose -f docker-compose.dev.yaml up -d --build
-docker compose exec app composer install
 docker compose exec app php bin/console d:m:m -n
 docker compose exec app php bin/console doctrine:fixtures:load -n
 ```
