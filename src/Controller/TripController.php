@@ -23,8 +23,11 @@ final class TripController extends AbstractController
      * @return Response
      */
     #[Route('/trip', name: 'app_trips')]
-    public function index(TripRepository $tripRepository, Request $request, PaginatorInterface $paginator): Response
-    {
+    public function index(
+        TripRepository $tripRepository,
+        Request $request,
+        PaginatorInterface $paginator
+    ): Response {
         $origin = $request->query->get('origin');
         $destination = $request->query->get('destination');
         $dateString = $request->query->get('date');

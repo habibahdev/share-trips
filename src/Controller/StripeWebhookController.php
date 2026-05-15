@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 
 final class StripeWebhookController extends AbstractController
 {
@@ -24,6 +25,7 @@ final class StripeWebhookController extends AbstractController
         Stripe::setApiKey($this->secretKey);
     }
 
+    #[Route('/stripe/webhook', name: 'app_stripe_webhook', methods: ['POST'])]
     public function handle(
         Request $request,
         PaymentRepository $paymentRepository,
@@ -32,6 +34,9 @@ final class StripeWebhookController extends AbstractController
     ): JsonResponse {
         $payload = $request->getContent();
         $signature = $request->headers->get('Stripe-Signature');
+        if ($signature === null || $signature === '') {
+            return new JsonResponse(['error' => 'Signature manquante'], Response::HTTP_BAD_REQUEST);
+        }
         try {
             $event = Webhook::constructEvent($payload, $signature, $this->webhookSecret);
         } catch (SignatureVerificationException) {
