@@ -1,4 +1,4 @@
-# Documentation ShareTrips
+# Documentation
 
 ## Sommaire
 
@@ -10,14 +10,13 @@
 * [Outils de développement](#outils-de-développement)
 * [Arrêt du projet](#arrêt-du-projet)
 * [Mise à jour de l’environnement Docker](#mise-à-jour-de-lenvironnement-docker)
-* [Fichier Compose alternatif](#fichier-compose-alternatif)
 
 ## Prérequis
 
-* **PHP** ≥ 8.2 (recommandé : 8.3, comme dans les Dockerfiles du dépôt)
+* **PHP** >= 8.2
 * **Composer**
-* **Node.js** et **npm** (pour Webpack Encore ; exécution en général sur la machine hôte)
-* **Docker** et **Docker Compose** (plugin V2 : `docker compose`)
+* **Node.js** et **npm**
+* **Docker** et **Docker Compose**
 
 ## Installation
 
@@ -32,8 +31,7 @@ Pour contribuer en fork, créez d’abord un fork sur GitHub puis clonez **votre
 
 ### Fichier d’environnement
 
-Copiez ou adaptez les fichiers d’environnement Symfony (`.env`, `.env.local`, etc.) selon la [documentation Symfony](https://symfony.com/doc/current/configuration.html).  
-Avec **`docker-compose.dev.yaml`**, le service `app` reçoit déjà une **`DATABASE_URL`** adaptée au réseau Docker (`postgres` comme hôte). Les variables sensibles (Stripe, e-mail, etc.) restent à configurer dans `.env` / `.env.local`.
+Avec **`docker-compose.dev.yaml`**, le service `app` reçoit déjà une **`DATABASE_URL`** adaptée au réseau Docker (`postgres` comme hôte).
 
 ### Démarrer Docker (environnement de développement)
 
@@ -41,20 +39,12 @@ Avec **`docker-compose.dev.yaml`**, le service `app` reçoit déjà une **`DATAB
 docker compose -f docker-compose.dev.yaml up -d --build
 ```
 
-Attendre que PostgreSQL soit prêt (le service `app` démarre après le healthcheck de `postgres`).
-
-### Dépendances PHP dans le conteneur
-
-Le code du projet est monté dans le conteneur `app` ; installez les dépendances **dans ce conteneur** pour utiliser la même version de PHP et les extensions attendues :
-
-```bash
-docker compose -f docker-compose.dev.yaml exec app composer install
-```
-
 ### Migrations
 
 ```bash
-docker compose -f docker-compose.dev.yaml exec app php bin/console doctrine:migrations:migrate --no-interaction
+docker compose exec app php bin/console doctrine:migrations:migrate -n
+docker compose exec app php bin/console doctrine:fixtures:load -n
+
 ```
 
 ### Dépendances JavaScript (hôte)
@@ -63,27 +53,18 @@ docker compose -f docker-compose.dev.yaml exec app php bin/console doctrine:migr
 npm install
 ```
 
-*(Vous pouvez utiliser `npm ci` si vous partez d’un clone propre avec un `package-lock.json` à jour.)*
-
 ## Lancement du projet
 
-* **Application (PHP built-in server dans le conteneur)** : [http://localhost:8000](http://localhost:8000)  
-  (port défini dans `docker-compose.dev.yaml`)
-
-Après modification du code PHP ou de la config, un vidage de cache peut être nécessaire :
-
-```bash
-docker compose -f docker-compose.dev.yaml exec app php bin/console cache:clear
-```
+**Application** : [http://localhost:8000](http://localhost:8000)
 
 ## Base de données
 
 ### Créer une migration
 
-Après modification des entités :
+Après modification d'au moins une entité :
 
 ```bash
-docker compose -f docker-compose.dev.yaml exec app php bin/console make:migration
+docker compose exec app php bin/console make:migration
 ```
 
 Puis exécuter les migrations (voir ci-dessous).
@@ -91,15 +72,15 @@ Puis exécuter les migrations (voir ci-dessous).
 ### Appliquer les migrations
 
 ```bash
-docker compose -f docker-compose.dev.yaml exec app php bin/console doctrine:migrations:migrate --no-interaction
+docker compose exec app php bin/console doctrine:migrations:migrate -n
 ```
 
-Raccourci équivalent : `d:m:m -n` au lieu de `doctrine:migrations:migrate --no-interaction`.
+Raccourci équivalent : `d:m:m -n` au lieu de `doctrine:migrations:migrate -n`.
 
 ### Jeu de données (fixtures)
 
 ```bash
-docker compose -f docker-compose.dev.yaml exec app php bin/console doctrine:fixtures:load --no-interaction
+docker compose exec app php bin/console doctrine:fixtures:load -n
 ```
 
 > Attention : en général, cette commande **réinitialise** les données de la base ciblée par `DATABASE_URL`.
@@ -143,9 +124,7 @@ Depuis **votre machine** (pas depuis l’intérieur du réseau Docker), connecte
 | Utilisateur | `tripsadmin`  |
 | Mot de passe | `tripsadmin` |
 | Base        | `sharetrips`  |
-| **Port**    | **`5433`**    |
-
-Le port **5433** est le port **hôte** mappé sur le conteneur (voir `docker-compose.dev.yaml`). À l’intérieur du réseau Compose, le service `app` utilise l’hôte **`postgres`** et le port **5432**.
+| **Port**    | `5433`   |
 
 ## Arrêt du projet
 
@@ -166,23 +145,12 @@ docker compose -f docker-compose.dev.yaml down
 ```bash
 docker compose -f docker-compose.dev.yaml down -v
 docker compose -f docker-compose.dev.yaml up -d --build
-docker compose -f docker-compose.dev.yaml exec app composer install
-docker compose -f docker-compose.dev.yaml exec app php bin/console doctrine:migrations:migrate --no-interaction
+docker compose exec app composer install
+docker compose exec app php bin/console d:m:m -n
 ```
 
 Rechargez les fixtures seulement si vous en avez besoin :
 
 ```bash
-docker compose -f docker-compose.dev.yaml exec app php bin/console doctrine:fixtures:load --no-interaction
+docker compose exec app php bin/console doctrine:fixtures:load -n
 ```
-
-## Fichier Compose alternatif
-
-Le dépôt contient aussi **`docker-compose.yaml`** (build avec `Dockerfile`, application sur le port **8001**, PostgreSQL sur **5432**). Les commandes ci-dessus s’adaptent en remplaçant systématiquement :
-
-`docker compose -f docker-compose.dev.yaml`  
-par  
-
-`docker compose -f docker-compose.yaml`
-
-Vérifiez les ports et les noms de conteneurs dans ce fichier avant de lancer Adminer ou l’application.
