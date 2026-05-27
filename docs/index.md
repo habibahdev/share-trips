@@ -27,11 +27,16 @@ git clone https://github.com/habibahdev/share-trips.git
 cd share-trips
 ```
 
-Pour contribuer en fork, créez d’abord un fork sur GitHub puis clonez **votre** dépôt.
+### Dépendances JavaScript (hôte)
+
+```bash
+composer install
+npm install
+```
 
 ### Fichier d’environnement
 
-Avec **`docker-compose.dev.yaml`**, le service `app` reçoit déjà une **`DATABASE_URL`** adaptée au réseau Docker (`postgres` comme hôte).
+Avec **`docker-compose.dev.yaml`**, le service construit déjà la base de données.
 
 ### Démarrer Docker (environnement de développement)
 
@@ -43,15 +48,9 @@ docker compose -f docker-compose.dev.yaml up -d --build
 
 ```bash
 docker compose exec app php bin/console doctrine:migrations:migrate -n
-docker compose exec app php bin/console doctrine:fixtures:load -n
-
 ```
 
-### Dépendances JavaScript (hôte)
-
-```bash
-npm install
-```
+Raccourci : `d:m:m -n` au lieu de `doctrine:migrations:migrate -n`.
 
 ## Lancement du projet
 
@@ -59,23 +58,11 @@ npm install
 
 ## Base de données
 
-### Créer une migration
-
-Après modification d'au moins une entité :
-
-```bash
-docker compose exec app php bin/console make:migration
-```
-
-Puis exécuter les migrations (voir ci-dessous).
-
 ### Appliquer les migrations
 
 ```bash
-docker compose exec app php bin/console doctrine:migrations:migrate -n
+docker compose exec app php bin/console d:m:m -n
 ```
-
-Raccourci équivalent : `d:m:m -n` au lieu de `doctrine:migrations:migrate -n`.
 
 ### Jeu de données (fixtures)
 
@@ -83,11 +70,7 @@ Raccourci équivalent : `d:m:m -n` au lieu de `doctrine:migrations:migrate -n`.
 docker compose exec app php bin/console doctrine:fixtures:load -n
 ```
 
-> Attention : en général, cette commande **réinitialise** les données de la base ciblée par `DATABASE_URL`.
-
 ## Assets front-end
-
-Les commandes Encore s’exécutent en principe **sur la machine hôte** (le conteneur `app` n’embarque pas Node).
 
 ### Build de production
 
@@ -145,7 +128,6 @@ docker compose -f docker-compose.dev.yaml down
 ```bash
 docker compose -f docker-compose.dev.yaml down -v
 docker compose -f docker-compose.dev.yaml up -d --build
-docker compose exec app composer install
 docker compose exec app php bin/console d:m:m -n
 ```
 
