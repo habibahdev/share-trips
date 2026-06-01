@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 /**
  * Contrôleur responsable de la gestion des réservations.
  */
+#[Route('/booking', name: 'app_booking_')]
 final class BookingController extends AbstractController
 {
     /**
@@ -30,7 +31,7 @@ final class BookingController extends AbstractController
      * @param StripeService $stripe
      * @return Response
      */
-    #[Route('/booking/add/{tripId}', name: 'app_booking_add')]
+    #[Route('/add/{tripId}', name: 'add')]
     public function add(
         int $tripId,
         TripRepository $tripRepository,
@@ -95,7 +96,7 @@ final class BookingController extends AbstractController
      * @param Booking $booking
      * @return Response
      */
-    #[Route('/booking/{booking}/stripe/success', name: 'app_booking_stripe_success')]
+    #[Route('/{booking}/stripe/success', name: 'stripe_success')]
     public function stripeSuccess(Booking $booking): Response
     {
         $user = $this->getUser();
@@ -116,7 +117,7 @@ final class BookingController extends AbstractController
      * @param EntityManagerInterface $entityManager
      * @return Response
      */
-    #[Route('/booking/{booking}/stripe/cancel', name: 'app_booking_stripe_cancel')]
+    #[Route('/{booking}/stripe/cancel', name: 'stripe_cancel')]
     public function stripeCancel(Booking $booking, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
@@ -142,7 +143,7 @@ final class BookingController extends AbstractController
      * @param Booking $booking
      * @return Response
      */
-    #[Route('/booking/{booking}/success', name: 'app_booking_add_success')]
+    #[Route('/{booking}/success', name: 'add_success')]
     public function success(Booking $booking): Response
     {
         $user = $this->getUser();

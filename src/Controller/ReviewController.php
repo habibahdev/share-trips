@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 /**
  * Contrôleur responsable des avis utilisateurs.
  */
+#[Route('/review', name: 'app_review_')]
 final class ReviewController extends AbstractController
 {
     /**
@@ -28,7 +29,7 @@ final class ReviewController extends AbstractController
      * @param ReviewRepository $reviewRepository Repository des avis
      * @return Response
      */
-    #[Route('/review/add/{id}', name: 'app_review_add')]
+    #[Route('/add/{id}', name: 'add')]
     public function index(
         Booking $booking,
         Request $request,
@@ -79,7 +80,7 @@ final class ReviewController extends AbstractController
      * @param ReviewRepository $reviewRepository Repository des avis
      * @return Response
      */
-    #[Route('/review/driver/{id}', name: 'app_review_driver')]
+    #[Route('/driver/{id}', name: 'driver')]
     public function driverProfile(User $driver, ReviewRepository $reviewRepository): Response
     {
         $reviews = $reviewRepository->findByReviewed($driver);

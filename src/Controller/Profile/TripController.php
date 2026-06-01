@@ -16,9 +16,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/profile/trip', name: 'app_profile_trip')]
 final class TripController extends AbstractController
 {
-    #[Route('/profile/trip', name: 'app_profile_trip')]
+    #[Route('', name: '')]
     public function index(): Response
     {
         $user = $this->getUser();
@@ -28,7 +29,7 @@ final class TripController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/trip/form/{trip}', name: 'app_profile_trip_form', defaults: ['trip' => null])]
+    #[Route('/form/{trip}', name: '_form', defaults: ['trip' => null])]
     public function form(?Trip $trip, Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
@@ -62,7 +63,7 @@ final class TripController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/trip/cancel/{trip}', name: 'app_profile_trip_cancel', methods: ['POST'])]
+    #[Route('/cancel/{trip}', name: '_cancel', methods: ['POST'])]
     public function cancel(
         Trip $trip,
         Request $request,
@@ -120,7 +121,7 @@ final class TripController extends AbstractController
         return $this->redirectToRoute('app_profile_trip');
     }
 
-    #[Route('/profile/trip/bookings/{booking}/confirm', name: 'app_profile_trip_booking_confirm', methods: ['POST'])]
+    #[Route('/bookings/{booking}/confirm', name: '_booking_confirm', methods: ['POST'])]
     public function confirmBooking(
         Booking $booking,
         EntityManagerInterface $entityManager,
@@ -171,7 +172,7 @@ final class TripController extends AbstractController
         return $this->redirectToRoute('app_profile_trip_show', ['trip' => $trip->getId()]);
     }
 
-    #[Route('/profile/trip/{trip}', name: 'app_profile_trip_show')]
+    #[Route('/{trip}', name: '_show')]
     public function show(Trip $trip): Response
     {
         $user = $this->getUser();

@@ -1,0 +1,215 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ conversation.getOtherParticipant(app.user).firstName }} -
+    {{ conversation.trip.origin }} → {{ conversation.trip.destination }}
+{% endblock %}
+
+{% block body %}
+<div class="conv-show-page">
+    <div class="container" style="max-width:720px;">
+
+        <div class="conv-show-header">
+            <a href="{{ path('app_conversation_list') }}" class="conv-back-link">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+
+            {% set other = conversation.getOtherParticipant(app.user) %}
+            <div class="conv-show-avatar">
+                {{ other.firstName ? other.firstName|first|upper : '?' }}
+            </div>
+
+            <div class="conv-show-meta">
+                <div class="conv-show-name">
+                    {{ other.firstName }} {{ other.lastName }}
+                </div>
+                <a href="{{ path('app_trip_show', {id: conversation.trip.id}) }}"
+                   class="conv-show-trip">
+                    <i class="bi bi-geo-alt" style="font-size:.7rem;"></i>
+                    {{ conversation.trip.origin }} → {{ conversation.trip.destination }}
+                    · {{ conversation.trip.departureAt|date('d/m/Y à H:i') }}
+                </a>
+            </div>
+        </div>
+
+        <div class="conv-show-card">
+            <div id="messages" class="conv-messages">
+
+                {% set lastDate = null %}
+                {% for message in conversation.messages %}
+
+                    {% set msgDate = message.sentAt|date('d/m/Y') %}
+                    {% if msgDate != lastDate %}
+                        <div class="conv-date-separator">
+                            {% if msgDate == 'now'|date('d/m/Y') %}
+                                Aujourd'hui
+                            {% elseif msgDate == '-1 day'|date('d/m/Y') %}
+                                Hier
+                            {% else %}
+                                {{ message.sentAt|date('d/m/Y') }}
+                            {% endif %}
+                        </div>
+                        {% set lastDate = msgDate %}
+                    {% endif %}
+
+                    {% set mine = (message.sender.id == app.user.id) %}
+                    <div class="conv-msg-row {{ mine ? 'conv-msg-row--mine' }}">
+                        {% if not mine %}
+                            <div class="conv-msg-avatar">
+                                {{ message.sender.firstName ? message.sender.firstName|first|upper : '?' }}
+                            </div>
+                        {% endif %}
+                        <div class="conv-bubble {{ mine ? 'conv-bubble--mine' : 'conv-bubble--theirs' }}">
+                            {{ message.content }}
+                            <div class="conv-bubble-time">
+                                {{ message.sentAt|date('H:i') }}
+                                {% if mine %}
+                                    <i class="bi bi-check2{{ message.isRead ? '-all text-primary' : '' }}"
+                                       style="font-size:.65rem;margin-left:2px;"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                {% else %}
+                    <div class="conv-no-messages">
+                        <i class="bi bi-chat-dots" style="font-size:2rem;display:block;margin-bottom:.75rem;color:#cbd5e1;"></i>
+                        Démarrez la conversation !
+                    </div>
+                {% endfor %}
+
+            </div>
+
+            <div class="conv-input-bar">
+                <input
+                    id="msg-input"
+                    type="text"
+                    class="conv-input"
+                    placeholder="Votre message…"
+                    autocomplete="off"
+                    maxlength="1000"
+                />
+                <button id="msg-send" class="conv-send-btn" aria-label="Envoyer">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% set lastMessage = conversation.messages|last %}
+<script>
+const currentUserId = {{ app.user.id }};
+const sendUrl = "{{ path('app_conversation_send', { id: conversation.id }) }}";
+const pollUrl = "{{ path('app_conversation_poll', { id: conversation.id }) }}";
+
+const messagesBox = document.getElementById('messages');
+const input = document.getElementById('msg-input');
+const sendBtn = document.getElementById('msg-send');
+
+let lastId = {{ lastMessage is defined and lastMessage is not null ? lastMessage.id : 0 }};
+
+function scrollBottom() {
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+}
+scrollBottom();
+
+function appendMessage(data) {
+    const mine = data.senderId === currentUserId;
+
+    // Supprimer le message "vide" si présent
+    const empty = messagesBox.querySelector('.conv-no-messages');
+    if (empty) empty.remove();
+
+    const row = document.createElement('div');
+    row.className = 'conv-msg-row' + (mine ? ' conv-msg-row--mine' : '');
+
+    if (!mine) {
+        const avatar = document.createElement('div');
+        avatar.className = 'conv-msg-avatar';
+        avatar.textContent = data.senderName ? data.senderName[0].toUpperCase() : '?';
+        row.appendChild(avatar);
+    }
+
+    const bubble = document.createElement('div');
+    bubble.className = 'conv-bubble ' + (mine ? 'conv-bubble--mine' : 'conv-bubble--theirs');
+    bubble.innerHTML = `
+        ${escapeHtml(data.content)}
+        <div class="conv-bubble-time">
+            ${data.sentAt}
+            ${mine ? '<i class="bi bi-check2" style="font-size:.65rem;margin-left:2px;"></i>' : ''}
+        </div>`;
+    row.appendChild(bubble);
+
+    messagesBox.appendChild(row);
+    scrollBottom();
+}
+
+function escapeHtml(str) {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+let polling = true;
+async function poll() {
+    if (!polling) return;
+    try {
+        const res = await fetch(`${pollUrl}?lastId=${lastId}`);
+        const data = await res.json();
+        for (const msg of data) {
+            if (msg.senderId !== currentUserId) {
+                appendMessage(msg);
+            }
+            lastId = Math.max(lastId, msg.id);
+        }
+    } catch (e) {
+        console.error('Polling error', e);
+    }
+}
+
+const pollInterval = setInterval(poll, 3000);
+
+
+document.addEventListener('visibilitychange', () => {
+    polling = !document.hidden;
+    if (!document.hidden) poll();
+});
+
+// Envoi
+async function sendMessage() {
+    const content = input.value.trim();
+    if (!content) return;
+
+    sendBtn.disabled = true;
+    appendMessage({
+        content,
+        senderId : currentUserId,
+        senderName: null,
+        sentAt   : new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+    });
+    input.value = '';
+
+    try {
+        const res = await fetch(sendUrl, {
+            method : 'POST',
+            headers : { 'X-Requested-With': 'XMLHttpRequest' },
+            body : new URLSearchParams({ content }),
+        });
+        const data = await res.json();
+        if (data.id) lastId = Math.max(lastId, data.id);
+    } finally {
+        sendBtn.disabled = false;
+        input.focus();
+    }
+}
+
+sendBtn.addEventListener('click', sendMessage);
+input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+</script>
+{% endblock %}

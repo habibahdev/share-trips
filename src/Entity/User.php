@@ -209,6 +209,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'reviewed', targetEntity: Review::class, orphanRemoval: true)]
     private Collection $reviewsReceived;
 
+    /** @var Collection<int, Conversation> */
+    #[ORM\OneToMany(mappedBy: 'driver', targetEntity: Conversation::class)]
+    private Collection $conversationsAsDriver;
+
+    /** @var Collection<int, Conversation> */
+    #[ORM\OneToMany(mappedBy: 'passenger', targetEntity: Conversation::class)]
+    private Collection $conversationsAsPassenger;
+
     public function __construct()
     {
         $this->vehicles = new ArrayCollection();
@@ -220,6 +228,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->tokenRegisterLifetime = (new \DateTimeImmutable('now'))->add(new DateInterval('PT10M'));
         $this->reviewsMade = new ArrayCollection();
         $this->reviewsReceived = new ArrayCollection();
+        $this->conversationsAsDriver = new ArrayCollection();
+        $this->conversationsAsPassenger = new ArrayCollection();
     }
 
     /**
@@ -773,5 +783,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $review->setReviewed($this);
         }
         return $this;
+    }
+
+    /** @return Collection<int, Conversation> */
+    public function getConversationsAsDriver(): Collection
+    {
+        return $this->conversationsAsDriver;
+    }
+
+    /** @return Collection<int, Conversation> */
+    public function getConversationsAsPassenger(): Collection
+    {
+        return $this->conversationsAsPassenger;
+    }
+
+    /** @return Collection<int, Conversation> */
+    public function getAllConversations(): Collection
+    {
+        return new ArrayCollection(
+            array_merge(
+                $this->conversationsAsDriver->toArray(),
+                $this->conversationsAsPassenger->toArray()
+            )
+        );
     }
 }

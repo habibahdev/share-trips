@@ -23,7 +23,7 @@
 ### Cloner le dépôt
 
 ```bash
-git clone https://github.com/habibahdev/share-trips.git
+git clone git@github.com:habibahdev/share-trips.git
 cd share-trips
 ```
 
@@ -61,6 +61,8 @@ Raccourci : `d:m:m -n` au lieu de `doctrine:migrations:migrate -n`.
 ### Appliquer les migrations
 
 ```bash
+docker compose exec app rm -f migrations/*.php
+docker compose exec app php bin/console make:migration
 docker compose exec app php bin/console d:m:m -n
 ```
 
@@ -128,6 +130,8 @@ docker compose -f docker-compose.dev.yaml down
 ```bash
 docker compose -f docker-compose.dev.yaml down -v
 docker compose -f docker-compose.dev.yaml up -d --build
+docker compose exec app rm -f migrations/*.php
+docker compose exec app php bin/console make:migration
 docker compose exec app php bin/console d:m:m -n
 ```
 

@@ -3,6 +3,8 @@
 namespace App\DataFixtures;
 
 use App\Entity\Booking;
+use App\Entity\Conversation;
+use App\Entity\Message;
 use App\Entity\Payment;
 use App\Entity\Review;
 use App\Entity\Trip;
@@ -42,6 +44,49 @@ class AppFixtures extends Fixture
         [3, 'Trajet correct, rien à signaler.'],
         [2, 'Conducteur en retard de 20 minutes, peu communicatif. Décevant.'],
         [1, 'Très mauvaise expérience, véhicule sale et conduite dangereuse. À éviter.']
+    ];
+
+    private const CONVERSATIONS = [
+        [
+            ['sender' => 'driver',
+                'content' => 'Bonjour ! Votre réservation est bien enregistrée. N\'hésitez pas à me contacter ici.'],
+            ['sender' => 'passenger', 'content' => 'Merci ! Où est-ce qu\'on se retrouve exactement ?'],
+            ['sender' => 'driver',
+                'content' => 'On se retrouve devant la gare principale, côté place du Général de Gaulle.'],
+            ['sender' => 'passenger', 'content' => 'Parfait, je serai là 5 minutes avant. Merci !'],
+            ['sender' => 'driver',    'content' => 'Super, à bientôt !'],
+        ],
+        [
+            ['sender' => 'driver',
+                'content' => 'Bonjour ! Votre réservation est bien enregistrée. N\'hésitez pas à me contacter ici.'],
+            ['sender' => 'passenger', 'content' => 'Bonjour, est-ce qu\'il y a de la place pour un bagage en soute ?'],
+            ['sender' => 'driver', 'content' => 'Oui bien sûr, j\'ai un grand coffre. Pas de problème pour un bagage.'],
+            ['sender' => 'passenger', 'content' => 'Super, merci beaucoup !'],
+        ],
+        [
+            ['sender' => 'driver',
+                'content' => 'Bonjour ! Votre réservation est bien enregistrée. N\'hésitez pas à me contacter ici.'],
+            ['sender' => 'passenger', 'content' => 'Bonjour, vous acceptez les animaux de compagnie ?'],
+            ['sender' => 'driver', 'content' => 'Désolé, je préfère éviter les animaux dans le véhicule.'],
+            ['sender' => 'passenger', 'content' => 'D\'accord, pas de problème. Je ferai garder mon chat.'],
+            ['sender' => 'driver', 'content' => 'Merci de votre compréhension !'],
+            ['sender' => 'passenger', 'content' => 'À samedi alors !'],
+        ],
+        [
+            ['sender' => 'driver',
+                'content' => 'Bonjour ! Votre réservation est bien enregistrée. N\'hésitez pas à me contacter ici.'],
+            ['sender' => 'passenger',
+                'content' => 'Bonjour, est-ce que vous pouvez me déposer à la gare en arrivant ?'],
+            ['sender' => 'driver', 'content' => 'Oui c\'est sur mon chemin, aucun problème !'],
+        ],
+        [
+            ['sender' => 'driver',
+                'content' => 'Bonjour ! Votre réservation est bien enregistrée. N\'hésitez pas à me contacter ici.'],
+            ['sender' => 'passenger', 'content' => 'Bonjour ! Je voulais juste confirmer l\'heure de départ.'],
+            ['sender' => 'driver', 'content' => 'On part à l\'heure prévue, 8h30 pile.'],
+            ['sender' => 'passenger', 'content' => 'Nickel, je serai là. Bonne soirée !'],
+            ['sender' => 'driver', 'content' => 'Bonne soirée à vous aussi !'],
+        ],
     ];
 
     public function __construct(private UserPasswordHasherInterface $hasher)
@@ -169,7 +214,7 @@ class AppFixtures extends Fixture
         }
 
         /**
-         * 9 trajets futurs NON complets
+         * 12 trajets futurs NON complets
          */
         for ($i = 0; $i < 12; $i++) {
             $driver = $users[$i % count($users)];
@@ -224,6 +269,95 @@ class AppFixtures extends Fixture
         }
 
         $manager->flush();
+
+        // conversations sur les trajets ouverts
+        $conversationIndex = 0;
+        foreach ($trips as $tripData) {
+            if ($tripData['type'] !== 'open') {
+                continue;
+            }
+            /** @var Trip $trip */
+            $trip = $tripData['trip'];
+            $driver = $tripData['driver'];
+
+            $passengers = array_values(array_filter($users, fn(User $u) => $u->getId() !== $driver->getId()));
+
+            // conversation par trajet ouvert
+            $passenger = $passengers[0];
+            $messages = self::CONVERSATIONS[$conversationIndex % count(self::CONVERSATIONS)];
+
+            $this->createConversation(
+                manager: $manager,
+                trip: $trip,
+                driver: $driver,
+                passenger: $passenger,
+                messages: $messages,
+                baseTime: new \DateTimeImmutable(sprintf('-%d hours', rand(1, 48)))
+            );
+            $conversationIndex++;
+        }
+
+        // conversation sur trajets passés
+        foreach ($trips as $tripData) {
+            if ($tripData['type'] !== 'open') {
+                continue;
+            }
+            /** @var Trip $trip */
+            $trip = $tripData['trip'];
+            $driver = $tripData['driver'];
+
+            $passengers = array_values(array_filter($users, fn(User $u) => $u->getId() !== $driver->getId()));
+
+            // conversation par trajet ouvert
+            foreach (array_slice($passengers, 0, 2) as $passenger) {
+                $messages = self::CONVERSATIONS[$conversationIndex % count(self::CONVERSATIONS)];
+                $this->createConversation(
+                    manager: $manager,
+                    trip: $trip,
+                    driver: $driver,
+                    passenger: $passenger,
+                    messages: $messages,
+                    baseTime: new \DateTimeImmutable(sprintf('-%d hours', rand(1, 48)))
+                );
+                $conversationIndex++;
+            }
+        }
+        $manager->flush();
+    }
+
+    /**
+     * @param array<array{sender: string, content: string}> $messages
+     */
+    private function createConversation(
+        ObjectManager $manager,
+        Trip $trip,
+        User $driver,
+        User $passenger,
+        array $messages,
+        \DateTimeImmutable $baseTime
+    ): void {
+        $conversation = new Conversation();
+        $conversation->setTrip($trip)
+            ->setDriver($driver)
+            ->setPassenger($passenger)
+            ->setCreatedAt($baseTime);
+        $manager->persist($conversation);
+
+        foreach ($messages as $i => $messageData) {
+            $sender = $messageData['sender'] === 'driver' ? $driver : $passenger;
+            $sentAt = $baseTime->modify(sprintf('+%d minutes', $i * rand(2, 15)));
+            $isLastPassengerMsg = (
+                $messageData['sender'] === 'passenger' && $i === array_key_last($messages)
+            );
+
+            $message = new Message();
+            $message->setConversation($conversation)
+                ->setSender($sender)
+                ->setContent($messageData['content'])
+                ->setSentAt($sentAt)
+                ->setIsRead(!$isLastPassengerMsg);
+            $manager->persist($message);
+        }
     }
 
     /**

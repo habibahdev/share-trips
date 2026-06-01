@@ -15,9 +15,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/profile/booking', name: 'app_profile_booking')]
 final class BookingController extends AbstractController
 {
-    #[Route('/profile/booking', name: 'app_profile_booking')]
+    #[Route('', name: '')]
     public function index(
         BookingRepository $bookingRepository,
         TripRepository $tripRepository,
@@ -54,7 +55,7 @@ final class BookingController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/booking/{booking}', name: 'app_profile_booking_show')]
+    #[Route('/{booking}', name: '_show')]
     public function show(Booking $booking): Response
     {
         $user = $this->getUser();
@@ -67,7 +68,7 @@ final class BookingController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/booking/{booking}/cancel', name: 'app_profile_booking_cancel', methods: ['POST'])]
+    #[Route('/{booking}/cancel', name: '_cancel', methods: ['POST'])]
     public function cancel(
         Booking $booking,
         Request $request,

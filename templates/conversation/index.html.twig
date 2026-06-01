@@ -1,0 +1,156 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Messages - ShareTrips{% endblock %}
+
+{% block body %}
+<div class="conversation-list-page">
+    <div class="container" style="max-width:720px;">
+
+        <div class="mb-4">
+            <h1 style="font-size:1.5rem;font-weight:800;color:#1e3a5f;margin:0;">
+                <i class="bi bi-chat-dots-fill me-2" style="color:#1d4ed8;"></i>Messages
+            </h1>
+            <p style="color:#94a3b8;font-size:.875rem;margin:.25rem 0 0;">
+                Vos conversations avec les conducteurs et passagers
+            </p>
+        </div>
+
+        {% if conversations is empty %}
+            <div class="conv-empty-state">
+                <div style="font-size:3rem;margin-bottom:1rem;">💬</div>
+                <div style="font-weight:700;color:#1e3a5f;font-size:1.1rem;margin-bottom:.5rem;">
+                    Aucune conversation
+                </div>
+                <p style="color:#94a3b8;font-size:.875rem;margin:0;">
+                    Vos conversations apparaîtront ici après la confirmation d'une réservation.
+                </p>
+                <a href="{{ path('app_trips') }}" class="btn-conv-primary mt-4 d-inline-flex">
+                    <i class="bi bi-map me-2"></i>Voir les trajets
+                </a>
+            </div>
+        {% else %}
+            <div class="conv-list-card">
+                {% for conv in conversations %}
+                    {% set other = conv.getOtherParticipant(app.user) %}
+                    {% set lastMsg = conv.lastMessage %}
+                    {% set unread = conv.countUnreadFor(app.user) %}
+
+                    <a href="{{ path('app_conversation_show', {id: conv.id}) }}"
+                       class="conv-list-item {{ unread > 0 ? 'conv-list-item--unread' }}">
+
+                        {# Avatar #}
+                        <div class="conv-avatar {{ unread > 0 ? 'conv-avatar--active' }}">
+                            {{ other.firstName ? other.firstName|first|upper : '?' }}
+                            {% if unread > 0 %}
+                                <span class="conv-avatar-dot"></span>
+                            {% endif %}
+                        </div>
+
+                        {# Contenu #}
+                        <div class="conv-item-body">
+                            <div class="conv-item-header">
+                                <span class="conv-item-name {{ unread > 0 ? 'conv-item-name--unread' }}">
+                                    {{ other.firstName }} {{ other.lastName }}
+                                </span>
+                                {% if lastMsg %}
+                                    <span class="conv-item-time">
+                                        {{ lastMsg.sentAt|date('d/m H:i') }}
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <div class="conv-item-trip">
+                                <i class="bi bi-geo-alt" style="font-size:.7rem;"></i>
+                                {{ conv.trip.origin }} → {{ conv.trip.destination }}
+                                <span class="conv-trip-date">
+                                    · {{ conv.trip.departureAt|date('d/m/Y') }}
+                                </span>
+                            </div>
+
+                            <div class="conv-item-preview">
+                                <span class="conv-preview-text {{ unread > 0 ? 'conv-preview-text--unread' }}">
+                                    {% if lastMsg %}
+                                        {% if lastMsg.sender.id == app.user.id %}
+                                            <span style="color:#94a3b8;">Vous : </span>
+                                        {% endif %}
+                                        {{ lastMsg.content|length > 60
+                                            ? lastMsg.content|slice(0, 60) ~ '…'
+                                            : lastMsg.content }}
+                                    {% else %}
+                                        <span style="color:#94a3b8;font-style:italic;">Nouvelle conversation</span>
+                                    {% endif %}
+                                </span>
+                                {% if unread > 0 %}
+                                    <span class="conv-unread-badge">
+                                        {{ unread > 9 ? '9+' : unread }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </a>
+
+                    {% if not loop.last %}
+                        <div style="height:1px;background:#f1f5f9;margin:0 1.25rem;"></div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            {# Pagination #}
+            {% if conversations.pageCount > 1 %}
+                <div class="d-flex justify-content-center mt-4">
+                    <nav>
+                        <ul class="pagination" style="gap:.35rem;">
+
+                            {# Précédent #}
+                            <li class="page-item {{ conversations.currentPageNumber == 1 ? 'disabled' }}">
+                                <a class="page-link-st"
+                                href="{{ conversations.currentPageNumber > 1
+                                    ? path('app_conversation_list', {page: conversations.currentPageNumber - 1})
+                                    : '#' }}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+
+                            {# Pages #}
+                            {% for page in 1..conversations.pageCount %}
+                                {% if
+                                    page == 1 or
+                                    page == conversations.pageCount or
+                                    (page >= conversations.currentPageNumber - 1 and page <= conversations.currentPageNumber + 1)
+                                %}
+                                    <li class="page-item">
+                                        <a class="page-link-st {{ page == conversations.currentPageNumber ? 'page-link-st--active' }}"
+                                        href="{{ path('app_conversation_list', {page: page}) }}">
+                                            {{ page }}
+                                        </a>
+                                    </li>
+                                {% elseif
+                                    page == conversations.currentPageNumber - 2 or
+                                    page == conversations.currentPageNumber + 2
+                                %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link-st">…</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {# Suivant #}
+                            <li class="page-item {{ conversations.currentPageNumber == conversations.pageCount ? 'disabled' }}">
+                                <a class="page-link-st"
+                                href="{{ conversations.currentPageNumber < conversations.pageCount
+                                    ? path('app_conversation_list', {page: conversations.currentPageNumber + 1})
+                                    : '#' }}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

@@ -28,6 +28,44 @@
 
             <ul class="navbar-nav ms-auto mb-2 mb-md-0 align-items-md-center gap-2">
                 {% if app.user %}
+                    <li class="nav-item">
+                        {% set unread = unread_messages_count() %}
+                        <a class="nav-link-st position-relative"
+                            href="{{ path('app_conversation_list') }}"
+                            style="display:flex;align-items:center;gap:.4rem;">
+                            <i class="bi bi-chat-dots"></i>
+                            <span class="d-none d-md-inline">Messages</span>
+                            {% if unread > 0 %}
+                            <span id="unread-badge"
+                                    style="
+                                    position:absolute;
+                                    top:-4px;right:-6px;
+                                    background:#dc2626;
+                                    color:#fff;
+                                    font-size:.65rem;
+                                    font-weight:700;
+                                    min-width:18px;height:18px;
+                                    border-radius:9px;
+                                    display:flex;align-items:center;justify-content:center;
+                                    padding:0 4px;
+                                    line-height:1;
+                                    box-shadow:0 0 0 2px var(--bs-body-bg, #fff);
+                                    ">
+                                {{ unread > 9 ? '9+' : unread }}
+                            </span>
+                            {% else %}
+                            <span id="unread-badge" style="display:none;
+                                    position:absolute;top:-4px;right:-6px;
+                                    background:#dc2626;color:#fff;font-size:.65rem;font-weight:700;
+                                    min-width:18px;height:18px;border-radius:9px;
+                                    display:none;align-items:center;justify-content:center;
+                                    padding:0 4px;line-height:1;
+                                    box-shadow:0 0 0 2px var(--bs-body-bg, #fff);">
+                            </span>
+                            {% endif %}
+                        </a>
+                    </li>
+
                     <li class="nav-item dropdown">
                         <a class="nav-link-st dropdown-toggle"
                            href="#" role="button" data-bs-toggle="dropdown">

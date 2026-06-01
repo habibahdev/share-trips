@@ -54,6 +54,63 @@
 
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
+            {% if app.user %}
+            <script>
+            const _unreadUrl = "{{ path('app_conversation_unread_count') }}";
+            async function refreshBadge() {
+                try {
+                    const res = await fetch(_unreadUrl);
+                    const data = await res.json();
+                    const badge = document.getElementById('unread-badge');
+                    if (!badge) return;
+                    if (data.count > 0) {
+                        badge.textContent = data.count > 9 ? '9+' : String(data.count);
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                } catch (e) {
+                    console.error('Badge error', e);
+                }
+            }
+            setInterval(refreshBadge, 10000);
+
+            document.addEventListener('visibilitychnage', () => {
+                if (!document.hidden) refreshBadge();
+            });
+            </script>
+            {% endif %}
         {% endblock %}
+
+
+        {% if app.user %}
+        <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:1090;">
+            <div id="msg-toast" class="toast align-items-center border-0 shadow"
+                role="alert" aria-live="assertive" aria-atomic="true"
+                style="min-width:300px;border-radius:14px;background:#fff;">
+                <div class="d-flex align-items-center gap-3 p-3">
+                <div style="width:38px;height:38px;border-radius:50%;background:#dbeafe;
+                            display:flex;align-items:center;justify-content:center;
+                            font-weight:700;color:#1d4ed8;font-size:1rem;flex-shrink:0;"
+                    id="toast-avatar">?</div>
+                <div class="flex-grow-1 overflow-hidden">
+                    <div style="font-weight:700;color:#1e3a5f;font-size:.9rem;" id="toast-sender"></div>
+                    <div style="font-size:.82rem;color:#64748b;
+                                white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+                        id="toast-content"></div>
+                    <div style="font-size:.72rem;color:#94a3b8;margin-top:.15rem;" id="toast-trip"></div>
+                </div>
+                <button type="button" class="btn-close ms-1" data-bs-dismiss="toast" aria-label="Fermer"></button>
+                </div>
+                <div class="px-3 pb-3">
+                <a id="toast-link" href="#"
+                    class="btn btn-sm w-100"
+                    style="border-radius:10px;background:#1d4ed8;color:#fff;font-weight:600;font-size:.82rem;">
+                    <i class="bi bi-chat-dots me-1"></i>Voir le message
+                </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </body>
 </html>
