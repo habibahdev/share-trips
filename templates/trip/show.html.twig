@@ -168,6 +168,13 @@
                                     Complet
                                 </button>
                             {% endif %}
+                            {% if app.user and app.user.id != trip.driver.id and app.user.verified %}
+                            <a href="{{ path('app_conversation_open', { tripId: trip.id }) }}"
+                                class="btn w-100 mt-2"
+                                style="border-radius:12px;border:1.5px solid #1d4ed8;color:#1d4ed8;font-weight:600;">
+                                <i class="bi bi-chat-dots me-2"></i>Contacter le conducteur
+                            </a>
+                            {% endif %}
                         {% endif %}
                     {% elseif trip.availableSeats <= 0 %}
                         <div class="alert-info-st" style="background:#fef9c3;border-color:#fde68a;color:#854d0e;">

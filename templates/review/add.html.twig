@@ -98,35 +98,6 @@
     </div>
 </div>
 
-<style>
-.star-rating-group {
-    display: flex;
-    flex-direction: column;
-    gap: .5rem;
-}
-.star-label {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-    cursor: pointer;
-}
-.star-input {
-    accent-color: #1d4ed8;
-    width: 1rem;
-    height: 1rem;
-    cursor: pointer;
-}
-.star-display {
-    font-size: .9rem;
-    color: #475569;
-    font-weight: 500;
-}
-.star-label:has(.star-input:checked) .star-display {
-    color: #f59e0b;
-    font-weight: 700;
-}
-</style>
-
 <script>
 const textarea = document.querySelector('textarea[name$="[comment]"]');
 const counter  = document.getElementById('char-count');

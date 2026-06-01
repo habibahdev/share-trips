@@ -126,9 +126,16 @@ class Trip
     #[ORM\OneToMany(mappedBy: 'trip', targetEntity: Booking::class)]
     private Collection $bookings;
 
+    /**
+     * @var Collection<int, Conversation>
+     */
+    #[ORM\OneToMany(mappedBy: 'trip', targetEntity: Conversation::class, cascade: ['remove'], orphanRemoval: true)]
+    private Collection $conversations;
+
     public function __construct()
     {
         $this->bookings = new ArrayCollection();
+        $this->conversations = new ArrayCollection();
     }
 
     /**
@@ -406,6 +413,31 @@ class Trip
         if ($this->bookings->removeElement($booking)) {
             if ($booking->getTrip() === $this) {
                 $booking->setTrip(null);
+            }
+        }
+        return $this;
+    }
+
+    /** @return Collection<int, Conversation> */
+    public function getConversations(): Collection
+    {
+        return $this->conversations;
+    }
+
+    public function addConversation(Conversation $conversation): static
+    {
+        if (!$this->conversations->contains($conversation)) {
+            $this->conversations->add($conversation);
+            $conversation->setTrip($this);
+        }
+        return $this;
+    }
+
+    public function removeConversation(Conversation $conversation): static
+    {
+        if ($this->conversations->removeElement($conversation)) {
+            if ($conversation->getTrip() === $this) {
+                $conversation->setTrip(null);
             }
         }
         return $this;

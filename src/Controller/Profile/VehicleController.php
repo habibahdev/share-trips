@@ -11,9 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/profile/vehicle', name: 'app_profile_vehicle')]
 final class VehicleController extends AbstractController
 {
-    #[Route('/profile/vehicle', name: 'app_profile_vehicle')]
+    #[Route('', name: '')]
     public function index(): Response
     {
         $user = $this->getUser();
@@ -23,7 +24,7 @@ final class VehicleController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/vehicle/form/{vehicle}', name: 'app_profile_vehicle_form', defaults: ['vehicle' => null])]
+    #[Route('/form/{vehicle}', name: '_form', defaults: ['vehicle' => null])]
     public function form(?Vehicle $vehicle, Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
@@ -48,7 +49,7 @@ final class VehicleController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/vehicle/delete/{vehicle}', name: 'app_profile_vehicle_delete', methods: ['POST'])]
+    #[Route('/profile/vehicle/delete/{vehicle}', name: '_delete', methods: ['POST'])]
     public function delete(Vehicle $vehicle, Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
