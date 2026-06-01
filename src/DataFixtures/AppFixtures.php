@@ -11,6 +11,7 @@ use App\Entity\Trip;
 use App\Entity\User;
 use App\Entity\Vehicle;
 use App\Enum\BookingStatus;
+use App\Enum\PaymentMethod;
 use App\Enum\PaymentStatus;
 use App\Enum\TripStatus;
 use App\Enum\UserStatus;
@@ -21,8 +22,9 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class AppFixtures extends Fixture
 {
     private const CITIES = [
-        'Paris', 'Lyon', 'Marseille', 'Bordeaux', 'Toulouse', 'Nantes', 'Strasbourg', 'Lille', 'Rennes', 'Nice',
-        'Angers', 'Rouen'
+        'Paris', 'Lyon', 'Marseille', 'Bordeaux',
+        'Toulouse', 'Nantes', 'Strasbourg',
+        'Lille', 'Rennes', 'Nice', 'Angers', 'Rouen'
     ];
 
     private const VEHICLES = [
@@ -138,57 +140,8 @@ class AppFixtures extends Fixture
             }
         }
 
-        /*
-        $trips = [];
-        foreach ($users as $driverIndex => $driver) {
-            $driverVehicles = $vehicles[$driverIndex];
-            $vehicle = $driverVehicles[0];
-            $tripFull = $this->createTrip(
-                driver: $driver,
-                vehicle: $vehicle,
-                origin: self::CITIES[$driverIndex],
-                dest: self::CITIES[($driverIndex + 1) % count(self::CITIES)],
-                departure: new \DateTimeImmutable(sprintf('+%d days', $driverIndex + 3)),
-                seats: 2,
-                price: 10.0 + $driverIndex,
-                status: TripStatus::Full
-            );
-            $manager->persist($tripFull);
-            $trips[] = ['trip' => $tripFull, 'driver' => $driver, 'type' => 'full'];
-
-            $tripOpen = $this->createTrip(
-                driver: $driver,
-                vehicle: $vehicle,
-                origin: self::CITIES[($driverIndex + 2) % count(self::CITIES)],
-                dest: self::CITIES[($driverIndex + 3) % count(self::CITIES)],
-                departure: new \DateTimeImmutable(sprintf('+%d days', $driverIndex + 10)),
-                seats: 4,
-                price: 15.0 + $driverIndex,
-                status: TripStatus::Open
-            );
-            $manager->persist($tripOpen);
-            $trips[] = ['trip' => $tripOpen, 'driver' => $driver, 'type' => 'open'];
-
-            $tripPast = $this->createTrip(
-                driver: $driver,
-                vehicle: $vehicle,
-                origin: self::CITIES[($driverIndex + 4) % count(self::CITIES)],
-                dest: self::CITIES[($driverIndex + 5) % count(self::CITIES)],
-                departure: new \DateTimeImmutable(sprintf('-%d days', $driverIndex + 5)),
-                seats: 3,
-                price: 12.0 + $driverIndex,
-                status: TripStatus::Completed
-            );
-            $manager->persist($tripPast);
-            $trips[] = ['trip' => $tripPast, 'driver' => $driver, 'type' => 'past'];
-        }
-        $manager->flush();
-        */
         $trips = [];
 
-        /**
-         * 3 trajets passés
-         */
         for ($i = 0; $i < 3; $i++) {
             $driver = $users[$i];
             $vehicle = $vehicles[$i][0];
@@ -213,9 +166,6 @@ class AppFixtures extends Fixture
             ];
         }
 
-        /**
-         * 12 trajets futurs NON complets
-         */
         for ($i = 0; $i < 12; $i++) {
             $driver = $users[$i % count($users)];
             $vehicle = $vehicles[$i % count($users)][0];
@@ -370,14 +320,14 @@ class AppFixtures extends Fixture
     ): void {
         // Réservation confirmée
         $booking1 = $this->createBooking($trip, $passengers[0], 1, BookingStatus::Confirmed);
-        $payment1 = $this->createPayment($booking1, $passengers[0], PaymentStatus::Completed);
+        $payment1 = $this->createPayment($booking1, $passengers[0], PaymentStatus::Completed, PaymentMethod::Card);
         $booking1->setPayment($payment1);
         $manager->persist($booking1);
         $manager->persist($payment1);
 
         // Réservation en attente de confirmation conducteur
         $booking2 = $this->createBooking($trip, $passengers[1], 1, BookingStatus::Pending);
-        $payment2 = $this->createPayment($booking2, $passengers[1], PaymentStatus::Completed);
+        $payment2 = $this->createPayment($booking2, $passengers[1], PaymentStatus::Completed, PaymentMethod::Cash);
         $booking2->setPayment($payment2);
         $manager->persist($booking2);
         $manager->persist($payment2);
@@ -394,7 +344,7 @@ class AppFixtures extends Fixture
     ): void {
         foreach (array_slice($passengers, 0, count(self::REVIEWS)) as $i => $passenger) {
             $booking = $this->createBooking($trip, $passenger, 1, BookingStatus::Confirmed);
-            $payment = $this->createPayment($booking, $passenger, PaymentStatus::Completed);
+            $payment = $this->createPayment($booking, $passenger, PaymentStatus::Completed, PaymentMethod::Card);
             $booking->setPayment($payment);
             $manager->persist($booking);
             $manager->persist($payment);
@@ -450,13 +400,15 @@ class AppFixtures extends Fixture
     private function createPayment(
         Booking $booking,
         User $payer,
-        PaymentStatus $status
+        PaymentStatus $status,
+        PaymentMethod $method
     ): Payment {
         $payment = new Payment();
         $payment->setBooking($booking)
                 ->setPayer($payer)
                 ->setAmount($booking->getTotalPrice())
                 ->setStatus($status)
+                ->setMethod($method)
                 ->setStripeSessionId(sprintf('cs_test_fixture_%s_%d', uniqid(), rand(1000, 9999)));
         return $payment;
     }

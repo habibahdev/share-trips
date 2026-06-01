@@ -155,6 +155,59 @@
                             </a>
                         </div>
 
+                        <hr class="section-divider">
+
+                        <div class="show-card mb-4">
+                            <div class="card-section-title">
+                                <i class="bi bi-signpost-split"></i> Points d'arrêt intermédiaires
+                                <span style="font-size:.75rem;color:#94a3b8;font-weight:400;margin-left:.5rem;">
+                                    (optionnel)
+                                </span>
+                            </div>
+
+                            <div id="stops-container">
+                                {% for stop in form.stops %}
+                                    <div class="stop-row" data-index="{{ loop.index0 }}">
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <div style="width:28px;height:28px;border-radius:50%;background:#dbeafe;
+                                                        color:#1d4ed8;font-weight:700;font-size:.8rem;
+                                                        display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                                {{ loop.index }}
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                {{ form_widget(stop.city) }}
+                                            </div>
+                                            <div style="width:200px;flex-shrink:0;">
+                                                {{ form_widget(stop.extraPrice) }}
+                                            </div>
+                                            <button type="button" class="btn-stop-remove" onclick="removeStop(this)"
+                                                    style="width:36px;height:36px;border-radius:10px;
+                                                        border:1.5px solid #fee2e2;background:#fff;
+                                                        color:#dc2626;cursor:pointer;flex-shrink:0;
+                                                        display:flex;align-items:center;justify-content:center;">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                        {{ form_errors(stop.city) }}
+                                        {{ form_errors(stop.extraPrice) }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            {# Prototype caché #}
+                            <div id="stops-prototype"
+                                data-prototype="{{ form_widget(form.stops.vars.prototype)|e('html_attr') }}"
+                                style="display:none;"></div>
+
+                            <button type="button" id="add-stop"
+                                    style="margin-top:.75rem;border:1.5px dashed #bfdbfe;background:transparent;
+                                        border-radius:12px;padding:.6rem 1.25rem;color:#1d4ed8;
+                                        font-weight:600;font-size:.85rem;cursor:pointer;width:100%;
+                                        transition:background .15s;">
+                                <i class="bi bi-plus-circle me-2"></i>Ajouter un arrêt
+                            </button>
+                        </div>
+
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn-save">
                                 <i class="bi bi-check2"></i>
@@ -173,4 +226,70 @@
         </div>
     </div>
 </div>
+
+<script>
+let stopIndex = {{ form.stops|length }};
+
+document.getElementById('add-stop').addEventListener('click', function () {
+    const container  = document.getElementById('stops-container');
+    const prototype  = document.getElementById('stops-prototype').dataset.prototype;
+    const newRow     = document.createElement('div');
+    newRow.className = 'stop-row';
+    newRow.dataset.index = stopIndex;
+
+    newRow.innerHTML = prototype.replace(/__name__/g, stopIndex);
+
+    // Ajouter le bouton supprimer
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.innerHTML = '<i class="bi bi-trash"></i>';
+    removeBtn.setAttribute('onclick', 'removeStop(this)');
+    removeBtn.style.cssText = 'width:36px;height:36px;border-radius:10px;border:1.5px solid #fee2e2;background:#fff;color:#dc2626;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;';
+
+    // Restructurer en ligne
+    const wrapper = document.createElement('div');
+    wrapper.className = 'd-flex align-items-center gap-2 mb-2';
+
+    const badge = document.createElement('div');
+    badge.style.cssText = 'width:28px;height:28px;border-radius:50%;background:#dbeafe;color:#1d4ed8;font-weight:700;font-size:.8rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;';
+    badge.textContent = stopIndex + 1;
+
+    const inputs = newRow.querySelectorAll('input');
+    inputs[0].className = 'login-input';
+    inputs[0].placeholder = "Ville d'arrêt";
+    if (inputs[1]) {
+        inputs[1].className = 'login-input';
+        inputs[1].placeholder = 'Prix supplémentaire (€)';
+        inputs[1].style.width = '200px';
+    }
+
+    const cityWrap = document.createElement('div');
+    cityWrap.className = 'flex-grow-1';
+    cityWrap.appendChild(inputs[0]);
+
+    wrapper.appendChild(badge);
+    wrapper.appendChild(cityWrap);
+    if (inputs[1]) wrapper.appendChild(inputs[1]);
+    wrapper.appendChild(removeBtn);
+
+    newRow.innerHTML = '';
+    newRow.appendChild(wrapper);
+
+    container.appendChild(newRow);
+    stopIndex++;
+    updateBadges();
+});
+
+function removeStop(btn) {
+    btn.closest('.stop-row').remove();
+    updateBadges();
+}
+
+function updateBadges() {
+    document.querySelectorAll('.stop-row').forEach((row, i) => {
+        const badge = row.querySelector('div[style*="border-radius:50%"]');
+        if (badge) badge.textContent = i + 1;
+    });
+}
+</script>
 {% endblock %}

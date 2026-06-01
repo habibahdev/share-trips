@@ -47,6 +47,7 @@ docker compose -f docker-compose.dev.yaml up -d --build
 ### Migrations
 
 ```bash
+docker compose exec app php bin/console make:migration
 docker compose exec app php bin/console doctrine:migrations:migrate -n
 ```
 
@@ -100,7 +101,7 @@ npm run maildev
 
 * URL : [http://localhost:8081](http://localhost:8081)
 
-Depuis **votre machine** (pas depuis l’intérieur du réseau Docker), connectez-vous au serveur PostgreSQL exposé sur l’hôte :
+Depuis **votre machine**, connectez-vous au serveur PostgreSQL exposé sur l’hôte :
 
 | Champ        | Valeur        |
 |-------------|---------------|
@@ -117,7 +118,7 @@ Depuis **votre machine** (pas depuis l’intérieur du réseau Docker), connecte
 docker compose -f docker-compose.dev.yaml stop
 ```
 
-Pour arrêter et supprimer les conteneurs (sans supprimer les volumes par défaut) :
+Pour arrêter et supprimer les conteneurs :
 
 ```bash
 docker compose -f docker-compose.dev.yaml down
@@ -125,7 +126,7 @@ docker compose -f docker-compose.dev.yaml down
 
 ## Mise à jour de l’environnement Docker
 
-À utiliser après une modification importante des Dockerfiles ou de `docker-compose.dev.yaml`, si vous voulez repartir sur des volumes neufs :
+À utiliser après une modification importante des Dockerfiles, si vous voulez repartir sur des volumes neufs :
 
 ```bash
 docker compose -f docker-compose.dev.yaml down -v

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\PaymentMethod;
 use App\Enum\PaymentStatus;
 use App\Repository\PaymentRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -72,6 +73,9 @@ class Payment
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $stripeSessionId = null;
+
+    #[ORM\Column(enumType: PaymentMethod::class)]
+    private ?PaymentMethod $method = null;
 
     public function __construct()
     {
@@ -252,6 +256,17 @@ class Payment
     public function setStripeSessionId(?string $stripeSessionId): static
     {
         $this->stripeSessionId = $stripeSessionId;
+        return $this;
+    }
+
+    public function getMethod(): PaymentMethod
+    {
+        return $this->method;
+    }
+
+    public function setMethod(PaymentMethod $method): static
+    {
+        $this->method = $method;
         return $this;
     }
 }
