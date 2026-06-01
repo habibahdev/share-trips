@@ -187,7 +187,51 @@
                             Ce trajet n'est plus disponible.
                         </div>
                     {% endif %}
+                    
+                    {% if trip.stops is not empty %}
+                        <div class="show-card mb-4">
+                            <div class="card-section-title">
+                                <i class="bi bi-signpost-split"></i> Arrêts intermédiaires
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:.5rem;">
 
+                                {# Départ #}
+                                <div style="display:flex;align-items:center;gap:.75rem;">
+                                    <div style="width:10px;height:10px;border-radius:50%;background:#1d4ed8;flex-shrink:0;"></div>
+                                    <span style="font-weight:700;color:#1e3a5f;">{{ trip.origin }}</span>
+                                </div>
+
+                                {# Ligne verticale + stops #}
+                                {% for stop in trip.stops %}
+                                    <div style="display:flex;align-items:center;gap:.75rem;padding-left:3px;">
+                                        <div style="width:4px;height:20px;background:#e2e8f0;margin-left:3px;"></div>
+                                    </div>
+                                    <div style="display:flex;align-items:center;gap:.75rem;">
+                                        <div style="width:10px;height:10px;border-radius:50%;background:#fff;
+                                                    border:2px solid #1d4ed8;flex-shrink:0;"></div>
+                                        <span style="color:#1e3a5f;">{{ stop.city }}</span>
+                                        {% if stop.extraPrice %}
+                                            <span style="margin-left:auto;font-size:.8rem;font-weight:700;
+                                                        color:#1d4ed8;background:#eff6ff;
+                                                        padding:.2rem .6rem;border-radius:8px;">
+                                                +{{ stop.extraPrice }}€
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+
+                                <div style="display:flex;align-items:center;gap:.75rem;padding-left:3px;">
+                                    <div style="width:4px;height:20px;background:#e2e8f0;margin-left:3px;"></div>
+                                </div>
+
+                                {# Arrivée #}
+                                <div style="display:flex;align-items:center;gap:.75rem;">
+                                    <div style="width:10px;height:10px;border-radius:50%;background:#1e3a5f;flex-shrink:0;"></div>
+                                    <span style="font-weight:700;color:#1e3a5f;">{{ trip.destination }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
 
