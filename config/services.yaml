@@ -30,9 +30,7 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.request, priority: 255 }
     
-    App\Service\StripeService:
-        arguments:
-            $secretKey: '%env(STRIPE_SECRET_KEY)%'
+
 
     App\Controller\StripeWebhookController:
         arguments:
