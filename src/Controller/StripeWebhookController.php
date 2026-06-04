@@ -8,7 +8,6 @@ use App\Service\MailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Event;
 use Stripe\Exception\SignatureVerificationException;
-use Stripe\Stripe;
 use Stripe\Webhook;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,10 +18,8 @@ use Symfony\Component\Routing\Attribute\Route;
 final class StripeWebhookController extends AbstractController
 {
     public function __construct(
-        private string $webhookSecret,
-        private string $secretKey
+        private string $webhookSecret
     ) {
-        Stripe::setApiKey($this->secretKey);
     }
 
     #[Route('/stripe/webhook', name: 'app_stripe_webhook', methods: ['POST'])]

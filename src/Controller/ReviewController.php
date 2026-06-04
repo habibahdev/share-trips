@@ -37,7 +37,9 @@ final class ReviewController extends AbstractController
         ReviewRepository $reviewRepository
     ): Response {
         $user = $this->getUser();
-        assert($user instanceof User);
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
         if ($booking->getPassenger()->getId() !== $user->getId()) {
             $this->addFlash('warning', 'Vous ne pouvez pas noter cette réservation.');
             return $this->redirectToRoute('app_profile_booking');

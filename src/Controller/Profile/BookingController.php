@@ -4,12 +4,9 @@ namespace App\Controller\Profile;
 
 use App\Entity\Booking;
 use App\Entity\User;
-use App\Enum\BookingStatus;
-use App\Enum\TripStatus;
 use App\Repository\BookingRepository;
 use App\Repository\TripRepository;
-use App\Service\MailService;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\BookingService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +15,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/profile/booking', name: 'app_profile_booking')]
 final class BookingController extends AbstractController
 {
+    public function __construct(private BookingService $bookingService)
+    {
+    }
+
     #[Route('', name: '')]
     public function index(
         BookingRepository $bookingRepository,
@@ -25,7 +26,9 @@ final class BookingController extends AbstractController
         Request $request
     ): Response {
         $user = $this->getUser();
-        assert($user instanceof User);
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
         $origin = $request->query->get('origin');
         $destination = $request->query->get('destination');
         $dateString = $request->query->get('date');
@@ -45,9 +48,8 @@ final class BookingController extends AbstractController
                 $date
             );
         }
-        $bookings = $bookingRepository->findByPassenger($user);
         return $this->render('profile/booking/index.html.twig', [
-            'bookings' => $bookings,
+            'bookings' => $bookingRepository->findByPassenger($user),
             'availableTrips' => $availableTrips,
             'origin' => $origin,
             'destination' => $destination,
@@ -59,7 +61,9 @@ final class BookingController extends AbstractController
     public function show(Booking $booking): Response
     {
         $user = $this->getUser();
-        assert($user instanceof User);
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
         if ($booking->getPassenger()->getId() !== $user->getId()) {
             return $this->redirectToRoute('app_profile_booking');
         }
@@ -69,14 +73,12 @@ final class BookingController extends AbstractController
     }
 
     #[Route('/{booking}/cancel', name: '_cancel', methods: ['POST'])]
-    public function cancel(
-        Booking $booking,
-        Request $request,
-        EntityManagerInterface $entityManager,
-        MailService $mailer
-    ): Response {
+    public function cancel(Booking $booking, Request $request): Response
+    {
         $user = $this->getUser();
-        assert($user instanceof User);
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
         if (
             !$this->isCsrfTokenValid(
                 'cancel_booking_' . $booking->getId(),
@@ -89,33 +91,12 @@ final class BookingController extends AbstractController
         if ($booking->getPassenger()->getId() !== $user->getId()) {
             return $this->redirectToRoute('app_profile_booking');
         }
-        if ($booking->getStatus() === BookingStatus::Cancelled) {
-            return $this->redirectToRoute('app_profile_booking');
+        try {
+            $this->bookingService->cancelByPassenger($booking);
+            $this->addFlash('success', 'Réservation annulée.');
+        } catch (\LogicException $e) {
+            $this->addFlash('danger', $e->getMessage());
         }
-        if ($booking->getTrip()->getDepartureAt() < new \DateTimeImmutable()) {
-            $this->addFlash('danger', 'Impossible d\'annuler un trajet déjà effectué.');
-            return $this->redirectToRoute('app_profile_booking');
-        }
-        $confirmed = $booking->getStatus() === BookingStatus::Confirmed;
-        if ($confirmed) {
-            $trip = $booking->getTrip();
-            $newAvailable = $trip->getAvailableSeats() + $booking->getSeatsBooked();
-            $trip->setAvailableSeats(min($trip->getVehicle()->getSeats(), $newAvailable));
-            if ($trip->getStatus() === TripStatus::Full) {
-                $trip->setStatus(TripStatus::Open);
-            }
-            // remboursement
-            if ($booking->getPayment()?->isSuccessful()) {
-                $booking->getPayment()->refund();
-                $mailer->sendRefund($booking);
-            }
-        }
-        $booking->setStatus(BookingStatus::Cancelled);
-        $entityManager->flush();
-        if ($confirmed) {
-            $mailer->sendBookingCancellationToDriver($booking);
-        }
-        $this->addFlash('success', 'Réservation annulée.');
         return $this->redirectToRoute('app_profile_booking');
     }
 }
