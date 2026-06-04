@@ -13,7 +13,9 @@ final class HomeController extends AbstractController
     public function index(): Response
     {
         $user = $this->getUser();
-        assert($user instanceof User);
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
         return $this->render('profile/home/index.html.twig', [
             'user' => $user
         ]);

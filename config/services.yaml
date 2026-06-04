@@ -24,14 +24,18 @@ services:
             $fromEmail: '%env(MAILER_FROM)%'
             $fromName: '%env(MAILER_FROM_NAME)%'
     
-    App\Service\StripeService:
+    App\Service\StripeInitializer:
         arguments:
             $secretKey: '%env(STRIPE_SECRET_KEY)%'
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, priority: 255 }
+    
+
 
     App\Controller\StripeWebhookController:
         arguments:
             $webhookSecret: '%env(STRIPE_WEBHOOK_SECRET)%'
-            $secretKey: '%env(STRIPE_SECRET_KEY)%'
+            #$secretKey: '%env(STRIPE_SECRET_KEY)%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

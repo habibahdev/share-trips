@@ -18,12 +18,15 @@ use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
  */
 final class RegisterController extends AbstractController
 {
+    public function __construct(private EntityManagerInterface $entityManager)
+    {
+    }
+
     /**
      * Gère l'inscription.
      *
      * @param Request $request Requête HTTP
      * @param UserPasswordHasherInterface $hasher Service de hachage du mot de passe
-     * @param EntityManagerInterface $entityManager Doctrine
      * @param MailService $mailer Service d'envoi e'mails
      * @param TokenGeneratorInterface $tokenGenerator Générateur de token sécurisé
      * @return Response
@@ -32,7 +35,6 @@ final class RegisterController extends AbstractController
     public function register(
         Request $request,
         UserPasswordHasherInterface $hasher,
-        EntityManagerInterface $entityManager,
         MailService $mailer,
         TokenGeneratorInterface $tokenGenerator
     ): Response {
@@ -46,8 +48,8 @@ final class RegisterController extends AbstractController
             $tokenRegister = $tokenGenerator->generateToken();
             $user->setPassword($hasher->hashPassword($user, $form->get('plainPassword')->getData()));
             $user->setTokenRegister($tokenRegister);
-            $entityManager->persist($user);
-            $entityManager->flush();
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
             $mailer->sendWelcome($user);
             $this->addFlash('info', 'Inscription prise en compte. Un e-mail de confirmation vous a été envoyé.');
             return $this->redirectToRoute('app_login');
@@ -62,15 +64,11 @@ final class RegisterController extends AbstractController
      *
      * @param string $token Token de validation
      * @param User $user Utilisateur
-     * @param EntityManagerInterface $entityManager Doctrine
      * @return Response
      */
     #[Route('/verify/{token}/{id<\d+>}', name: 'app_confirm_email')]
-    public function confirmEmail(
-        string $token,
-        User $user,
-        EntityManagerInterface $entityManager
-    ): Response {
+    public function confirmEmail(string $token, User $user): Response
+    {
         if ($user->isVerified()) {
             $this->addFlash('info', 'Ce compte est déjà activé.');
             return $this->redirectToRoute('app_login');
@@ -86,7 +84,7 @@ final class RegisterController extends AbstractController
         }
         $user->setIsVerified(true);
         $user->setTokenRegister(null);
-        $entityManager->flush();
+        $this->entityManager->flush();
         $this->addFlash('success', 'Compte activé. Vous pouvez maintenant vous connecter.');
         return $this->redirectToRoute('app_login');
     }
@@ -94,26 +92,24 @@ final class RegisterController extends AbstractController
     /**
      * Renvoie un email de confirmation à l'utilisateur connecté.
      *
-     * @param EntityManagerInterface $entityManager Doctrine
      * @param MailService $mailer Service d'envoi d'email
      * @param TokenGeneratorInterface $tokenGenerator Générateur de token sécurisé
      * @return Response
      */
     #[Route('/resend', name: 'app_resend')]
-    public function resend(
-        EntityManagerInterface $entityManager,
-        MailService $mailer,
-        TokenGeneratorInterface $tokenGenerator
-    ): Response {
+    public function resend(MailService $mailer, TokenGeneratorInterface $tokenGenerator): Response
+    {
         $user = $this->getUser();
-        assert($user instanceof User);
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
         if ($user->isVerified()) {
             $this->addFlash('warning', 'Vous avez déjà vérifié votre adresse e-mail');
             return $this->redirectToRoute('app_profile');
         }
         $tokenRegister = $tokenGenerator->generateToken();
         $user->setTokenRegister($tokenRegister);
-        $entityManager->flush();
+        $this->entityManager->flush();
         $mailer->sendWelcome($user);
         $this->addFlash('info', 'L\'e-mail de confirmation vous a été renvoyé.');
         return $this->redirectToRoute('app_profile');

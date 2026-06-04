@@ -18,12 +18,15 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 final class ForgotPasswordController extends AbstractController
 {
+    public function __construct(private EntityManagerInterface $entityManager)
+    {
+    }
+
     /**
      * Affichage et traitement de la demande de réinitialisation.
      *
      * @param Request $request Requête HTTP
      * @param UserRepository $userRepository Repository des utilisateurs
-     * @param EntityManagerInterface $entityManager Doctrine
      * @param MailService $mailer Service d'envoi d'emails
      * @return Response
      */
@@ -31,7 +34,6 @@ final class ForgotPasswordController extends AbstractController
     public function request(
         Request $request,
         UserRepository $userRepository,
-        EntityManagerInterface $entityManager,
         MailService $mailer
     ): Response {
         $form = $this->createForm(ForgotPasswordType::class);
@@ -48,7 +50,7 @@ final class ForgotPasswordController extends AbstractController
                 $user->setTokenForgotPassword($token);
                 $date = (new \DateTimeImmutable())->modify('+1 hour');
                 $user->setTokenForgotPasswordExpiredAt($date);
-                $entityManager->flush();
+                $this->entityManager->flush();
                 $mailer->sendForgotPassword($user);
             }
             return $this->redirectToRoute('app_forgot_password_check');
@@ -76,7 +78,6 @@ final class ForgotPasswordController extends AbstractController
      * @param Request $request Requête HTTP
      * @param UserRepository $userRepository Repository des utilisateurs
      * @param UserPasswordHasherInterface $hasher Service du hachage du mot de passe
-     * @param EntityManagerInterface $entityManager Doctrine
      * @return Response
      */
     #[Route('/reset-password/{token}', name: 'app_reset_password')]
@@ -84,8 +85,7 @@ final class ForgotPasswordController extends AbstractController
         string $token,
         Request $request,
         UserRepository $userRepository,
-        UserPasswordHasherInterface $hasher,
-        EntityManagerInterface $entityManager
+        UserPasswordHasherInterface $hasher
     ): Response {
         $user = $userRepository->findOneBy(['tokenForgotPassword' => $token]);
         if (!$user || !$user->isForgotPasswordTokenValid()) {
@@ -102,7 +102,7 @@ final class ForgotPasswordController extends AbstractController
             $user->setPassword($hasher->hashPassword($user, $newPassword));
             $user->setTokenForgotPassword(null);
             $user->setTokenForgotPasswordExpiredAt(null);
-            $entityManager->flush();
+            $this->entityManager->flush();
             $this->addFlash(
                 'success',
                 'Mot de passe réinitialisé avec succès. Vous pouvez vous connecter.'

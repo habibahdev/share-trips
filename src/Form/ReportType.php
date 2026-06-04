@@ -20,7 +20,7 @@ class ReportType extends AbstractType
                 'label' => 'Motif du signalement',
                 'choices' => ReportReason::cases(),
                 'choice_label' => fn(ReportReason $r) => $r->label(),
-                'choice_value' => fn(ReportReason $r) => $r->label(),
+                'choice_value' => fn(ReportReason $r) => $r->value,
                 'constraints' => [
                     new NotBlank(message: 'Veuillez choisir un motif.')
                 ]

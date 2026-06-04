@@ -24,7 +24,7 @@ class VehicleRepository extends ServiceEntityRepository
     public function findByUser(User $user): array
     {
         return $this->createQueryBuilder('v')
-            ->where('v.user = :user')
+            ->where('v.usser = :user')
             ->setParameter('user', $user)
             ->orderBy('v.brand', 'asc')
             ->addOrderBy('v.model', 'asc')

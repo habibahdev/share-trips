@@ -12,10 +12,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 final class StripeService
 {
     public function __construct(
-        private string $secretKey,
         private UrlGeneratorInterface $urlGenerator
     ) {
-        Stripe::setApiKey($this->secretKey);
     }
 
     public function createCheckoutSession(Booking $booking, Payment $payment): Session

@@ -32,7 +32,9 @@ final class ReportController extends AbstractController
         EntityManagerInterface $entityManager
     ): Response {
         $user = $this->getUser();
-        assert($user instanceof User);
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
         if ($booking->getTrip()->getDepartureAt() > new \DateTimeImmutable()) {
             $this->addFlash('danger', 'Vous ne pouvez signaler qu\'après le trajet.');
             return $this->redirectToRoute('app_profile_booking');

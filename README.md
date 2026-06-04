@@ -39,7 +39,7 @@ ShareTrips a été conçu pour :
 
 ## Documentation
 
-La documentation d’installation et d’utilisation est disponible dans **[docs/index.md](docs/index.md)** (démarrage Docker, base de données, assets, MailDev, Adminer).
+La documentation d’installation et d’utilisation est disponible dans **[docs/index.md](docs/index.md)**.
 
 ## Crédit
 

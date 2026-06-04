@@ -79,7 +79,7 @@ class ConversationRepository extends ServiceEntityRepository
      * @param integer $id
      * @return Conversation|null
      */
-    public function fondOneWithMessages(int $id): ?Conversation
+    public function findOneWithMessages(int $id): ?Conversation
     {
         return $this->createQueryBuilder('c')
             ->leftJoin('c.messages', 'm')
