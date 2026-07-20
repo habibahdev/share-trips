@@ -217,6 +217,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'passenger', targetEntity: Conversation::class)]
     private Collection $conversationsAsPassenger;
 
+    /**
+     * Chemin du document fournit.
+     *
+     * @var string|null
+     */
+    #[ORM\Column(nullable: true)]
+    private ?string $identityDocument = null;
+
+    /**
+     * Indique si le document a été vérifié ou non.
+     *
+     * @var boolean
+     */
+    #[ORM\Column(default: false)]
+    private bool $isIdentityVerified = false;
+
+    /**
+     * Date de vérification des documents.
+     *
+     * @var \DateTimeImmutable|null
+     */
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $identityVerifiedAt = null;
+
     public function __construct()
     {
         $this->vehicles = new ArrayCollection();
@@ -806,5 +830,71 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $this->conversationsAsPassenger->toArray()
             )
         );
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return string|null
+     */
+    public function getIdentityDocument(): ?string
+    {
+        return $this->identityDocument;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string|null $identityDocument
+     * @return static
+     */
+    public function setIdentityDocument(?string $identityDocument): static
+    {
+        $this->identityDocument = $identityDocument;
+        return $this;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return boolean
+     */
+    public function isIdentityVerified(): bool
+    {
+        return $this->isIdentityVerified;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param boolean $verified
+     * @return static
+     */
+    public function setIsIdentityVerified(bool $verified): static
+    {
+        $this->isIdentityVerified = $verified;
+        return $this;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return \DateTimeImmutable|null
+     */
+    public function getIdentityVerifiedAt(): ?\DateTimeImmutable
+    {
+        return $this->identityVerifiedAt;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param \DateTimeImmutable|null $at
+     * @return static
+     */
+    public function setIdentityVerifiedAt(?\DateTimeImmutable $at): static
+    {
+        $this->identityVerifiedAt = $at;
+        return $this;
     }
 }

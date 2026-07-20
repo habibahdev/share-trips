@@ -143,6 +143,18 @@ class MailService
         );
     }
 
+    public function sendIdentityVerified(User $user): void
+    {
+        $this->send(
+            to: new Address($user->getEmail(), $user->getFullName()),
+            subject: 'Identité vérifiée - ShareTrips',
+            template: 'emails/identity_verified.html.twig',
+            context: [
+                'user' => $user
+            ]
+        );
+    }
+
     /**
      * @param array<string, mixed> $context
      */

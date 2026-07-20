@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family:'Plus Jakarta Sans',sans-serif;background:#f8fafc;padding:2rem;">
+    <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:20px;border:1.5px solid #f1f5f9;padding:2rem;">
+
+        <div style="text-align:center;margin-bottom:2rem;">
+            <h1 style="color:#1e3a5f;font-size:1.5rem;font-weight:800;">
+                Share<span style="color:#1d4ed8;">Trips</span>
+            </h1>
+        </div>
+
+        <h2 style="color:#1e3a5f;font-weight:700;">Bonjour {{ user.firstName }} ! 👋</h2>
+        <p style="color:#475569;">
+            Bonne nouvelle ! Votre identité a été vérifiée avec succès.
+            Un badge <strong>Conducteur vérifié</strong> apparaît désormais sur votre profil.
+        </p>
+        <p style="color:#94a3b8;font-size:.8rem;text-align:center;">
+            © {{ "now"|date("Y") }} ShareTrips - Tous droits réservés
+        </p>
+    </div>
+</body>
+</html>

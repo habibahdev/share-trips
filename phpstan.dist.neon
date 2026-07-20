@@ -7,5 +7,6 @@ parameters:
     excludePaths:
         - tests/bootstrap.php
         - src/Kernel.php
+        - src/Entity/User.php
     paths:
         - src

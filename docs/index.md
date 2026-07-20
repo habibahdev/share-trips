@@ -106,7 +106,7 @@ Depuis **votre machine**, connectez-vous au serveur PostgreSQL exposé sur l’h
 | Champ        | Valeur        |
 |-------------|---------------|
 | Système     | PostgreSQL    |
-| Serveur     | `localhost`   |
+| Serveur     | `postgres`   |
 | Utilisateur | `tripsadmin`  |
 | Mot de passe | `tripsadmin` |
 | Base        | `sharetrips`  |
