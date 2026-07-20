@@ -11,6 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
@@ -18,6 +19,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\ChoiceFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 
@@ -38,10 +40,17 @@ class UserCrudController extends AbstractCrudController
         }
 
         $originalData = $entityManager->getUnitOfWork()->getOriginalEntityData($entityInstance);
+        $wasVerified = (bool) ($originalData['isIdentityVerified'] ?? false);
         $originalRaw = $originalData['status'] ?? null;
         $originalStatus = $originalRaw instanceof UserStatus
             ? $originalRaw
             : ($originalRaw !== null ? UserStatus::from($originalRaw) : null);
+        if (!$wasVerified && $entityInstance->isIdentityVerified()) {
+            $entityInstance->setIdentityVerifiedAt(new \DateTimeImmutable());
+        }
+        if ($wasVerified && !$entityInstance->isIdentityVerified()) {
+            $entityInstance->setIdentityVerifiedAt(null);
+        }
         parent::updateEntity($entityManager, $entityInstance);
         if ($originalStatus !== $entityInstance->getStatus()) {
             if ($entityInstance->isBanned()) {
@@ -49,6 +58,9 @@ class UserCrudController extends AbstractCrudController
             } elseif ($entityInstance->isSuspended()) {
                 $this->mailer->sendSuspension($entityInstance);
             }
+        }
+        if (!$wasVerified && $entityInstance->isIdentityVerified()) {
+            $this->mailer->sendIdentityVerified($entityInstance);
         }
     }
 
@@ -90,7 +102,21 @@ class UserCrudController extends AbstractCrudController
                 ]),
             DateField::new('suspendedUntil', 'Suspendu jusqu\'au')->hideOnIndex(),
             TextareaField::new('adminNote', 'Note admin')->hideOnIndex(),
-            DateTimeField::new('createdAt', 'Inscrit le')->onlyOnIndex()->hideOnForm()
+            DateTimeField::new('createdAt', 'Inscrit le')->onlyOnIndex()->hideOnForm(),
+            BooleanField::new('isDentityVerified', 'Identité vérifiée'),
+            DateTimeField::new('identityVerifiedAt', 'Vérifiée le')->hideOnForm()->hideOnIndex(),
+            UrlField::new('identityDocumentUrl', 'Document d\'identité')
+                ->formatValue(function ($value, User $user) {
+                    if (!$user->getIdentityDocument()) {
+                        return 'Aucun document';
+                    }
+                    return sprintf(
+                        '<a href="/admin/identity/document/%d" target="_blank"
+                        class="btn btn-sm btn-outline-secondary">Voir le document</a>',
+                        $user->getId()
+                    );
+                })
+                ->onlyOnDetail(),
         ];
     }
 
