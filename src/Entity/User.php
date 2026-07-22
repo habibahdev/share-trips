@@ -230,7 +230,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *
      * @var boolean
      */
-    #[ORM\Column(default: false)]
+    #[ORM\Column]
     private bool $isIdentityVerified = false;
 
     /**

@@ -18,6 +18,7 @@ final class IdentityController extends AbstractController
     {
     }
 
+    #[Route('', name: '')]
     public function index(Request $request, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();

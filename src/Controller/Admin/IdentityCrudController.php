@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
  * @extends AbstractCrudController<User>
  */
 #[Route('/admin/identity', name: 'admin_identity_')]
-class UserCrudController extends AbstractCrudController
+class IdentityCrudController extends AbstractCrudController
 {
     public function __construct(private readonly IdentityDocumentService $identityService)
     {
