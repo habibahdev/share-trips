@@ -2,18 +2,19 @@
 
 namespace App\Controller\Profile;
 
+use App\Controller\AbstractAppController;
+use App\Dto\TripSearchCriteria;
 use App\Entity\Booking;
-use App\Entity\User;
 use App\Repository\BookingRepository;
 use App\Repository\TripRepository;
+use App\Security\BookingVoter;
 use App\Service\BookingService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/profile/booking', name: 'app_profile_booking')]
-final class BookingController extends AbstractController
+final class BookingController extends AbstractAppController
 {
     public function __construct(private BookingService $bookingService)
     {
@@ -25,48 +26,30 @@ final class BookingController extends AbstractController
         TripRepository $tripRepository,
         Request $request
     ): Response {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
-        $origin = $request->query->get('origin');
-        $destination = $request->query->get('destination');
-        $dateString = $request->query->get('date');
-        $date = null;
-        if ($dateString) {
-            try {
-                $date = new \DateTimeImmutable($dateString);
-            } catch (\Exception) {
-                $date = null;
-            }
-        }
+        $user = $this->getAppUser();
+        $criteria = TripSearchCriteria::fromRequest($request);
         $availableTrips = null;
-        if ($origin || $destination || $date) {
+        if ($criteria->origin || $criteria->destination || $criteria->date) {
             $availableTrips = $tripRepository->findAvailableTrips(
-                $origin,
-                $destination,
-                $date
+                $criteria->origin,
+                $criteria->destination,
+                $criteria->date
             );
         }
         return $this->render('profile/booking/index.html.twig', [
             'bookings' => $bookingRepository->findByPassenger($user),
             'availableTrips' => $availableTrips,
-            'origin' => $origin,
-            'destination' => $destination,
-            'date' => $date
+            'origin' => $criteria->origin,
+            'destination' => $criteria->destination,
+            'date' => $criteria->date
         ]);
     }
 
     #[Route('/{booking}', name: '_show')]
     public function show(Booking $booking): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
-        if ($booking->getPassenger()->getId() !== $user->getId()) {
-            return $this->redirectToRoute('app_profile_booking');
-        }
+        $this->getAppUser();
+        $this->denyAccessUnlessGranted(BookingVoter::VIEW, $booking);
         return $this->render('profile/booking/show.html.twig', [
             'booking' => $booking
         ]);
@@ -75,10 +58,8 @@ final class BookingController extends AbstractController
     #[Route('/{booking}/cancel', name: '_cancel', methods: ['POST'])]
     public function cancel(Booking $booking, Request $request): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $this->getAppUser();
+        $this->denyAccessUnlessGranted(BookingVoter::CANCEL, $booking);
         if (
             !$this->isCsrfTokenValid(
                 'cancel_booking_' . $booking->getId(),
@@ -88,9 +69,7 @@ final class BookingController extends AbstractController
             $this->addFlash('danger', 'Problème inconnu.');
             return $this->redirectToRoute('app_profile_booking');
         }
-        if ($booking->getPassenger()->getId() !== $user->getId()) {
-            return $this->redirectToRoute('app_profile_booking');
-        }
+
         try {
             $this->bookingService->cancelByPassenger($booking);
             $this->addFlash('success', 'Réservation annulée.');

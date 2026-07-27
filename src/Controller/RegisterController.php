@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
+use App\Controller\AbstractAppController;
 use App\Entity\User;
 use App\Form\RegisterType;
 use App\Service\MailService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 /**
  * Contrôleur responsable de l'inscription des utilisateurs.
  */
-final class RegisterController extends AbstractController
+final class RegisterController extends AbstractAppController
 {
     public function __construct(private EntityManagerInterface $entityManager)
     {
@@ -99,10 +99,7 @@ final class RegisterController extends AbstractController
     #[Route('/resend', name: 'app_resend')]
     public function resend(MailService $mailer, TokenGeneratorInterface $tokenGenerator): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $user = $this->getAppUser();
         if ($user->isVerified()) {
             $this->addFlash('warning', 'Vous avez déjà vérifié votre adresse e-mail');
             return $this->redirectToRoute('app_profile');

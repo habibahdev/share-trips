@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/_ui.html.twig' as ui %}
 
 {% block title %}{{ driver.firstName }} {{ driver.lastName }} - Profil conducteur - Share Trips{% endblock %}
 
@@ -9,9 +10,7 @@
     <div class="show-card mb-4">
         <div class="d-flex align-items-center gap-4 flex-wrap">
 
-            <div class="driver-avatar" style="width:64px;height:64px;font-size:1.5rem;flex-shrink:0;">
-                {{ driver.firstName ? driver.firstName|first|upper : '?' }}
-            </div>
+            {{ ui.avatar(driver.firstName, 'driver-avatar', null, 'lg') }}
 
             <div style="flex:1;min-width:0;">
                 <h1 style="font-size:1.4rem;font-weight:800;color:#1e3a5f;margin:0 0 .25rem;">
@@ -116,9 +115,7 @@
 
                         <div class="d-flex justify-content-between align-items-start mb-1">
                             <div class="d-flex align-items-center gap-2">
-                                <div class="passenger-avatar" style="width:32px;height:32px;font-size:.8rem;">
-                                    {{ review.reviewer.firstName ? review.reviewer.firstName|first|upper : '?' }}
-                                </div>
+                                {{ ui.avatar(review.reviewer.firstName, 'passenger-avatar', null, 'sm') }}
                                 <div>
                                     <div style="font-weight:600;font-size:.875rem;color:#1e3a5f;">
                                         {{ review.reviewer.firstName ?? 'Utilisateur' }}

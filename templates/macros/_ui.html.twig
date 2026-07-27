@@ -1,0 +1,63 @@
+{# Avatar rond avec initiale(s).
+   class = classe(s) CSS de base existante(s) (avatar, driver-avatar, etc.)
+   size  = modificateur optionnel parmi: xs, sm, md, lg, xl #}
+{% macro avatar(firstName, class = 'avatar', lastName = null, size = null) %}
+    <div class="{{ class }}{{ size ? ' avatar--' ~ size }}">{{ firstName ? firstName|first|upper : '?' }}{% if lastName %}{{ lastName|first|upper }}{% endif %}</div>
+{% endmacro %}
+
+{# Badge de statut d'un Trip (TripStatus) #}
+{% macro trip_status_badge(trip) %}
+    {% set map = {
+        'open': ['Disponible', 'status-open'],
+        'full': ['Complet', 'status-full'],
+        'cancelled': ['Annulé', 'status-cancelled'],
+        'completed': ['Terminé', 'status-completed']
+    } %}
+    {% set data = map[trip.status.value] %}
+    <span class="status-badge {{ data[1] }}">{{ data[0] }}</span>
+{% endmacro %}
+
+{# Badge de statut d'une Booking (BookingStatus) #}
+{% macro booking_status_badge(booking) %}
+    {% set map = {
+        'confirmed': ['Confirmée', 'status-confirmed'],
+        'pending': ['En attente', 'status-pending'],
+        'cancelled': ['Annulée', 'status-cancelled']
+    } %}
+    {% set data = map[booking.status.value] %}
+    <span class="status-badge {{ data[1] }}">{{ data[0] }}</span>
+{% endmacro %}
+
+{# Badge de statut d'un Payment (PaymentStatus), avec icône #}
+{% macro payment_status_badge(payment) %}
+    {% set map = {
+        'completed': ['Payé', 'status-confirmed', 'bi-check-circle'],
+        'pending': ['En attente', 'status-pending', 'bi-hourglass-split'],
+        'refunded': ['Remboursé', 'status-open', 'bi-arrow-counterclockwise'],
+        'failed': ['Échoué', 'status-cancelled', 'bi-x-circle']
+    } %}
+    {% set data = map[payment.status.value] %}
+    <span class="status-badge {{ data[1] }}"><i class="bi {{ data[2] }} me-1"></i>{{ data[0] }}</span>
+{% endmacro %}
+
+{# Petit badge "booking-confirmed/pending" utilisé dans profile/trip/show #}
+{% macro booking_small_status_badge(booking) %}
+    {% if booking.status.value == 'confirmed' %}
+        <span class="booking-status booking-confirmed">Confirmée</span>
+    {% else %}
+        <span class="booking-status booking-pending">En attente</span>
+    {% endif %}
+{% endmacro %}
+
+{# Badge trip-badge (utilisé sur les cartes de trajet en grille : places / complet / annulé) #}
+{% macro trip_seats_badge(trip) %}
+    {% if trip.status.value == 'full' %}
+        <span class="trip-badge trip-badge--full">Complet</span>
+    {% elseif trip.status.value == 'cancelled' %}
+        <span class="trip-badge trip-badge--cancelled">Annulé</span>
+    {% else %}
+        <span class="trip-badge trip-badge--open">
+            {{ trip.availableSeats }} place{{ trip.availableSeats > 1 ? 's' : '' }}
+        </span>
+    {% endif %}
+{% endmacro %}

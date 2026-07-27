@@ -2,12 +2,11 @@
 
 namespace App\Controller;
 
+use App\Controller\AbstractAppController;
 use App\Entity\Booking;
 use App\Entity\Report;
-use App\Entity\User;
 use App\Form\ReportType;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -15,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 /**
  * Contrôleur responsable du signalement entre utilisateurs.
  */
-final class ReportController extends AbstractController
+final class ReportController extends AbstractAppController
 {
     /**
      * Création d'un signalement par rapport à un trajet
@@ -31,21 +30,17 @@ final class ReportController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager
     ): Response {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
+        $user = $this->getAppUser();
+        $isPassenger = $booking->getPassenger()->getId() === $user->getId();
+        $isDriver = $booking->getTrip()->getDriver()->getId() === $user->getId();
+        if (!$isPassenger && !$isDriver) {
             throw $this->createAccessDeniedException();
         }
         if ($booking->getTrip()->getDepartureAt() > new \DateTimeImmutable()) {
             $this->addFlash('danger', 'Vous ne pouvez signaler qu\'après le trajet.');
             return $this->redirectToRoute('app_profile_booking');
         }
-        if ($booking->getPassenger()->getId() === $user->getId()) {
-            $reported = $booking->getTrip()->getDriver();
-        } elseif ($booking->getTrip()->getDriver()->getId() === $user->getId()) {
-            $reported = $booking->getPassenger();
-        } else {
-            return $this->redirectToRoute('app_home');
-        }
+        $reported = $isPassenger ? $booking->getTrip()->getDriver() : $booking->getPassenger();
         $existing = $entityManager->getRepository(Report::class)->findOneBy([
             'reporter' => $user,
             'booking' => $booking
@@ -69,7 +64,7 @@ final class ReportController extends AbstractController
         return $this->render('report/index.html.twig', [
             'reported' => $reported,
             'booking' => $booking,
-            'form' => $form,
+            'form' => $form
         ]);
     }
 }

@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/_ui.html.twig' as ui %}
 
 {% block title %}Mon profil - Share Trips{% endblock %}
 
@@ -20,9 +21,7 @@
             <div class="col-lg-4">
                 <div class="profile-card p-4 text-center h-100">
 
-                    <div class="avatar-lg">
-                        {{ user.firstName ? user.firstName|first|upper : '?' }}{{ user.lastName ? user.lastName|first|upper : '' }}
-                    </div>
+                    {{ ui.avatar(user.firstName, 'avatar-lg', user.lastName, 'xl') }}
 
                     <h4 style="font-weight:800;color:#1e3a5f;margin-bottom:.25rem;">
                         {{ user.firstName ?? '' }} {{ user.lastName ?? '' }}
@@ -137,6 +136,16 @@
                                     </div>
                                     <div class="quick-link-label">Mot de passe</div>
                                     <div class="quick-link-sub">Modifier</div>
+                                </a>
+                            </div>
+
+                            <div class="col-6 col-md-3">
+                                <a href="{{ path('app_profile_identity_') }}" class="quick-link">
+                                    <div class="quick-link-icon" style="background:#eff6ff;">
+                                        <i class="bi bi-person-vcard" style="color:#1d4ed8;"></i>
+                                    </div>
+                                    <div class="quick-link-label">Mes documents</div>
+                                    <div class="quick-link-sub">Mon identité</div>
                                 </a>
                             </div>
                         {% endif %}

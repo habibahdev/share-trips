@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/_ui.html.twig' as ui %}
 
 {% block title %}Noter {{ driver.firstName }} {{ driver.lastName }} - Share Trips{% endblock %}
 
@@ -17,9 +18,7 @@
 
         <div style="background:#f8fafc;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;">
             <div class="d-flex align-items-center gap-3 mb-2">
-                <div class="driver-avatar">
-                    {{ driver.firstName ? driver.firstName|first|upper : '?' }}
-                </div>
+                {{ ui.avatar(driver.firstName, 'driver-avatar') }}
                 <div>
                     <div style="font-weight:700;color:#1e3a5f;">
                         {{ driver.firstName ?? '' }} {{ driver.lastName ?? '' }}

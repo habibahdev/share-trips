@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/_ui.html.twig' as ui %}
 
 {% block title %}Share Trips - Le covoiturage partout en France{% endblock %}
 
@@ -90,9 +91,7 @@
                                 {# Header : avatar + conducteur + statut #}
                                 <div class="d-flex align-items-center justify-content-between mb-3">
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="avatar">
-                                            {{ trip.driver.firstName ? trip.driver.firstName|first|upper : '?' }}
-                                        </div>
+                                        {{ ui.avatar(trip.driver.firstName) }}
                                         <div>
                                             <div style="font-weight:600;color:#1e3a5f;font-size:.875rem;">
                                                 {{ trip.driver.firstName ?? '' }} {{ trip.driver.lastName ?? '' }}
@@ -103,16 +102,7 @@
                                         </div>
                                     </div>
 
-                                    {# Badge statut #}
-                                    {% if trip.status.value == 'full' %}
-                                        <span class="trip-badge trip-badge--full">Complet</span>
-                                    {% elseif trip.status.value == 'cancelled' %}
-                                        <span class="trip-badge trip-badge--cancelled">Annulé</span>
-                                    {% else %}
-                                        <span class="trip-badge trip-badge--open">
-                                            {{ trip.availableSeats }} place{{ trip.availableSeats > 1 ? 's' : '' }}
-                                        </span>
-                                    {% endif %}
+                                    {{ ui.trip_seats_badge(trip) }}
                                 </div>
 
                                 {# Route #}

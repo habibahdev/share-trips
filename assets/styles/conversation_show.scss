@@ -13,7 +13,8 @@
     margin-bottom: 1.25rem;
 }
 .conv-back-link {
-    width: 40px; height: 40px;
+    width: 40px;
+    height: 40px;
     border-radius: 12px;
     background: #fff;
     border: 1.5px solid #f1f5f9;
@@ -32,18 +33,6 @@
     color: #1d4ed8;
 }
 
-.conv-show-avatar {
-    width: 48px; height: 48px;
-    border-radius: 50%;
-    background: #1d4ed8;
-    color: #fff;
-    font-weight: 800;
-    font-size: 1.15rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
 .conv-show-meta {
     flex: 1;
     overflow: hidden; 
@@ -129,20 +118,6 @@
 .conv-msg-row--mine {
     align-self: flex-end;
     flex-direction: row-reverse;
-}
-
-.conv-msg-avatar {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: #dbeafe;
-    color: #1d4ed8;
-    font-weight: 700;
-    font-size: .7rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    margin-bottom: 2px;
 }
 
 /* Bulles */

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Controller\AbstractAppController;
 use App\Entity\Booking;
 use App\Entity\Review;
 use App\Entity\User;
@@ -9,7 +10,6 @@ use App\Enum\BookingStatus;
 use App\Form\ReviewType;
 use App\Repository\ReviewRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
  * Contrôleur responsable des avis utilisateurs.
  */
 #[Route('/review', name: 'app_review_')]
-final class ReviewController extends AbstractController
+final class ReviewController extends AbstractAppController
 {
     /**
      * Laisser un avis sur un conducteur.
@@ -36,10 +36,7 @@ final class ReviewController extends AbstractController
         EntityManagerInterface $entityManager,
         ReviewRepository $reviewRepository
     ): Response {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $user = $this->getAppUser();
         if ($booking->getPassenger()->getId() !== $user->getId()) {
             $this->addFlash('warning', 'Vous ne pouvez pas noter cette réservation.');
             return $this->redirectToRoute('app_profile_booking');

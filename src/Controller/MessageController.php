@@ -2,15 +2,14 @@
 
 namespace App\Controller;
 
+use App\Controller\AbstractAppController;
 use App\Entity\Conversation;
 use App\Entity\Message;
 use App\Entity\Trip;
-use App\Entity\User;
 use App\Repository\ConversationRepository;
 use App\Repository\MessageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +19,7 @@ use Symfony\Component\Routing\Attribute\Route;
  * Contrôleur responsable de la gestion des messages.
  */
 #[Route('/conversations', name: 'app_conversation_')]
-final class MessageController extends AbstractController
+final class MessageController extends AbstractAppController
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -33,8 +32,8 @@ final class MessageController extends AbstractController
     public function open(int $tripId): Response
     {
         $trip = $this->entityManager->find(Trip::class, $tripId);
-        $user = $this->getUser();
-        if (!$user instanceof User) {
+        $user = $this->getAppUser();
+        if ($trip->getDriver()->getId() === $user->getId()) {
             throw $this->createAccessDeniedException();
         }
 
@@ -56,10 +55,7 @@ final class MessageController extends AbstractController
     #[Route('/{id}', name: 'show')]
     public function show(Conversation $conversation): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $user = $this->getAppUser();
         $this->denyAccessUnlessGranted('CONVERSATION_VIEW', $conversation);
         $this->messageRepository->markAsReadInConversation($conversation, $user);
         return $this->render('conversation/show.html.twig', [
@@ -75,10 +71,7 @@ final class MessageController extends AbstractController
         if (!$content) {
             return $this->json(['error' => 'Message vide'], 400);
         }
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $user = $this->getAppUser();
         $message = new Message();
         $message->setConversation($conversation)
             ->setSender($user)
@@ -93,10 +86,7 @@ final class MessageController extends AbstractController
     #[Route('/', name: 'list')]
     public function list(PaginatorInterface $paginator, Request $request): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $user = $this->getAppUser();
         $conversations = $paginator->paginate(
             $this->conversationRepository->findAllForUserQuery($user),
             $request->query->getInt('page', 1),
@@ -111,10 +101,7 @@ final class MessageController extends AbstractController
     public function poll(Conversation $conversation, Request $request): JsonResponse
     {
         $this->denyAccessUnlessGranted('CONVERSATION_VIEW', $conversation);
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $user = $this->getAppUser();
         $lastId = $request->query->getInt('lastId', 0);
         $messages = $this->messageRepository->findNewerThan($conversation, $lastId);
         $this->messageRepository->markAsReadInConversation($conversation, $user);
@@ -131,10 +118,7 @@ final class MessageController extends AbstractController
     #[Route('/unread-count', name: 'unread_count', methods: ['GET'])]
     public function unreadCount(): JsonResponse
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $user = $this->getAppUser();
         return $this->json([
             'count' => $this->messageRepository->countUnreadForUser($user)
         ]);

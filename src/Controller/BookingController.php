@@ -2,16 +2,16 @@
 
 namespace App\Controller;
 
+use App\Controller\AbstractAppController;
 use App\Entity\Booking;
 use App\Entity\Payment;
-use App\Entity\User;
 use App\Enum\BookingStatus;
 use App\Form\BookingType;
 use App\Repository\BookingRepository;
 use App\Repository\TripRepository;
+use App\Security\BookingVoter;
 use App\Service\StripeService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Attribute\Route;
  * Contrôleur responsable de la gestion des réservations.
  */
 #[Route('/booking', name: 'app_booking_')]
-final class BookingController extends AbstractController
+final class BookingController extends AbstractAppController
 {
     public function __construct(private EntityManagerInterface $entityManager)
     {
@@ -43,10 +43,7 @@ final class BookingController extends AbstractController
         StripeService $stripe,
         BookingRepository $bookingRepository
     ): Response {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $user = $this->getAppUser();
 
         $trip = $tripRepository->find($tripId);
         if (!$trip) {
@@ -67,6 +64,10 @@ final class BookingController extends AbstractController
             $this->addFlash('danger', 'Ce trajet est complet.');
             return $this->redirectToRoute('app_trip_show', ['id' => $tripId]);
         }
+        if ($bookingRepository->hasActiveBooking($trip, $user)) {
+            $this->addFlash('warning', 'Vous avez déjà une réservation active pour ce trajet.');
+            return $this->redirectToRoute('app_trip_show', ['id' => $tripId]);
+        }
         $booking = new Booking();
         $booking->setPassenger($user);
         $booking->setTrip($trip);
@@ -80,10 +81,6 @@ final class BookingController extends AbstractController
             $payment->setAmount($booking->getTotalPrice());
             $payment->setBooking($booking);
             $booking->setPayment($payment);
-            if ($bookingRepository->hasActiveBooking($trip, $user)) {
-                $this->addFlash('warning', 'Vous avez déjà une réservation active pour ce trajet.');
-                return $this->redirectToRoute('app_trip_show', ['id' => $tripId]);
-            }
             $this->entityManager->persist($booking);
             $this->entityManager->persist($payment);
             $this->entityManager->flush();
@@ -107,13 +104,8 @@ final class BookingController extends AbstractController
     #[Route('/{booking}/stripe/success', name: 'stripe_success')]
     public function stripeSuccess(Booking $booking): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
-        if ($booking->getPassenger()->getId() !== $user->getId()) {
-            return $this->redirectToRoute('app_home');
-        }
+        $this->getAppUser();
+        $this->denyAccessUnlessGranted(BookingVoter::VIEW, $booking);
         return $this->render('booking/success.html.twig', [
             'booking' => $booking,
             'trip' => $booking->getTrip()
@@ -129,13 +121,8 @@ final class BookingController extends AbstractController
     #[Route('/{booking}/stripe/cancel', name: 'stripe_cancel')]
     public function stripeCancel(Booking $booking): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
-        if ($booking->getPassenger()->getId() !== $user->getId()) {
-            return $this->redirectToRoute('app_home');
-        }
+        $this->getAppUser();
+        $this->denyAccessUnlessGranted(BookingVoter::VIEW, $booking);
         $payment = $booking->getPayment();
         if ($payment && !$payment->getStatus()->isFinal()) {
             $payment->markAsFailed();
@@ -157,13 +144,8 @@ final class BookingController extends AbstractController
     #[Route('/{booking}/success', name: 'add_success')]
     public function success(Booking $booking): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
-        if ($booking->getPassenger()->getId() !== $user->getId()) {
-            return $this->redirectToRoute('app_home');
-        }
+        $this->getAppUser();
+        $this->denyAccessUnlessGranted(BookingVoter::VIEW, $booking);
         return $this->render('booking/success.html.twig', [
             'booking' => $booking,
             'trip' => $booking->getTrip(),

@@ -20,27 +20,18 @@
     transition: background .15s;
     cursor: pointer;
 }
-.conv-list-item:hover { background: #f8fafc; }
-.conv-list-item--unread { background: #eff6ff; }
-.conv-list-item--unread:hover { background: #dbeafe; }
+.conv-list-item:hover {
+    background: #f8fafc;
+}
 
-.conv-avatar {
-    width: 48px; height: 48px;
-    border-radius: 50%;
+.conv-list-item--unread {
+    background: #eff6ff;
+}
+
+.conv-list-item--unread:hover {
     background: #dbeafe;
-    color: #1d4ed8;
-    font-weight: 800;
-    font-size: 1.15rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    position: relative;
 }
-.conv-avatar--active {
-    background: #1d4ed8;
-    color: #fff; 
-}
+
 .conv-avatar-dot {
     position: absolute;
     top: 1px; right: 1px;

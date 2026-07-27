@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Dto\TripSearchCriteria;
 use App\Repository\TripRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,23 +24,19 @@ final class HomeController extends AbstractController
     #[Route('/', name: 'app_home')]
     public function index(Request $request, TripRepository $tripRepository): Response
     {
-        $origin = $request->query->get('origin');
-        $destination = $request->query->get('destination');
-        $dateString = $request->query->get('date');
-        $date = null;
-        if ($dateString) {
-            try {
-                $date = new \DateTimeImmutable($dateString);
-            } catch (\Exception) {
-                $date = null;
-            }
-        }
-        $nextTrips = $tripRepository->findAvailableTrips($origin, $destination, $date);
+        $criteria = TripSearchCriteria::fromRequest($request);
+
+        $nextTrips = $tripRepository->findAvailableTrips(
+            $criteria->origin,
+            $criteria->destination,
+            $criteria->date
+        );
+
         return $this->render('home/index.html.twig', [
             'nextTrips' => $nextTrips,
-            'origin' => $origin,
-            'destination' => $destination,
-            'date' => $date
+            'origin' => $criteria->origin,
+            'destination' => $criteria->destination,
+            'date' => $criteria->date
         ]);
     }
 }
