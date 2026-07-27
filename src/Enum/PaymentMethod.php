@@ -5,7 +5,7 @@ namespace App\Enum;
 enum PaymentMethod: string
 {
     case Card = 'card';
-    case Cash = 'espèce';
+    case Cash = 'cash';
 
     public function label(): string
     {

@@ -2,17 +2,17 @@
 
 namespace App\Controller\Profile;
 
-use App\Entity\User;
+use App\Controller\AbstractAppController;
 use App\Entity\Vehicle;
 use App\Form\VehicleType;
+use App\Security\VehicleVoter;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/profile/vehicle', name: 'app_profile_vehicle')]
-final class VehicleController extends AbstractController
+final class VehicleController extends AbstractAppController
 {
     public function __construct(private EntityManagerInterface $entityManager)
     {
@@ -21,10 +21,7 @@ final class VehicleController extends AbstractController
     #[Route('', name: '')]
     public function index(): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $user = $this->getAppUser();
         return $this->render('profile/vehicle/index.html.twig', [
             'vehicles' => $user->getVehicles(),
         ]);
@@ -33,12 +30,9 @@ final class VehicleController extends AbstractController
     #[Route('/form/{vehicle}', name: '_form', defaults: ['vehicle' => null])]
     public function form(?Vehicle $vehicle, Request $request): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
-        if ($vehicle && $vehicle->getUsser() !== $user) {
-            return $this->redirectToRoute('app_profile_vehicle');
+        $user = $this->getAppUser();
+        if ($vehicle) {
+            $this->denyAccessUnlessGranted(VehicleVoter::EDIT, $vehicle);
         }
         if (!$vehicle) {
             $vehicle = new Vehicle();
@@ -60,10 +54,9 @@ final class VehicleController extends AbstractController
     #[Route('/profile/vehicle/delete/{vehicle}', name: '_delete', methods: ['POST'])]
     public function delete(Vehicle $vehicle, Request $request): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $user = $this->getAppUser();
+        $this->denyAccessUnlessGranted(VehicleVoter::EDIT, $vehicle);
+
         if (
             !$this->isCsrfTokenValid(
                 'delete_vehicle_' . $vehicle->getId(),

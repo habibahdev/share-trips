@@ -80,6 +80,7 @@ class Payment
     public function __construct()
     {
         $this->status = PaymentStatus::Pending;
+        $this->method = PaymentMethod::Card;
     }
 
     public function __toString(): string
@@ -259,7 +260,7 @@ class Payment
         return $this;
     }
 
-    public function getMethod(): PaymentMethod
+    public function getMethod(): ?PaymentMethod
     {
         return $this->method;
     }

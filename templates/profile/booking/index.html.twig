@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/_ui.html.twig' as ui %}
 
 {% block title %}Mes réservations - Share Trips{% endblock %}
 
@@ -174,21 +175,14 @@
 
                             <div class="col-md-2 text-md-center">
                                 <div class="price-tag mb-1">{{ booking.totalPrice|number_format(2, ',', ' ') }}€</div>
-                                <span class="status-badge
-                                    {% if booking.status == constant('App\\Enum\\BookingStatus::Confirmed') %}status-confirmed
-                                    {% elseif booking.status == constant('App\\Enum\\BookingStatus::Pending') %}status-pending
-                                    {% else %}status-cancelled{% endif %}">
-                                    {% if booking.status == constant('App\\Enum\\BookingStatus::Confirmed') %}Confirmée
-                                    {% elseif booking.status == constant('App\\Enum\\BookingStatus::Pending') %}En attente
-                                    {% else %}Annulée{% endif %}
-                                </span>
+                                {{ ui.booking_status_badge(booking) }}
                             </div>
 
                             <div class="col-md-3 d-flex gap-2 justify-content-md-end flex-wrap">
                                 <a href="{{ path('app_profile_booking_show', { booking: booking.id }) }}" class="btn-detail">
                                     <i class="bi bi-eye"></i> Détail
                                 </a>
-                                {% if booking.status != constant('App\\Enum\\BookingStatus::Cancelled') and booking.trip.departureAt > date() %}
+                                {% if booking.status.value != 'cancelled' and booking.trip.departureAt > date() %}
                                     <form method="post" action="{{ path('app_profile_booking_cancel', { booking: booking.id }) }}"
                                           onsubmit="return confirm('Annuler cette réservation ?')"
                                           style="display:contents;">
@@ -198,7 +192,7 @@
                                         </button>
                                     </form>
                                 {% endif %}
-                                {% if booking.status == constant('App\\Enum\\BookingStatus::Confirmed')
+                                {% if booking.status.value == 'confirmed'
                                     and booking.trip.departureAt < date() %}
                                     <a href="{{ path('app_review_add', { id: booking.id }) }}"
                                        class="btn-detail"
@@ -206,7 +200,7 @@
                                         <i class="bi bi-star"></i> Noter
                                     </a>
                                 {% endif %}
-                                {% if booking.status == constant('App\\Enum\\BookingStatus::Confirmed') and booking.trip.departureAt < date() %}
+                                {% if booking.status.value == 'confirmed' and booking.trip.departureAt < date() %}
                                     <a href="{{ path('app_report_add', { id: booking.id }) }}"
                                         class="btn-detail"
                                         style="background:#fee2e2;color:#b91c1c;border-color:#fca5a5;">

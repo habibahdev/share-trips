@@ -325,6 +325,12 @@ class AppFixtures extends Fixture
         $manager->persist($booking1);
         $manager->persist($payment1);
 
+        $booking3 = $this->createBooking($trip, $passengers[2], 1, BookingStatus::Pending);
+        $payment3 = $this->createPayment($booking3, $passengers[2], PaymentStatus::Completed, PaymentMethod::Cash);
+        $booking3->setPayment($payment3);
+        $manager->persist($booking3);
+        $manager->persist($payment3);
+
         // Réservation en attente de confirmation conducteur
         $booking2 = $this->createBooking($trip, $passengers[1], 1, BookingStatus::Pending);
         $payment2 = $this->createPayment($booking2, $passengers[1], PaymentStatus::Completed, PaymentMethod::Cash);

@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/_ui.html.twig' as ui %}
 
 {% block title %}Mon profil : mes trajets - Share Trips{% endblock %}
 
@@ -45,27 +46,18 @@
                             </div>
                             <div class="col-md-2 text-md-center">
                                 <div class="price-tag mb-1">{{ trip.pricePerSeat }}€</div>
-                                <span class="status-badge
-                                    {% if trip.status == constant('App\\Enum\\TripStatus::Open') %}status-open
-                                    {% elseif trip.status == constant('App\\Enum\\TripStatus::Full') %}status-full
-                                    {% elseif trip.status == constant('App\\Enum\\TripStatus::Cancelled') %}status-cancelled
-                                    {% else %}status-completed{% endif %}">
-                                    {% if trip.status == constant('App\\Enum\\TripStatus::Open') %}Disponible
-                                    {% elseif trip.status == constant('App\\Enum\\TripStatus::Full') %}Complet
-                                    {% elseif trip.status == constant('App\\Enum\\TripStatus::Cancelled') %}Annulé
-                                    {% else %}Terminé{% endif %}
-                                </span>
+                                {{ ui.trip_status_badge(trip) }}
                             </div>
                             <div class="col-md-3 d-flex gap-2 justify-content-md-end">
                                 <a href="{{ path('app_profile_trip_show', { trip: trip.id }) }}" class="btn-action btn-action-show" title="Voir"><i class="bi bi-eye"></i></a>
-                                {% if trip.status == constant('App\\Enum\\TripStatus::Open') %}
+                                {% if trip.status.value == 'open' %}
                                     <a href="{{ path('app_profile_trip_form', { trip: trip.id }) }}"
                                        class="btn-action btn-action-edit" title="Modifier">
                                         <i class="bi bi-pencil"></i>
                                     </a>
                                 {% endif %}
-                                {% if trip.status != constant('App\\Enum\\TripStatus::Cancelled')
-                                    and trip.status != constant('App\\Enum\\TripStatus::Completed')
+                                {% if trip.status.value != 'cancelled'
+                                    and trip.status.value != 'completed'
                                     and trip.departureAt > date() %}
                                     <form method="post"
                                           action="{{ path('app_profile_trip_cancel', { trip: trip.id }) }}"

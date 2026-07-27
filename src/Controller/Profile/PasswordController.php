@@ -2,16 +2,15 @@
 
 namespace App\Controller\Profile;
 
-use App\Entity\User;
+use App\Controller\AbstractAppController;
 use App\Form\ChangePasswordType;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class PasswordController extends AbstractController
+final class PasswordController extends AbstractAppController
 {
     #[Route('/profile/password', name: 'app_profile_password')]
     public function index(
@@ -19,10 +18,7 @@ final class PasswordController extends AbstractController
         UserPasswordHasherInterface $hasher,
         EntityManagerInterface $entityManager
     ): Response {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $user = $this->getAppUser();
         $form = $this->createForm(ChangePasswordType::class, $user);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {

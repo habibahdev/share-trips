@@ -13,10 +13,76 @@
                 </a>
 
                 <h1 style="font-size:1.5rem;font-weight:800;color:#1e3a5f;margin:.5rem 0 1.5rem;">
-                    Modifier mes documents
+                    Vérification d'identité
                 </h1>
 
-                
+                <div class="edit-card">
+
+                    {% if user.identityDocument %}
+                        <div style="background:#fef9c3;border:1.5px solid #fde68a;border-radius:12px;
+                                    padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:flex-start;gap:.75rem;">
+                            <i class="bi bi-hourglass-split" style="color:#854d0e;font-size:1.1rem;flex-shrink:0;margin-top:2px;"></i>
+                            <div>
+                                <div style="font-weight:700;color:#854d0e;font-size:.9rem;">
+                                    Document en cours de vérification
+                                </div>
+                                <p style="font-size:.85rem;color:#854d0e;margin:.25rem 0 0;">
+                                    Notre équipe examine votre document. Vous pouvez en soumettre un nouveau
+                                    ci-dessous s'il ne convient pas.
+                                </p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p style="font-size:.9rem;color:#64748b;margin-bottom:1.5rem;">
+                            Envoyez une pièce d'identité (permis de conduire) pour obtenir le badge
+                            <strong>Conducteur vérifié</strong> et rassurer vos passagers.
+                        </p>
+                    {% endif %}
+
+                    {{ form_start(form, {
+                        'attr': {
+                            'novalidate': 'novalidate',
+                            'enctype': 'multipart/form-data'
+                        }
+                    }) }}
+
+                        <div class="mb-4">
+                            <label class="edit-label" for="{{ form.identityDocument.vars.id }}">
+                                <i class="bi bi-file-earmark-arrow-up me-1"></i>Pièce d'identité
+                            </label>
+                            {{ form_widget(form.identityDocument, {
+                                'attr': {
+                                    'class': 'edit-input' ~ (form.identityDocument.vars.errors|length ? ' is-invalid' : '')
+                                }
+                            }) }}
+                            {% if form.identityDocument.vars.help %}
+                                <div style="font-size:.78rem;color:#94a3b8;margin-top:.4rem;display:flex;align-items:center;gap:5px;">
+                                    <i class="bi bi-info-circle"></i> {{ form.identityDocument.vars.help }}
+                                </div>
+                            {% endif %}
+                            {% if form.identityDocument.vars.errors|length %}
+                                {% for error in form.identityDocument.vars.errors %}
+                                    <div class="invalid-feedback-st">
+                                        <i class="bi bi-exclamation-circle-fill"></i>{{ error.message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn-save">
+                                <i class="bi bi-check2"></i>
+                                {{ user.identityDocument ? 'Renvoyer un document' : 'Envoyer le document' }}
+                            </button>
+                            <a href="{{ path('app_profile') }}" class="btn-cancel">
+                                Annuler
+                            </a>
+                        </div>
+
+                    {{ form_end(form) }}
+
+                </div>
+
             </div>
         </div>
     </div>

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Dto\TripSearchCriteria;
 use App\Entity\Trip;
 use App\Repository\TripRepository;
 use Knp\Component\Pager\PaginatorInterface;
@@ -28,18 +29,12 @@ final class TripController extends AbstractController
         Request $request,
         PaginatorInterface $paginator
     ): Response {
-        $origin = $request->query->get('origin');
-        $destination = $request->query->get('destination');
-        $dateString = $request->query->get('date');
-        $date = null;
-        if ($dateString) {
-            try {
-                $date = new \DateTimeImmutable($dateString);
-            } catch (\Exception) {
-                $date = null;
-            }
-        }
-        $query = $tripRepository->findAvailableTripsQuery($origin, $destination, $date);
+        $criteria = TripSearchCriteria::fromRequest($request);
+        $query = $tripRepository->findAvailableTripsQuery(
+            $criteria->origin,
+            $criteria->destination,
+            $criteria->date
+        );
         $trips = $paginator->paginate(
             $query,
             $request->query->getInt('page', 1),
@@ -47,9 +42,9 @@ final class TripController extends AbstractController
         );
         return $this->render('trip/index.html.twig', [
             'trips' => $trips,
-            'origin' => $origin,
-            'destination' => $destination,
-            'date' => $date,
+            'origin' => $criteria->origin,
+            'destination' => $criteria->destination,
+            'date' => $criteria->date,
         ]);
     }
 

@@ -103,7 +103,7 @@ class UserCrudController extends AbstractCrudController
             DateField::new('suspendedUntil', 'Suspendu jusqu\'au')->hideOnIndex(),
             TextareaField::new('adminNote', 'Note admin')->hideOnIndex(),
             DateTimeField::new('createdAt', 'Inscrit le')->onlyOnIndex()->hideOnForm(),
-            BooleanField::new('isDentityVerified', 'Identité vérifiée'),
+            BooleanField::new('isIdentityVerified', 'Identité vérifiée'),
             DateTimeField::new('identityVerifiedAt', 'Vérifiée le')->hideOnForm()->hideOnIndex(),
             UrlField::new('identityDocumentUrl', 'Document d\'identité')
                 ->formatValue(function ($value, User $user) {

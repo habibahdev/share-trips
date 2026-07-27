@@ -2,20 +2,21 @@
 
 namespace App\Controller\Profile;
 
+use App\Controller\AbstractAppController;
 use App\Entity\Booking;
 use App\Entity\Trip;
-use App\Entity\User;
 use App\Enum\TripStatus;
 use App\Form\TripType;
+use App\Security\BookingVoter;
+use App\Security\TripVoter;
 use App\Service\BookingService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/profile/trip', name: 'app_profile_trip')]
-final class TripController extends AbstractController
+final class TripController extends AbstractAppController
 {
     public function __construct(
         private BookingService $bookingService,
@@ -26,10 +27,7 @@ final class TripController extends AbstractController
     #[Route('', name: '')]
     public function index(): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $user = $this->getAppUser();
         return $this->render('profile/trip/index.html.twig', [
             'trips' => $user->getTripsAsDriver()
         ]);
@@ -38,10 +36,18 @@ final class TripController extends AbstractController
     #[Route('/form/{trip}', name: '_form', defaults: ['trip' => null])]
     public function form(?Trip $trip, Request $request): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
+        $user = $this->getAppUser();
+        if ($trip) {
+            $this->denyAccessUnlessGranted(TripVoter::EDIT, $trip);
+            if ($trip->getStatus() === TripStatus::Cancelled || $trip->getStatus() === TripStatus::Full) {
+                $this->addFlash(
+                    'danger',
+                    'iMpossible de modifier un trajet annulé ou complet.'
+                );
+                return $this->redirectToRoute('app_profile_trip');
+            }
         }
+
         if ($user->getVehicles()->isEmpty()) {
             $this->addFlash(
                 'warning',
@@ -49,26 +55,24 @@ final class TripController extends AbstractController
             );
             return $this->redirectToRoute('app_profile_vehicle_form');
         }
+
         if (!$trip) {
             $trip = new Trip();
             $trip->setDriver($user);
-        } else {
-            if ($trip->getDriver()->getId() !== $user->getId()) {
-                return $this->redirectToRoute('app_profile_trip');
-            }
-            if ($trip->getStatus() === TripStatus::Cancelled || $trip->getStatus() === TripStatus::Full) {
-                $this->addFlash('danger', 'Impossible de modifier un trajet annulé ou complet.');
-                return $this->redirectToRoute('app_profile_trip');
-            }
         }
+
         $form = $this->createForm(TripType::class, $trip, [
             'vehicles' => $user->getVehicles()
         ]);
+
         $form->handleRequest($request);
+
         if ($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->persist($trip);
             $this->entityManager->flush();
+
             $this->addFlash('success', 'Trajet sauvegardé.');
+
             return $this->redirectToRoute('app_profile_trip');
         }
         return $this->render('profile/trip/form.html.twig', [
@@ -81,10 +85,8 @@ final class TripController extends AbstractController
     #[Route('/cancel/{trip}', name: '_cancel', methods: ['POST'])]
     public function cancel(Trip $trip, Request $request): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $this->getAppUser();
+        $this->denyAccessUnlessGranted(TripVoter::EDIT, $trip);
         if (
             !$this->isCsrfTokenValid(
                 'cancel_trip_' . $trip->getId(),
@@ -94,9 +96,7 @@ final class TripController extends AbstractController
             $this->addFlash('danger', 'Problème inconnu.');
             return $this->redirectToRoute('app_profile_trip');
         }
-        if ($trip->getDriver()->getId() !== $user->getId()) {
-            return $this->redirectToRoute('app_profile_trip');
-        }
+
         try {
             $refundErrors = $this->bookingService->cancelTrip($trip);
             foreach ($refundErrors as $error) {
@@ -112,14 +112,10 @@ final class TripController extends AbstractController
     #[Route('/bookings/{booking}/confirm', name: '_booking_confirm', methods: ['POST'])]
     public function confirmBooking(Booking $booking, Request $request): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
+        $this->getAppUser();
+        $this->denyAccessUnlessGranted(BookingVoter::CONFIRM, $booking);
         $trip = $booking->getTrip();
-        if ($trip->getDriver()->getId() !== $user->getId()) {
-            throw $this->createAccessDeniedException('Accès refusé.');
-        }
+
         if (
             !$this->isCsrfTokenValid(
                 'confirm_booking_' . $booking->getId(),
@@ -141,13 +137,8 @@ final class TripController extends AbstractController
     #[Route('/{trip}', name: '_show')]
     public function show(Trip $trip): Response
     {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw $this->createAccessDeniedException();
-        }
-        if ($trip->getDriver()->getId() !== $user->getId()) {
-            return $this->redirectToRoute('app_profile_trip');
-        }
+        $this->getAppUser();
+        $this->denyAccessUnlessGranted(TripVoter::VIEW, $trip);
         return $this->render('profile/trip/show.html.twig', [
             'trip' => $trip
         ]);

@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/_ui.html.twig' as ui %}
 
 {% block title %}Détails de la réservation - Share Trips{% endblock %}
 
@@ -22,33 +23,17 @@
                     <i class="bi bi-person-check"></i> {{ booking.seatsBooked }} place{{ booking.seatsBooked > 1 ? 's' : '' }} réservée{{ booking.seatsBooked > 1 ? 's' : '' }}
                 </div>
                 <div class="trip-summary-meta">
-                    <span class="status-badge
-                        {% if booking.trip.status == constant('App\\Enum\\TripStatus::Open') %}status-open
-                        {% elseif booking.trip.status == constant('App\\Enum\\TripStatus::Full') %}status-full
-                        {% elseif booking.trip.status == constant('App\\Enum\\TripStatus::Cancelled') %}status-cancelled
-                        {% else %}status-completed{% endif %}">
-                        {% if booking.trip.status == constant('App\\Enum\\TripStatus::Open') %}Disponible
-                        {% elseif booking.trip.status == constant('App\\Enum\\TripStatus::Full') %}Complet
-                        {% elseif booking.trip.status == constant('App\\Enum\\TripStatus::Cancelled') %}Annulé
-                        {% else %}Terminé{% endif %}
-                    </span>
+                    {{ ui.trip_status_badge(booking.trip) }}
                 </div>
                 <div class="trip-summary-meta mt-1">
-                    <span class="status-badge
-                        {% if booking.status == constant('App\\Enum\\BookingStatus::Confirmed') %}status-confirmed
-                        {% elseif booking.status == constant('App\\Enum\\BookingStatus::Pending') %}status-pending
-                        {% else %}status-cancelled{% endif %}">
-                        {% if booking.status == constant('App\\Enum\\BookingStatus::Confirmed') %}Réservation confirmée
-                        {% elseif booking.status == constant('App\\Enum\\BookingStatus::Pending') %}En attente de confirmation
-                        {% else %}Réservation annulée{% endif %}
-                    </span>
+                    {{ ui.booking_status_badge(booking) }}
                 </div>
             </div>
 
             <div style="margin-bottom:1rem;">
                 <div class="info-label">Conducteur</div>
                 <div class="d-flex align-items-center gap-2">
-                    <div class="driver-avatar">{{ booking.trip.driver.firstName ? booking.trip.driver.firstName|first|upper : '?' }}</div>
+                    {{ ui.avatar(booking.trip.driver.firstName, 'driver-avatar') }}
                     <div>
                         <div class="info-value">{{ booking.trip.driver.firstName ?? '' }} {{ booking.trip.driver.lastName ?? '' }}</div>
                         {% if booking.trip.driver.phone %}
@@ -81,27 +66,12 @@
                             {{ booking.payment.method ? booking.payment.method.label() : 'N/A' }}
                         </span>
 
-                        {% set ps = booking.payment.status %}
-                        <span class="status-badge
-                            {% if ps == constant('App\\Enum\\PaymentStatus::Completed') %}status-confirmed
-                            {% elseif ps == constant('App\\Enum\\PaymentStatus::Pending') %}status-pending
-                            {% elseif ps == constant('App\\Enum\\PaymentStatus::Refunded') %}status-open
-                            {% else %}status-cancelled{% endif %}">
-                            {% if ps == constant('App\\Enum\\PaymentStatus::Completed') %}
-                                <i class="bi bi-check-circle me-1"></i>Payé
-                            {% elseif ps == constant('App\\Enum\\PaymentStatus::Pending') %}
-                                <i class="bi bi-hourglass-split me-1"></i>En attente
-                            {% elseif ps == constant('App\\Enum\\PaymentStatus::Refunded') %}
-                                <i class="bi bi-arrow-counterclockwise me-1"></i>Remboursé
-                            {% else %}
-                                <i class="bi bi-x-circle me-1"></i>Échoué
-                            {% endif %}
-                        </span>
+                        {{ ui.payment_status_badge(booking.payment) }}
 
                     </div>
 
-                    {% if ps == constant('App\\Enum\\PaymentStatus::Pending')
-                        and booking.status != constant('App\\Enum\\BookingStatus::Cancelled') %}
+                    {% if booking.payment.status.value == 'pending'
+                        and booking.status.value != 'cancelled' %}
 
                         <div class="mt-3 p-3"
                              style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px;">
@@ -141,7 +111,7 @@
             {% endif %}
 
             <div class="d-flex gap-3 flex-wrap mt-4">
-                {% if booking.status != constant('App\\Enum\\BookingStatus::Cancelled') %}
+                {% if booking.status.value != 'cancelled' %}
                     <form method="post"
                           action="{{ path('app_profile_booking_cancel', { booking: booking.id }) }}"
                           onsubmit="return confirm('Annuler cette réservation ?')"
@@ -152,7 +122,7 @@
                         </button>
                     </form>
                 {% endif %}
-                {% if booking.status == constant('App\\Enum\\BookingStatus::Confirmed') and booking.trip.departureAt < date() %}
+                {% if booking.status.value == 'confirmed' and booking.trip.departureAt < date() %}
                     <a href="{{ path('app_report_add', { id: booking.id }) }}" class="btn-report-link">
                         <i class="bi bi-flag"></i> Signaler le conducteur
                     </a>

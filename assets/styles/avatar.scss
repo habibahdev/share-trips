@@ -1,0 +1,103 @@
+// ═══════════════════════════════════════════════════════════════
+// SOURCE UNIQUE pour tous les avatars ronds "personne" (initiale(s)
+// dans un cercle coloré). Chaque classe nommée définit ICI sa forme,
+// sa couleur ET sa taille par défaut — plus aucune autre feuille SCSS
+// ne doit redéfinir width/height/font-size pour ces classes.
+//
+// Utilisation : class="{base} {modificateur de taille optionnel}"
+// ex: class="driver-avatar avatar--lg"
+// ═══════════════════════════════════════════════════════════════
+
+@mixin avatar-shape($size, $font-size, $bg: #1e3a5f, $color: #fff) {
+    width: $size;
+    height: $size;
+    border-radius: 50%;
+    background: $bg;
+    color: $color;
+    font-weight: 700;
+    font-size: $font-size;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+// Avatar générique (cartes de trajet en grille - home, liste trajets)
+.avatar {
+    @include avatar-shape(44px, .95rem);
+}
+
+// Avatar conducteur - taille par défaut unifiée à 50px
+// (auparavant 50px dans profile_booking_show.scss ET 56px dans trip_show.scss :
+// on retient 50px comme canonique, trip_show.scss ne redéfinit plus rien)
+.driver-avatar {
+    @include avatar-shape(50px, .9rem);
+    font-weight: 800;
+}
+
+// Variante compacte du conducteur (résumé de réservation)
+.driver-avatar-sm {
+    @include avatar-shape(36px, .8rem);
+}
+
+// Avatar passager - n'existait dans aucune feuille SCSS avant cette
+// unification (coquille silencieuse). Taille alignée sur driver-avatar-sm.
+.passenger-avatar {
+    @include avatar-shape(36px, .8rem);
+}
+
+// Avatars de conversation
+.conv-avatar {
+    @include avatar-shape(48px, 1.15rem, #dbeafe, #1d4ed8);
+    position: relative;
+}
+.conv-avatar--active {
+    background: #1d4ed8;
+    color: #fff;
+}
+
+.conv-show-avatar {
+    @include avatar-shape(48px, 1.15rem, #1d4ed8, #fff);
+}
+
+.conv-msg-avatar {
+    @include avatar-shape(28px, .7rem, #dbeafe, #1d4ed8);
+    margin-bottom: 2px;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Modificateurs de taille — se combinent avec n'importe quelle classe
+// ci-dessus pour l'exception ponctuelle (ex: driver-avatar en 64px sur
+// le profil public d'un conducteur). Le !important est nécessaire ici
+// car ces classes doivent pouvoir surcharger n'importe quel avatar de base.
+// ─────────────────────────────────────────────────────────────────
+
+.avatar--xs {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: .7rem !important;
+}
+
+.avatar--sm {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: .8rem !important;
+}
+
+.avatar--md {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: .95rem !important;
+}
+
+.avatar--lg {
+    width: 64px !important;
+    height: 64px !important;
+    font-size: 1.5rem !important;
+}
+
+.avatar--xl {
+    width: 80px !important;
+    height: 80px !important;
+    font-size: 1.6rem !important;
+}

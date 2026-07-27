@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+{% import 'macros/_ui.html.twig' as ui %}
 
 {% block title %}
     {{ conversation.getOtherParticipant(app.user).firstName }} -
@@ -15,9 +16,7 @@
             </a>
 
             {% set other = conversation.getOtherParticipant(app.user) %}
-            <div class="conv-show-avatar">
-                {{ other.firstName ? other.firstName|first|upper : '?' }}
-            </div>
+            {{ ui.avatar(other.firstName, 'conv-show-avatar') }}
 
             <div class="conv-show-meta">
                 <div class="conv-show-name">
@@ -55,9 +54,7 @@
                     {% set mine = (message.sender.id == app.user.id) %}
                     <div class="conv-msg-row {{ mine ? 'conv-msg-row--mine' }}">
                         {% if not mine %}
-                            <div class="conv-msg-avatar">
-                                {{ message.sender.firstName ? message.sender.firstName|first|upper : '?' }}
-                            </div>
+                            {{ ui.avatar(message.sender.firstName, 'conv-msg-avatar') }}
                         {% endif %}
                         <div class="conv-bubble {{ mine ? 'conv-bubble--mine' : 'conv-bubble--theirs' }}">
                             {{ message.content }}
