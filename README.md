@@ -24,22 +24,26 @@ Plateforme de covoiturage permettant de proposer et réserver des trajets entre 
 
 ShareTrips a été conçu pour :
 
-* simplifier l’organisation de trajets entre particuliers ;
-* mettre en pratique une architecture backend avec Symfony ;
-* simuler un projet proche de conditions réelles (Docker, CI).
+* simplifier l’organisation de trajets entre particuliers
+* mettre en pratique une architecture backend avec Symfony
+* simuler un projet proche de conditions réelles (Docker, CI)
 
 ## Fonctionnalités principales
 
-* authentification et gestion des utilisateurs ;
-* création et gestion de trajets ;
-* recherche de trajets ;
-* réservation de places ;
-* envoi d’e-mails (MailDev en local) ;
-* paiement en ligne (Stripe).
+* authentification et gestion des utilisateurs
+* création et gestion de trajets
+* recherche de trajets
+* réservation de places
+* envoi d’e-mails (MailDev en local)
+* paiement en ligne (Stripe)
+
+### Fonctionnalités à venir
+
+* clean architecture
 
 ## Documentation
 
-La documentation d’installation et d’utilisation est disponible dans **[docs/index.md](docs/index.md)**.
+Une documentation d’installation et d’utilisation est disponible [ici](docs/index.md).
 
 ## Crédit
 
