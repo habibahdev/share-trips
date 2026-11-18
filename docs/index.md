@@ -27,35 +27,21 @@ git clone git@github.com:habibahdev/share-trips.git
 cd share-trips
 ```
 
-### Dépendances JavaScript (hôte)
+### Dépendances JavaScript
 
 ```bash
 composer install
 npm install
 ```
 
-### Fichier d’environnement
+## Lancement du projet (en mode développement)
 
 Avec **`docker-compose.dev.yaml`**, le service construit déjà la base de données.
 
-### Démarrer Docker (environnement de développement)
 
 ```bash
 docker compose -f docker-compose.dev.yaml up -d --build
 ```
-
-### Migrations
-
-```bash
-docker compose exec app php bin/console make:migration
-docker compose exec app php bin/console doctrine:migrations:migrate -n
-```
-
-Raccourci : `d:m:m -n` au lieu de `doctrine:migrations:migrate -n`.
-
-## Lancement du projet
-
-**Application** : [http://localhost:8000](http://localhost:8000)
 
 ## Base de données
 
@@ -67,7 +53,7 @@ docker compose exec app php bin/console make:migration
 docker compose exec app php bin/console d:m:m -n
 ```
 
-### Jeu de données (fixtures)
+### Jeu de données
 
 ```bash
 docker compose exec app php bin/console doctrine:fixtures:load -n
@@ -86,6 +72,8 @@ npm run build
 ```bash
 npm run watch
 ```
+
+L'application est visible à l'adresse suivante : [http://localhost:8000](http://localhost:8000)
 
 ## Outils de développement
 

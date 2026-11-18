@@ -23,7 +23,7 @@ services:
     container_name: sharetrips_postgres
     restart: unless-stopped
     ports:
-      - "5433:5432"
+      - "5434:5432"
     environment:
       POSTGRES_DB: sharetrips
       POSTGRES_USER: tripsadmin
